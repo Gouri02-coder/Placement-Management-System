@@ -1,0 +1,177 @@
+<div class="student-details-container">
+  <header class="details-header">
+    <button class="back-btn" (click)="handleBack()">← Back to List</button>
+    <h1>Student Details</h1>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="handleEdit()">Edit Student</button>
+      <button class="btn-secondary" (click)="handlePrint()">Print Profile</button>
+    </div>
+  </header>
+
+  <div class="student-profile">
+    <div class="profile-header">
+      <div class="avatar">
+        <span>{{ getAvatarInitials() }}</span>
+      </div>
+      <div class="profile-info">
+        <h2>{{ student.personalInfo.fullName }}</h2>
+        <p class="student-id">ID: STU{{ student.id.toString().padStart(3, '0') }}</p>
+        <p class="status-badge" 
+           [class.status-placed]="student.placementInfo.status === 'Placed'"
+           [class.status-not-placed]="student.placementInfo.status === 'Not Placed'"
+           [class.status-internship]="student.placementInfo.status === 'Internship'">
+          {{ student.placementInfo.status }}
+        </p>
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <!-- Personal Information -->
+      <div class="detail-section">
+        <h3>Personal Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Full Name</label>
+            <span>{{ student.personalInfo.fullName }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Email</label>
+            <span>{{ student.personalInfo.email }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Phone</label>
+            <span>{{ student.personalInfo.phone }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Date of Birth</label>
+            <span>{{ formatDate(student.personalInfo.dateOfBirth) }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Address</label>
+            <span>{{ student.personalInfo.address }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Information -->
+      <div class="detail-section">
+        <h3>Academic Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Department</label>
+            <span>{{ student.academicInfo.department }}</span>
+          </div>
+          <div class="detail-item">
+            <label>CGPA</label>
+            <span>{{ student.academicInfo.cgpa.toFixed(1) }}/4.0</span>
+          </div>
+          <div class="detail-item">
+            <label>Current Semester</label>
+            <span>{{ student.academicInfo.currentSemester }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Expected Graduation</label>
+            <span>{{ student.academicInfo.expectedGraduation }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Major</label>
+            <span>{{ student.academicInfo.major }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placement Information -->
+      <div class="detail-section">
+        <h3>Placement Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Placement Status</label>
+            <span>{{ student.placementInfo.status }}</span>
+          </div>
+          
+          <!-- Company - Only show if placed -->
+          <div class="detail-item" *ngIf="student.placementInfo.company">
+            <label>Company</label>
+            <span>{{ student.placementInfo.company }}</span>
+          </div>
+          
+          <!-- Position - Only show if placed -->
+          <div class="detail-item" *ngIf="student.placementInfo.position">
+            <label>Position</label>
+            <span>{{ student.placementInfo.position }}</span>
+          </div>
+          
+          <!-- Package - Only show if placed -->
+          <div class="detail-item" *ngIf="student.placementInfo.package">
+            <label>Package</label>
+            <span>{{ student.placementInfo.package }}</span>
+          </div>
+          
+          <!-- Placement Date - Only show if placed and date exists -->
+          <div class="detail-item" *ngIf="student.placementInfo.placementDate">
+            <label>Placement Date</label>
+            <!-- FIX: Use the helper method or safe navigation -->
+            <span>{{ getPlacementDate() }}</span>
+            <!-- Alternative: <span>{{ formatDate(student.placementInfo.placementDate) }}</span> -->
+          </div>
+
+          <!-- Show message if not placed -->
+          <div class="detail-item full-width" *ngIf="student.placementInfo.status === 'Not Placed'">
+            <label>Placement Status</label>
+            <span class="not-placed-message">Student is currently not placed. Placement information will be available once the student gets placed.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills & Certifications -->
+      <div class="detail-section">
+        <h3>Skills & Certifications</h3>
+        <div class="skills-container">
+          <div class="skills-list">
+            <span class="skill-tag" *ngFor="let skill of student.skills">
+              {{ skill }}
+            </span>
+          </div>
+          <div class="no-data" *ngIf="student.skills.length === 0">
+            No skills recorded.
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Experience -->
+      <div class="detail-section">
+        <h3>Work Experience</h3>
+        <div class="experience-list">
+          <div class="experience-item" *ngFor="let exp of student.experience">
+            <h4>{{ exp.position }}</h4>
+            <div class="company">{{ exp.company }}</div>
+            <div class="duration">{{ exp.duration }}</div>
+            <p class="description">{{ exp.description }}</p>
+          </div>
+          <div class="no-data" *ngIf="student.experience.length === 0">
+            No work experience recorded.
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <div class="detail-section">
+        <h3>Projects</h3>
+        <div class="projects-list">
+          <div class="project-item" *ngFor="let project of student.projects">
+            <h4>{{ project.name }}</h4>
+            <div class="project-type">{{ project.type }}</div>
+            <div class="project-duration">{{ project.duration }}</div>
+            <p class="description">{{ project.description }}</p>
+            <div class="technologies">
+              <strong>Technologies:</strong> {{ project.technologies.join(', ') }}
+            </div>
+          </div>
+          <div class="no-data" *ngIf="student.projects.length === 0">
+            No projects recorded.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

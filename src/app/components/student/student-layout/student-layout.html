@@ -1,0 +1,44 @@
+<div class="student-layout">
+  <!-- Sidebar -->
+  <div class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <!-- Profile Section -->
+    <div class="profile-section">
+      <div class="avatar">{{ studentAvatar }}</div>
+      <div class="profile-info" *ngIf="!isSidebarCollapsed">
+        <h3>{{ studentName }}</h3>
+        <p>{{ studentEmail }}</p>
+        <div class="status-badge">Student</div>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        {{ isSidebarCollapsed ? '→' : '←' }}
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      <a 
+        *ngFor="let item of menuItems" 
+        [routerLink]="item.path" 
+        class="nav-item"
+        [class.active]="item.active"
+        (click)="setActiveItem(item)"
+      >
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <!-- Logout Section -->
+    <div class="logout-section">
+      <button class="logout-btn" (click)="logout()">
+        <span class="nav-icon">🚪</span>
+        <span class="nav-label" *ngIf="!isSidebarCollapsed">Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.collapsed]="isSidebarCollapsed">
+    <router-outlet></router-outlet>
+  </div>
+</div>
