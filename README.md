@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # PlacementManagementSystem
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
+=======
+# Frontend
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
 
 ## Development server
 

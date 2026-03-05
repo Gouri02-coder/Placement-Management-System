@@ -1,0 +1,218 @@
+<div class="student-form-container">
+  <header class="form-header">
+    <button type="button" class="back-btn" (click)="onCancel()">← Back</button>
+    <h1>{{ isEditMode ? 'Edit Student' : 'Add New Student' }}</h1>
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" (click)="loadSampleData()">Load Sample</button>
+      <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
+    </div>
+  </header>
+
+  <form class="student-form" (ngSubmit)="onSubmit()" #studentForm="ngForm">
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <h2>Personal Information</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            [(ngModel)]="student.personalInfo.fullName"
+            required
+            placeholder="Enter full name"
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="!student.personalInfo.fullName && studentForm.submitted">
+            Full name is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="student.personalInfo.email"
+            required
+            placeholder="Enter email address"
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="!student.personalInfo.email && studentForm.submitted">
+            Email is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            [(ngModel)]="student.personalInfo.phone"
+            required
+            placeholder="Enter phone number"
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="!student.personalInfo.phone && studentForm.submitted">
+            Phone number is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="dateOfBirth">Date of Birth *</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            name="dateOfBirth"
+            [(ngModel)]="student.personalInfo.dateOfBirth"
+            required
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="!student.personalInfo.dateOfBirth && studentForm.submitted">
+            Date of birth is required
+          </span>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address">Address</label>
+          <textarea
+            id="address"
+            name="address"
+            [(ngModel)]="student.personalInfo.address"
+            placeholder="Enter full address"
+            class="form-control"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Information Section -->
+    <div class="form-section">
+      <h2>Academic Information</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="department">Department *</label>
+          <select
+            id="department"
+            name="department"
+            [(ngModel)]="student.academicInfo.department"
+            required
+            class="form-control"
+          >
+            <option value="">Select Department</option>
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
+          <span class="error-message" *ngIf="!student.academicInfo.department && studentForm.submitted">
+            Department is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="cgpa">CGPA *</label>
+          <input
+            type="number"
+            id="cgpa"
+            name="cgpa"
+            [(ngModel)]="student.academicInfo.cgpa"
+            required
+            min="0"
+            max="4"
+            step="0.1"
+            placeholder="Enter CGPA"
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="(!student.academicInfo.cgpa && studentForm.submitted) || student.academicInfo.cgpa < 0">
+            Valid CGPA is required (0-4)
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="currentSemester">Current Semester *</label>
+          <select
+            id="currentSemester"
+            name="currentSemester"
+            [(ngModel)]="student.academicInfo.currentSemester"
+            required
+            class="form-control"
+          >
+            <option value="">Select Semester</option>
+            <option *ngFor="let semester of semesters" [value]="semester">{{ semester }}</option>
+          </select>
+          <span class="error-message" *ngIf="!student.academicInfo.currentSemester && studentForm.submitted">
+            Current semester is required
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="expectedGraduation">Expected Graduation *</label>
+          <input
+            type="month"
+            id="expectedGraduation"
+            name="expectedGraduation"
+            [(ngModel)]="student.academicInfo.expectedGraduation"
+            required
+            class="form-control"
+          >
+          <span class="error-message" *ngIf="!student.academicInfo.expectedGraduation && studentForm.submitted">
+            Expected graduation date is required
+          </span>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="major">Major/Specialization</label>
+          <input
+            type="text"
+            id="major"
+            name="major"
+            [(ngModel)]="student.academicInfo.major"
+            placeholder="Enter major or specialization"
+            class="form-control"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="form-section">
+      <h2>Skills & Technologies</h2>
+      <div class="skills-input-group">
+        <div class="skills-input">
+          <input
+            type="text"
+            [(ngModel)]="student.newSkill"
+            name="newSkill"
+            placeholder="Add a skill (e.g., JavaScript, Python, React)"
+            class="form-control"
+            (keyup.enter)="addSkill()"
+          >
+          <button type="button" class="add-skill-btn" (click)="addSkill()">Add Skill</button>
+        </div>
+        
+        <div class="skills-list" *ngIf="student.skills.length > 0">
+          <div class="skill-tag" *ngFor="let skill of student.skills">
+            {{ skill }}
+            <button type="button" class="remove-skill" (click)="removeSkill(skill)">×</button>
+          </div>
+        </div>
+        
+        <div class="no-skills" *ngIf="student.skills.length === 0">
+          No skills added yet. Start by adding some skills above.
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="submit" class="btn-submit">
+        {{ isEditMode ? 'Update Student' : 'Create Student' }}
+      </button>
+    </div>
+  </form>
+</div>

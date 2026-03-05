@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './modules/shared/components/navbar/navbar.component';
@@ -21,3 +22,21 @@ export class AppComponent {
     return !hideNavbarRoutes.some(route => currentRoute.includes(route));
   }
 }
+=======
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { StudentDashboard } from './components/student/student-dashboard/student-dashboard';
+import { StudentDetails } from './components/student/student-details/student-details';
+import { StudentList } from './components/student/student-list/student-list';
+import { StudentForm } from './components/student/student-form/student-form';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet,StudentDashboard,StudentDetails,StudentList,StudentForm],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App {
+  protected readonly title = signal('frontend');
+}
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4

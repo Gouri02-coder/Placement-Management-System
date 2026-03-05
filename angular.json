@@ -3,7 +3,11 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+<<<<<<< HEAD
     "placement-management-system": {
+=======
+    "frontend": {
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -14,6 +18,12 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+<<<<<<< HEAD
+=======
+            "polyfills": [
+              "zone.js"
+            ],
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -22,11 +32,16 @@
               }
             ],
             "styles": [
+<<<<<<< HEAD
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ]
             
          
+=======
+              "src/styles.css"
+            ]
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
           },
           "configurations": {
             "production": {
@@ -56,10 +71,17 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
+<<<<<<< HEAD
               "buildTarget": "placement-management-system:build:production"
             },
             "development": {
               "buildTarget": "placement-management-system:build:development"
+=======
+              "buildTarget": "frontend:build:production"
+            },
+            "development": {
+              "buildTarget": "frontend:build:development"
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
             }
           },
           "defaultConfiguration": "development"
@@ -70,6 +92,13 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+<<<<<<< HEAD
+=======
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               {
@@ -78,19 +107,26 @@
               }
             ],
             "styles": [
+<<<<<<< HEAD
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
 
             ],
             "scripts": [
             "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+=======
+              "src/styles.css"
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
             ]
           }
         }
       }
     }
+<<<<<<< HEAD
   },
   "cli": {
     "analytics": "1644da00-7ce1-430d-a0c7-6b1607df7471"
+=======
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
   }
 }

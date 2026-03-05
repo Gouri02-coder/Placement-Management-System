@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+<<<<<<< HEAD
 export const routes: Routes = [
   // Landing page route
   {
@@ -34,3 +35,6 @@ export const routes: Routes = [
   // Wildcard route
   { path: '**', redirectTo: '' }
 ];
+=======
+export const routes: Routes = [];
+>>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
