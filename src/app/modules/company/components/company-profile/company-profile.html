@@ -1,0 +1,222 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <button class="btn btn-back" (click)="goBack()">
+      <i class="material-icons">arrow_back</i> Back to Dashboard
+    </button>
+    <h1>Company Profile</h1>
+    <div class="header-actions">
+      <button *ngIf="!isEditing" class="btn btn-primary" (click)="toggleEdit()">
+        <i class="material-icons">edit</i> Edit Profile
+      </button>
+      <button class="btn btn-info" (click)="getVerificationStatus()">
+        <i class="material-icons">verified</i> Check Status
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <i class="material-icons spin">refresh</i>
+    <p>Loading profile...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="profile-content">
+    <!-- Status Banner -->
+    <div class="status-banner" [class]="getStatusClass()">
+      <div class="status-content">
+        <i class="material-icons">{{getStatusIcon()}}</i>
+        <div class="status-text">
+          <h3>Verification Status: {{companyProfile.status | uppercase}}</h3>
+          <p *ngIf="companyProfile.verificationNotes">{{companyProfile.verificationNotes}}</p>
+          <p *ngIf="!companyProfile.verificationNotes">
+            {{ companyProfile.status === 'approved' ? 'Your company profile has been verified and approved.' :
+               companyProfile.status === 'rejected' ? 'Your company profile requires additional verification.' :
+               'Your company profile is under review by our admin team.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-section">
+      <div class="logo-preview">
+        <img [src]="logoPreview || companyProfile.logo || 'https://via.placeholder.com/150'" 
+             alt="Company Logo" 
+             class="company-logo">
+        <div class="logo-actions" *ngIf="isEditing">
+          <input type="file" #logoInput accept="image/*" (change)="onLogoSelected($event)" hidden>
+          <button class="btn btn-outline" (click)="logoInput.click()">
+            <i class="material-icons">photo_camera</i> Change Logo
+          </button>
+          <button *ngIf="logoPreview || companyProfile.logo" class="btn btn-outline btn-danger" (click)="removeLogo()">
+            <i class="material-icons">delete</i> Remove
+          </button>
+          <button *ngIf="logoFile" class="btn btn-primary" (click)="uploadLogo()">
+            <i class="material-icons">cloud_upload</i> Upload
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Form -->
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        
+        <div class="form-group">
+          <label for="companyName">Company Name *</label>
+          <input type="text" id="companyName" formControlName="name" 
+                 [class.error]="name?.invalid && name?.touched"
+                 [readonly]="!isEditing">
+          <div class="error-message" *ngIf="name?.invalid && name?.touched">
+            <span *ngIf="name?.errors?.['required']">Company name is required</span>
+            <span *ngIf="name?.errors?.['minlength']">Company name must be at least 2 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="website">Website *</label>
+          <input type="url" id="website" formControlName="website" 
+                 [class.error]="website?.invalid && website?.touched"
+                 [readonly]="!isEditing" placeholder="https://example.com">
+          <div class="error-message" *ngIf="website?.invalid && website?.touched">
+            <span *ngIf="website?.errors?.['required']">Website is required</span>
+            <span *ngIf="website?.errors?.['pattern']">Please enter a valid URL starting with http:// or https://</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Company Address *</label>
+          <textarea id="address" formControlName="address" rows="3"
+                    [class.error]="address?.invalid && address?.touched"
+                    [readonly]="!isEditing" placeholder="Full company address"></textarea>
+          <div class="error-message" *ngIf="address?.invalid && address?.touched">
+            <span *ngIf="address?.errors?.['required']">Address is required</span>
+            <span *ngIf="address?.errors?.['minlength']">Address must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Company Description *</label>
+          <textarea id="description" formControlName="description" rows="5"
+                    [class.error]="description?.invalid && description?.touched"
+                    [readonly]="!isEditing" 
+                    placeholder="Describe your company, services, culture, etc."></textarea>
+          <div class="error-message" *ngIf="description?.invalid && description?.touched">
+            <span *ngIf="description?.errors?.['required']">Description is required</span>
+            <span *ngIf="description?.errors?.['minlength']">Description must be at least 50 characters</span>
+          </div>
+          <div class="char-count" [class.warning]="description?.value?.length < 50">
+            {{ description?.value?.length || 0 }}/50 characters
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>HR Contact Information</h3>
+        <div formGroupName="hrContact">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="hrName">HR Contact Name *</label>
+              <input type="text" id="hrName" formControlName="name" 
+                     [class.error]="hrName?.invalid && hrName?.touched"
+                     [readonly]="!isEditing">
+              <div class="error-message" *ngIf="hrName?.invalid && hrName?.touched">
+                <span *ngIf="hrName?.errors?.['required']">HR contact name is required</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hrPosition">Position *</label>
+              <input type="text" id="hrPosition" formControlName="position" 
+                     [class.error]="hrPosition?.invalid && hrPosition?.touched"
+                     [readonly]="!isEditing">
+              <div class="error-message" *ngIf="hrPosition?.invalid && hrPosition?.touched">
+                <span *ngIf="hrPosition?.errors?.['required']">Position is required</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="hrEmail">Email *</label>
+              <input type="email" id="hrEmail" formControlName="email" 
+                     [class.error]="hrEmail?.invalid && hrEmail?.touched"
+                     [readonly]="!isEditing">
+              <div class="error-message" *ngIf="hrEmail?.invalid && hrEmail?.touched">
+                <span *ngIf="hrEmail?.errors?.['required']">Email is required</span>
+                <span *ngIf="hrEmail?.errors?.['email']">Please enter a valid email address</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="hrPhone">Phone *</label>
+              <input type="tel" id="hrPhone" formControlName="phone" 
+                     [class.error]="hrPhone?.invalid && hrPhone?.touched"
+                     [readonly]="!isEditing" placeholder="10-digit number">
+              <div class="error-message" *ngIf="hrPhone?.invalid && hrPhone?.touched">
+                <span *ngIf="hrPhone?.errors?.['required']">Phone number is required</span>
+                <span *ngIf="hrPhone?.errors?.['pattern']">Please enter a valid 10-digit phone number</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions" *ngIf="isEditing">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || !profileForm.valid">
+          <i class="material-icons" *ngIf="isSubmitting" class="spin">refresh</i>
+          {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Read-only View -->
+    <div *ngIf="!isEditing" class="profile-view">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Company Name</label>
+          <p>{{companyProfile.name}}</p>
+        </div>
+        <div class="info-item">
+          <label>Website</label>
+          <p><a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a></p>
+        </div>
+        <div class="info-item full-width">
+          <label>Address</label>
+          <p>{{companyProfile.address}}</p>
+        </div>
+        <div class="info-item full-width">
+          <label>Description</label>
+          <p class="description-text">{{companyProfile.description}}</p>
+        </div>
+      </div>
+
+      <div class="hr-section">
+        <h4>HR Contact</h4>
+        <div class="hr-grid">
+          <div class="hr-item">
+            <label>Name</label>
+            <p>{{companyProfile.hrContact.name}}</p>
+          </div>
+          <div class="hr-item">
+            <label>Position</label>
+            <p>{{companyProfile.hrContact.position}}</p>
+          </div>
+          <div class="hr-item">
+            <label>Email</label>
+            <p><a [href]="'mailto:' + companyProfile.hrContact.email">{{companyProfile.hrContact.email}}</a></p>
+          </div>
+          <div class="hr-item">
+            <label>Phone</label>
+            <p><a [href]="'tel:' + companyProfile.hrContact.phone">{{companyProfile.hrContact.phone}}</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

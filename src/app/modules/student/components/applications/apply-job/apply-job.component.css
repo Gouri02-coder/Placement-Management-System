@@ -1,0 +1,233 @@
+.apply-job-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.application-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.job-preview h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.job-card {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.job-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.job-header h3 {
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  font-size: 1.4em;
+}
+
+.company {
+  color: #3498db;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.job-details {
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.detail-row .value {
+  color: #7f8c8d;
+}
+
+.job-description,
+.job-requirements {
+  margin-bottom: 20px;
+}
+
+.job-description h4,
+.job-requirements h4 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.job-description p {
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.job-requirements ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.job-requirements li {
+  color: #555;
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+
+.deadline-warning {
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #ffeaa7;
+}
+
+.application-details {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  height: fit-content;
+}
+
+.application-details h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #dcdfe6;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+}
+
+.link {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.btn-cancel {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-cancel:hover {
+  background: #7f8c8d;
+}
+
+.btn-submit {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  min-width: 160px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #219a52;
+}
+
+.btn-submit:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .apply-job-container {
+    padding: 15px;
+  }
+  
+  .application-form {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+}

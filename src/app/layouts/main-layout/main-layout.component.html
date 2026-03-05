@@ -1,0 +1,36 @@
+<div class="layout-wrapper" [class]="getContainerClass()">
+
+  <app-navbar *ngIf="authService.isAuthenticated()"></app-navbar>
+
+ 
+  <app-sidebar 
+    *ngIf="showSidebar && authService.isAuthenticated()"
+    [isCollapsed]="isSidebarCollapsed"
+    (toggleCollapse)="onToggleSidebar()">
+  </app-sidebar>
+
+  
+  <main [class]="getMainContentClass()">
+    <div class="content-wrapper">
+     
+      <ng-content select="[page-header]"></ng-content>
+      
+
+      <div class="page-content">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </main>
+
+ 
+  <app-footer *ngIf="shouldShowFooter() && authService.isAuthenticated()"></app-footer>
+
+
+  <app-loading-spinner
+    *ngIf="false"
+    class="global-loading"
+    type="spinner"
+    size="large"
+    message="Loading...">
+  </app-loading-spinner>
+</div>

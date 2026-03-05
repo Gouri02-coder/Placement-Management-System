@@ -1,0 +1,343 @@
+<!-- student-dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- Welcome Section with Profile Info -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <h1>Welcome back, {{ student?.personalInfo?.firstName }}! 👋</h1>
+        <p>Here's your placement activity summary</p>
+      </div>
+      <div class="profile-badge">
+        <div class="profile-avatar">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="profile-info">
+          <span class="student-name">{{ student?.personalInfo?.firstName }} {{ student?.personalInfo?.lastName }}</span>
+          <span class="student-id">ID: {{ student?.id }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-progress">
+      <div class="progress-info">
+        <span>Profile Completion</span>
+        <span>{{ stats.profileCompletion }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="stats.profileCompletion"></div>
+      </div>
+      <button routerLink="/student/profile" class="complete-profile-btn">
+        Complete Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards with Icons -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon applications">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <span class="stat-trend positive" *ngIf="stats.totalApplications > 0">
+          <i class="fas fa-arrow-up"></i>
+        </span>
+      </div>
+      <div class="stat-info">
+        <h3>{{ stats.totalApplications }}</h3>
+        <p>Total Applications</p>
+      </div>
+      <div class="stat-detail">
+        <span>{{ stats.pendingApplications }} pending</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon pending">
+          <i class="fas fa-clock"></i>
+        </div>
+        <span class="stat-trend" *ngIf="stats.pendingApplications > 0">
+          {{ stats.pendingApplications }}
+        </span>
+      </div>
+      <div class="stat-info">
+        <h3>{{ stats.pendingApplications }}</h3>
+        <p>Pending Reviews</p>
+      </div>
+      <div class="stat-detail">
+        <span>Under review</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon interviews">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <span class="stat-badge" *ngIf="stats.interviewsScheduled > 0">
+          {{ stats.interviewsScheduled }}
+        </span>
+      </div>
+      <div class="stat-info">
+        <h3>{{ stats.interviewsScheduled }}</h3>
+        <p>Interviews</p>
+      </div>
+      <div class="stat-detail">
+        <span>Upcoming</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon profile">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <span class="stat-percentage">{{ stats.profileCompletion }}%</span>
+      </div>
+      <div class="stat-info">
+        <h3>{{ stats.profileCompletion }}%</h3>
+        <p>Profile Complete</p>
+      </div>
+      <div class="stat-detail">
+        <a routerLink="/student/profile" class="improve-link">
+          Improve <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Upcoming Interviews -->
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-calendar-check card-icon"></i>
+          <h3>Upcoming Interviews</h3>
+        </div>
+        <a routerLink="/student/interviews" class="view-all">
+          View All <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="interviews-list">
+          <div *ngFor="let interview of interviews.slice(0, 3)" class="interview-item">
+            <div class="interview-time">
+              <div class="time-badge">
+                <span class="time">{{ interview.schedule.date | date:'dd' }}</span>
+                <span class="month">{{ interview.schedule.date | date:'MMM' }}</span>
+              </div>
+            </div>
+            <div class="interview-details">
+              <h4>{{ interview.jobTitle }}</h4>
+              <p class="company">{{ interview.companyName }}</p>
+              <div class="interview-meta">
+                <span class="meta-item">
+                  <i class="far fa-clock"></i>
+                  {{ interview.schedule.time }}
+                </span>
+                <span class="meta-item">
+                  <i class="fas fa-video"></i>
+                  {{ interview.schedule.mode }}
+                </span>
+              </div>
+            </div>
+            <div class="interview-actions">
+              <span class="status-badge {{ interview.status }}">
+                {{ interview.status }}
+              </span>
+              <button class="btn-prepare" routerLink="/student/interview-prep">
+                Prepare
+              </button>
+            </div>
+          </div>
+          <div *ngIf="interviews.length === 0" class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <p>No upcoming interviews</p>
+            <small>Keep applying to get interview calls</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Jobs -->
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-briefcase card-icon"></i>
+          <h3>Recommended Jobs</h3>
+        </div>
+        <a routerLink="/student/job-search" class="view-all">
+          View All <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="jobs-list">
+          <div *ngFor="let job of recommendedJobs" class="job-item">
+            <div class="job-company">
+              <div class="company-avatar">
+                {{ job.companyName.charAt(0) }}
+              </div>
+            </div>
+            <div class="job-details">
+              <h4>{{ job.title }}</h4>
+              <p class="company-name">{{ job.companyName }}</p>
+              <div class="job-meta">
+                <span class="meta-tag location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  {{ job.location }}
+                </span>
+                <span class="meta-tag salary">
+                  <i class="fas fa-money-bill-wave"></i>
+                  ₹{{ job.salary.min/1000 }}k - {{ job.salary.max/1000 }}k
+                </span>
+              </div>
+              <div class="job-skills">
+                <span *ngFor="let skill of job.skillsRequired.slice(0, 2)" class="skill-tag">
+                  {{ skill }}
+                </span>
+                <span *ngIf="job.skillsRequired.length > 2" class="more-skills">
+                  +{{ job.skillsRequired.length - 2 }} more
+                </span>
+              </div>
+            </div>
+            <div class="job-actions">
+              <button class="apply-btn" routerLink="/student/job-search/{{job.id}}">
+                Apply Now
+              </button>
+            </div>
+          </div>
+          <div *ngIf="recommendedJobs.length === 0" class="empty-state">
+            <i class="fas fa-search"></i>
+            <p>No recommended jobs</p>
+            <small>Update your profile for better recommendations</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Applications -->
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-file-contract card-icon"></i>
+          <h3>Recent Applications</h3>
+        </div>
+        <a routerLink="/student/applications" class="view-all">
+          View All <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="applications-list">
+          <div *ngFor="let application of applications.slice(0, 4)" class="application-item">
+            <div class="app-status">
+              <div class="status-indicator {{ application.status }}"></div>
+            </div>
+            <div class="app-details">
+              <h4>{{ application.jobTitle }}</h4>
+              <p class="company-name">{{ application.companyName }}</p>
+              <div class="app-meta">
+                <span class="meta-item">
+                  <i class="far fa-calendar"></i>
+                  {{ application.appliedDate | date:'mediumDate' }}
+                </span>
+                <span class="meta-item days-ago">
+                  {{ calculateDaysAgo(application.appliedDate) }} ago
+                </span>
+              </div>
+            </div>
+            <div class="app-actions">
+              <span class="status-badge {{ application.status }}">
+                {{ application.status }}
+              </span>
+              <button class="btn-track" routerLink="/student/applications">
+                Track
+              </button>
+            </div>
+          </div>
+          <div *ngIf="applications.length === 0" class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <p>No applications yet</p>
+            <small>Start applying to jobs today</small>
+            <button routerLink="/student/job-search" class="browse-jobs-btn">
+              <i class="fas fa-search"></i> Browse Jobs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions & Stats -->
+    <div class="content-card quick-actions-card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-bolt card-icon"></i>
+          <h3>Quick Actions</h3>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions-grid">
+          <button routerLink="/student/job-search" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <span>Search Jobs</span>
+          </button>
+          
+          <button routerLink="/student/resume-builder" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-file-pdf"></i>
+            </div>
+            <span>Update Resume</span>
+          </button>
+          
+          <button routerLink="/student/profile" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-user-edit"></i>
+            </div>
+            <span>Edit Profile</span>
+          </button>
+          
+          <button routerLink="/student/placement-drives" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-calendar-day"></i>
+            </div>
+            <span>View Drives</span>
+          </button>
+          
+          <button routerLink="/student/interview-prep" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <span>Interview Prep</span>
+          </button>
+          
+          <button routerLink="/student/interview-feedback" class="action-btn">
+            <div class="action-icon">
+              <i class="fas fa-comment-alt"></i>
+            </div>
+            <span>View Feedback</span>
+          </button>
+        </div>
+        
+        <div class="activity-stats">
+          <h4>Activity Summary</h4>
+          <div class="stats-list">
+            <div class="stat-line">
+              <span>Applications this week</span>
+              <span class="stat-value">3</span>
+            </div>
+            <div class="stat-line">
+              <span>Profile views</span>
+              <span class="stat-value">12</span>
+            </div>
+            <div class="stat-line">
+              <span>Interviews this month</span>
+              <span class="stat-value">{{ stats.interviewsScheduled }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

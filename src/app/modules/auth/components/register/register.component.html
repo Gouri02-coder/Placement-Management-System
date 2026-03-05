@@ -1,0 +1,209 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>Create Account</h2>
+    <p class="subtitle">Join our placement platform</p>
+
+    <!-- Role Selection -->
+    <div class="role-selection">
+      <div 
+        class="role-option" 
+        [class.active]="selectedRole === 'student'"
+        (click)="selectRole('student')">
+        <div class="role-icon">🎓</div>
+        <h3>Student</h3>
+        <p>Find internships and job opportunities</p>
+      </div>
+
+      <div 
+        class="role-option" 
+        [class.active]="selectedRole === 'company'"
+        (click)="selectRole('company')">
+        <div class="role-icon">🏢</div>
+        <h3>Company</h3>
+        <p>Hire talented students</p>
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="register-form" *ngIf="selectedRole">
+      <h3>Register as {{getRoleDisplayName()}}</h3>
+      
+      <!-- Common Fields -->
+      <div class="form-group">
+        <label for="name">Full Name {{selectedRole === 'company' ? '(Contact Person)' : ''}}</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          placeholder="Enter your full name">
+        <div class="error" *ngIf="getFieldError('name')">{{getFieldError('name')}}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          placeholder="Enter your email">
+        <div class="error" *ngIf="getFieldError('email')">{{getFieldError('email')}}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          placeholder="Create a password (min. 6 characters)">
+        <div class="error" *ngIf="getFieldError('password')">{{getFieldError('password')}}</div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          formControlName="phone" 
+          [placeholder]="selectedRole === 'company' ? 'Enter contact number' : 'Enter your phone number'">
+        <div class="error" *ngIf="getFieldError('phone')">{{getFieldError('phone')}}</div>
+      </div>
+
+      <!-- Student Specific Fields -->
+      <div *ngIf="selectedRole === 'student'" class="student-fields">
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input 
+            type="text" 
+            id="department" 
+            formControlName="department" 
+            placeholder="Enter your department (e.g., Computer Science)">
+          <div class="error" *ngIf="getFieldError('department')">{{getFieldError('department')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="course">Course</label>
+          <input 
+            type="text" 
+            id="course" 
+            formControlName="course" 
+            placeholder="Enter your course (e.g., B.Tech, MCA)">
+          <div class="error" *ngIf="getFieldError('course')">{{getFieldError('course')}}</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="year">Academic Year</label>
+            <select id="year" formControlName="year" class="form-select">
+              <option value="">Select Year</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+            <div class="error" *ngIf="getFieldError('year')">{{getFieldError('year')}}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="cgpa">CGPA</label>
+            <input 
+              type="number" 
+              id="cgpa" 
+              formControlName="cgpa" 
+              placeholder="CGPA" 
+              step="0.01" 
+              min="0" 
+              max="10">
+            <div class="error" *ngIf="getFieldError('cgpa')">{{getFieldError('cgpa')}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Specific Fields -->
+      <div *ngIf="selectedRole === 'company'" class="company-fields">
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input 
+            type="text" 
+            id="companyName" 
+            formControlName="companyName" 
+            placeholder="Enter your company name">
+          <div class="error" *ngIf="getFieldError('companyName')">{{getFieldError('companyName')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="industry">Industry</label>
+          <select id="industry" formControlName="industry" class="form-select">
+            <option value="">Select Industry</option>
+            <option value="IT">Information Technology</option>
+            <option value="finance">Finance & Banking</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="manufacturing">Manufacturing</option>
+            <option value="education">Education</option>
+            <option value="retail">Retail</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="error" *ngIf="getFieldError('industry')">{{getFieldError('industry')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="website">Company Website (Optional)</label>
+          <input 
+            type="url" 
+            id="website" 
+            formControlName="website" 
+            placeholder="https://www.example.com">
+          <div class="error" *ngIf="getFieldError('website')">{{getFieldError('website')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="companySize">Company Size</label>
+          <select id="companySize" formControlName="companySize" class="form-select">
+            <option value="">Select Company Size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="501-1000">501-1000 employees</option>
+            <option value="1000+">1000+ employees</option>
+          </select>
+          <div class="error" *ngIf="getFieldError('companySize')">{{getFieldError('companySize')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Company Address</label>
+          <textarea 
+            id="address" 
+            formControlName="address" 
+            placeholder="Enter complete company address"
+            rows="3"></textarea>
+          <div class="error" *ngIf="getFieldError('address')">{{getFieldError('address')}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Company Description (Optional)</label>
+          <textarea 
+            id="description" 
+            formControlName="description" 
+            placeholder="Brief description about your company"
+            rows="3"></textarea>
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="register-btn" 
+        [disabled]="registerForm.invalid || isLoading">
+        {{isLoading ? 'Creating Account...' : 'Create Account'}}
+      </button>
+
+      <div class="login-link">
+        Already have an account? <a (click)="goToLogin()">Sign In</a>
+      </div>
+    </form>
+
+    <div class="no-role-selected" *ngIf="!selectedRole">
+      <p>Please select your role to continue registration</p>
+    </div>
+  </div>
+</div>

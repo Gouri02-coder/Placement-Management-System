@@ -1,0 +1,428 @@
+<div class="interview-preparation-container">
+  <div class="header">
+    <h2>Interview Preparation</h2>
+    <p>Prepare for your technical interviews with curated resources and study plans</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'questions'" (click)="activeTab = 'questions'" class="tab-btn">
+      Interview Questions
+    </button>
+    <button [class.active]="activeTab === 'study-plan'" (click)="activeTab = 'study-plan'" class="tab-btn">
+      Study Plans
+    </button>
+    <button [class.active]="activeTab === 'resources'" (click)="activeTab = 'resources'" class="tab-btn">
+      Resources
+    </button>
+  </div>
+
+  <!-- Interview Questions Tab -->
+  <div *ngIf="activeTab === 'questions'" class="tab-content">
+    <div class="questions-section">
+      <!-- Questions List -->
+      <div *ngIf="!showQuestionForm && !selectedQuestion" class="questions-list">
+        <div class="section-header">
+          <h3>Interview Questions</h3>
+          <button (click)="addQuestion()" class="btn-add">
+            + Add Question
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <input type="text" [(ngModel)]="searchTerm" (input)="filterQuestions()" 
+                 placeholder="Search questions..." class="search-input">
+          
+          <select [(ngModel)]="selectedCategory" (change)="filterQuestions()" class="filter-select">
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+          
+          <select [(ngModel)]="selectedDifficulty" (change)="filterQuestions()" class="filter-select">
+            <option value="">All Difficulties</option>
+            <option *ngFor="let difficulty of difficulties" [value]="difficulty">
+              {{ difficulty | titlecase }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Questions Grid -->
+        <div *ngIf="filteredQuestions.length > 0" class="questions-grid">
+          <div *ngFor="let question of filteredQuestions" class="question-card">
+            <div class="question-header">
+              <h4>{{ question.question }}</h4>
+              <span class="difficulty" [style.background]="getDifficultyColor(question.difficulty)">
+                {{ question.difficulty }}
+              </span>
+            </div>
+            
+            <div class="question-meta">
+              <span class="category">{{ question.category }}</span>
+              <span class="review-date">Last reviewed: {{ question.lastReviewed | date:'shortDate' }}</span>
+            </div>
+            
+            <div class="tags">
+              <span *ngFor="let tag of question.tags" class="tag">{{ tag }}</span>
+            </div>
+            
+            <div class="question-actions">
+              <button (click)="viewQuestion(question)" class="btn-view">View</button>
+              <button (click)="editQuestion(question)" class="btn-edit">Edit</button>
+              <button (click)="deleteQuestion(question)" class="btn-delete">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="filteredQuestions.length === 0" class="empty-state">
+          <p>No questions found matching your criteria.</p>
+        </div>
+      </div>
+
+      <!-- Question Detail View -->
+      <div *ngIf="selectedQuestion && !showQuestionForm" class="question-detail">
+        <div class="detail-header">
+          <button (click)="selectedQuestion = null" class="btn-back">← Back to List</button>
+          <h3>Question Details</h3>
+        </div>
+
+        <div class="detail-card">
+          <div class="question-meta-large">
+            <span class="category-badge">{{ selectedQuestion.category }}</span>
+            <span class="difficulty-badge" [style.background]="getDifficultyColor(selectedQuestion.difficulty)">
+              {{ selectedQuestion.difficulty }}
+            </span>
+            <span class="review-info">Last reviewed: {{ selectedQuestion.lastReviewed | date:'mediumDate' }}</span>
+          </div>
+
+          <div class="question-content">
+            <h4>Question:</h4>
+            <p class="question-text">{{ selectedQuestion.question }}</p>
+          </div>
+
+          <div class="answer-content">
+            <h4>Answer:</h4>
+            <p class="answer-text">{{ selectedQuestion.answer }}</p>
+          </div>
+
+          <div class="tags-section">
+            <h4>Tags:</h4>
+            <div class="tags">
+              <span *ngFor="let tag of selectedQuestion.tags" class="tag">{{ tag }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Form -->
+      <div *ngIf="showQuestionForm" class="question-form">
+        <div class="form-header">
+          <h3>{{ isEditingQuestion ? 'Edit Question' : 'Add New Question' }}</h3>
+          <button (click)="showQuestionForm = false" class="btn-cancel">Cancel</button>
+        </div>
+
+        <form (ngSubmit)="saveQuestion()" class="form">
+          <div class="form-group">
+            <label>Question *</label>
+            <textarea [(ngModel)]="newQuestion.question" name="question" 
+                      rows="3" required placeholder="Enter the interview question..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Answer *</label>
+            <textarea [(ngModel)]="newQuestion.answer" name="answer" 
+                      rows="6" required placeholder="Enter your answer..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select [(ngModel)]="newQuestion.category" name="category" required>
+                <option value="">Select Category</option>
+                <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Difficulty</label>
+              <select [(ngModel)]="newQuestion.difficulty" name="difficulty">
+                <option *ngFor="let difficulty of difficulties" [value]="difficulty">
+                  {{ difficulty | titlecase }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-input">
+              <input type="text" [(ngModel)]="newTag" (keyup.enter)="addTag()" 
+                     placeholder="Add a tag" name="newTag">
+              <button type="button" (click)="addTag()" class="btn-add-tag">Add</button>
+            </div>
+            <div class="tags-list">
+              <span *ngFor="let tag of newQuestion.tags" class="tag">
+                {{ tag }}
+                <button type="button" (click)="removeTag(tag)" class="btn-remove-tag">×</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save" 
+                    [disabled]="!newQuestion.question || !newQuestion.answer || !newQuestion.category">
+              {{ isEditingQuestion ? 'Update Question' : 'Save Question' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Study Plans Tab -->
+  <div *ngIf="activeTab === 'study-plan'" class="tab-content">
+    <div class="study-plans-section">
+      <!-- Study Plans List -->
+      <div *ngIf="!showPlanForm && !selectedPlan" class="plans-list">
+        <div class="section-header">
+          <h3>Study Plans</h3>
+          <button (click)="addPlan()" class="btn-add">+ Create Plan</button>
+        </div>
+
+        <div *ngIf="studyPlans.length === 0" class="empty-state">
+          <p>No study plans created yet.</p>
+        </div>
+
+        <div *ngFor="let plan of studyPlans" class="plan-card">
+          <div class="plan-header">
+            <h4>{{ plan.title }}</h4>
+            <span class="status-badge" [style.background]="getStatusColor(plan.status)">
+              {{ plan.status.replace('-', ' ') | titlecase }}
+            </span>
+          </div>
+
+          <p class="plan-description">{{ plan.description }}</p>
+
+          <div class="plan-meta">
+            <span class="category">{{ plan.category }}</span>
+            <span class="hours">{{ plan.completedHours }}/{{ plan.estimatedHours }} hours</span>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="getProgressPercentage(plan) + '%'"></div>
+          </div>
+
+          <div class="plan-actions">
+            <button (click)="viewPlan(plan)" class="btn-view">View</button>
+            <button (click)="editPlan(plan)" class="btn-edit">Edit</button>
+            <button (click)="deletePlan(plan)" class="btn-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Detail View -->
+      <div *ngIf="selectedPlan && !showPlanForm" class="plan-detail">
+        <div class="detail-header">
+          <button (click)="selectedPlan = null" class="btn-back">← Back to List</button>
+          <h3>Study Plan Details</h3>
+        </div>
+
+        <div class="detail-card">
+          <div class="plan-header-large">
+            <h4>{{ selectedPlan.title }}</h4>
+            <span class="status-badge" [style.background]="getStatusColor(selectedPlan.status)">
+              {{ selectedPlan.status.replace('-', ' ') | titlecase }}
+            </span>
+          </div>
+
+          <p class="plan-description">{{ selectedPlan.description }}</p>
+
+          <div class="progress-section">
+            <h5>Progress</h5>
+            <div class="progress-info">
+              <span>{{ selectedPlan.completedHours }}/{{ selectedPlan.estimatedHours }} hours completed</span>
+              <span class="percentage">{{ getProgressPercentage(selectedPlan) | number:'1.0-0' }}%</span>
+            </div>
+            <div class="progress-bar large">
+              <div class="progress-fill" [style.width]="getProgressPercentage(selectedPlan) + '%'"></div>
+            </div>
+            
+            <div class="progress-control">
+              <label>Update completed hours:</label>
+              <input type="number" [value]="selectedPlan.completedHours" 
+                     (change)="updateProgress(selectedPlan, $any($event.target).value)"
+                     min="0" [max]="selectedPlan.estimatedHours" class="hours-input">
+            </div>
+          </div>
+
+          <div class="topics-section">
+            <h5>Topics to Cover</h5>
+            <ul class="topics-list">
+              <li *ngFor="let topic of selectedPlan.topics">{{ topic }}</li>
+            </ul>
+          </div>
+
+          <div class="resources-section">
+            <h5>Recommended Resources</h5>
+            <ul class="resources-list">
+              <li *ngFor="let resource of selectedPlan.resources">{{ resource }}</li>
+            </ul>
+          </div>
+
+          <div *ngIf="selectedPlan.deadline" class="deadline-section">
+            <h5>Deadline</h5>
+            <p>{{ selectedPlan.deadline | date:'mediumDate' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Form -->
+      <div *ngIf="showPlanForm" class="plan-form">
+        <div class="form-header">
+          <h3>{{ isEditingPlan ? 'Edit Study Plan' : 'Create Study Plan' }}</h3>
+          <button (click)="showPlanForm = false" class="btn-cancel">Cancel</button>
+        </div>
+
+        <form (ngSubmit)="savePlan()" class="form">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" [(ngModel)]="newPlan.title" name="title" required>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [(ngModel)]="newPlan.description" name="description" rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select [(ngModel)]="newPlan.category" name="category" required>
+                <option value="">Select Category</option>
+                <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Estimated Hours *</label>
+              <input type="number" [(ngModel)]="newPlan.estimatedHours" name="estimatedHours" required min="1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Resources</label>
+            <div class="list-input">
+              <input type="text" [(ngModel)]="newResource" (keyup.enter)="addResource()" 
+                     placeholder="Add a resource">
+              <button type="button" (click)="addResource()" class="btn-add-item">Add</button>
+            </div>
+            <div class="items-list">
+              <span *ngFor="let resource of newPlan.resources" class="item-tag">
+                {{ resource }}
+                <button type="button" (click)="removeResource(resource)" class="btn-remove-item">×</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Topics</label>
+            <div class="list-input">
+              <input type="text" [(ngModel)]="newTopic" (keyup.enter)="addTopic()" 
+                     placeholder="Add a topic">
+              <button type="button" (click)="addTopic()" class="btn-add-item">Add</button>
+            </div>
+            <div class="items-list">
+              <span *ngFor="let topic of newPlan.topics" class="item-tag">
+                {{ topic }}
+                <button type="button" (click)="removeTopic(topic)" class="btn-remove-item">×</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Deadline (Optional)</label>
+            <input type="date" [(ngModel)]="newPlan.deadline" name="deadline">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save" 
+                    [disabled]="!newPlan.title || !newPlan.category || !newPlan.estimatedHours">
+              {{ isEditingPlan ? 'Update Plan' : 'Create Plan' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resources Tab -->
+  <div *ngIf="activeTab === 'resources'" class="tab-content">
+    <div class="resources-section">
+      <h3>Interview Preparation Resources</h3>
+      
+      <div class="resources-grid">
+        <div class="resource-category">
+          <h4>📚 Books</h4>
+          <ul>
+            <li><strong>Cracking the Coding Interview</strong> - Gayle Laakmann McDowell</li>
+            <li><strong>Introduction to Algorithms</strong> - CLRS</li>
+            <li><strong>Designing Data-Intensive Applications</strong> - Martin Kleppmann</li>
+            <li><strong>Clean Code</strong> - Robert C. Martin</li>
+          </ul>
+        </div>
+
+        <div class="resource-category">
+          <h4>🌐 Online Platforms</h4>
+          <ul>
+            <li><strong>LeetCode</strong> - Coding practice and contests</li>
+            <li><strong>HackerRank</strong> - Coding challenges and certifications</li>
+            <li><strong>GeeksforGeeks</strong> - Tutorials and company-specific questions</li>
+            <li><strong>InterviewBit</strong> - Structured learning path</li>
+          </ul>
+        </div>
+
+        <div class="resource-category">
+          <h4>🎥 Video Resources</h4>
+          <ul>
+            <li><strong>freeCodeCamp</strong> - Full interview preparation courses</li>
+            <li><strong>NeetCode</strong> - Problem solving patterns and strategies</li>
+            <li><strong>System Design Interview</strong> - Channel for system design prep</li>
+            <li><strong>CS Dojo</strong> - Algorithm explanations</li>
+          </ul>
+        </div>
+
+        <div class="resource-category">
+          <h4>💼 Behavioral Preparation</h4>
+          <ul>
+            <li><strong>STAR Method</strong> - Situation, Task, Action, Result framework</li>
+            <li><strong>Amazon Leadership Principles</strong> - For Amazon interviews</li>
+            <li><strong>Google's hiring process</strong> - Understanding the workflow</li>
+            <li><strong>Common behavioral questions</strong> - Practice responses</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tips-section">
+        <h4>💡 Preparation Tips</h4>
+        <div class="tips-grid">
+          <div class="tip-card">
+            <h5>Consistent Practice</h5>
+            <p>Solve at least 2-3 problems daily and review previously solved problems regularly.</p>
+          </div>
+          <div class="tip-card">
+            <h5>Mock Interviews</h5>
+            <p>Practice with peers or use platforms like Pramp for mock interview sessions.</p>
+          </div>
+          <div class="tip-card">
+            <h5>Time Management</h5>
+            <p>Practice solving problems within time constraints to simulate real interview conditions.</p>
+          </div>
+          <div class="tip-card">
+            <h5>Conceptual Understanding</h5>
+            <p>Focus on understanding underlying concepts rather than memorizing solutions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

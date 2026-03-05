@@ -1,0 +1,332 @@
+<div class="interview-schedule-container">
+  <div class="header">
+    <h2>Interview Schedule</h2>
+    <p>Manage your upcoming interviews and track your schedule</p>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <button [class.active]="calendarView === 'list'" (click)="calendarView = 'list'" class="toggle-btn">
+      📋 List View
+    </button>
+    <button [class.active]="calendarView === 'calendar'" (click)="calendarView = 'calendar'" class="toggle-btn">
+      📅 Calendar View
+    </button>
+  </div>
+
+  <!-- List View -->
+  <div *ngIf="calendarView === 'list'" class="list-view">
+    <!-- Filters and Actions -->
+    <div class="controls">
+      <div class="filters">
+        <select [(ngModel)]="statusFilter" (change)="filterInterviews()" class="filter-select">
+          <option value="">All Status</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="rescheduled">Rescheduled</option>
+        </select>
+
+        <select [(ngModel)]="dateFilter" (change)="filterInterviews()" class="filter-select">
+          <option value="">All Dates</option>
+          <option value="today">Today</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="past">Past</option>
+        </select>
+      </div>
+
+      <button (click)="addInterview()" class="btn-add">
+        + Schedule Interview
+      </button>
+    </div>
+
+    <!-- Interviews List -->
+    <div *ngIf="!showInterviewForm && !selectedInterview" class="interviews-list">
+      <div *ngIf="filteredInterviews.length === 0" class="empty-state">
+        <p>No interviews found matching your criteria.</p>
+        <button (click)="addInterview()" class="btn-primary">Schedule Your First Interview</button>
+      </div>
+
+      <div *ngFor="let interview of filteredInterviews" class="interview-card" 
+           [class.upcoming]="isUpcoming(interview)"
+           [class.completed]="interview.status === 'completed'">
+        <div class="interview-header">
+          <div class="company-info">
+            <h4>{{ interview.companyName }}</h4>
+            <span class="job-title">{{ interview.jobTitle }}</span>
+          </div>
+          <div class="interview-meta">
+            <span class="status-badge" [style.background]="getStatusColor(interview.status)">
+              {{ getStatusLabel(interview.status) }}
+            </span>
+            <span class="interview-type">
+              {{ getInterviewTypeIcon(interview.interviewType) }} {{ interview.interviewType }}
+            </span>
+          </div>
+        </div>
+
+        <div class="interview-details">
+          <div class="detail-item">
+            <span class="label">Date & Time:</span>
+            <span class="value">{{ interview.interviewDate | date:'medium' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Duration:</span>
+            <span class="value">{{ interview.duration }} minutes</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Interviewer:</span>
+            <span class="value">{{ interview.interviewer }}</span>
+          </div>
+          <div *ngIf="interview.location" class="detail-item">
+            <span class="label">Location:</span>
+            <span class="value">{{ interview.location }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="isUpcoming(interview)" class="upcoming-info">
+          <span class="time-until">⏰ {{ getTimeUntilInterview(interview) }} until interview</span>
+        </div>
+
+        <div class="interview-actions">
+          <button *ngIf="isUpcoming(interview) && interview.interviewLink" 
+                  (click)="joinInterview(interview)" class="btn-join">
+            Join Interview
+          </button>
+          <button (click)="viewInterview(interview)" class="btn-view">
+            View Details
+          </button>
+          <button *ngIf="isUpcoming(interview)" (click)="editInterview(interview)" class="btn-edit">
+            Reschedule
+          </button>
+          <button *ngIf="isUpcoming(interview)" (click)="cancelInterview(interview)" class="btn-cancel">
+            Cancel
+          </button>
+          <button (click)="setReminder(interview)" 
+                  [class.active]="interview.reminder" class="btn-reminder">
+            {{ interview.reminder ? '🔔' : '🔕' }} Reminder
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview Detail View -->
+    <div *ngIf="selectedInterview && !showInterviewForm" class="interview-detail">
+      <div class="detail-header">
+        <button (click)="selectedInterview = null" class="btn-back">← Back to List</button>
+        <h3>Interview Details</h3>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-section">
+          <h4>Interview Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Company:</label>
+              <span>{{ selectedInterview.companyName }}</span>
+            </div>
+            <div class="info-item">
+              <label>Position:</label>
+              <span>{{ selectedInterview.jobTitle }}</span>
+            </div>
+            <div class="info-item">
+              <label>Interviewer:</label>
+              <span>{{ selectedInterview.interviewer }}</span>
+            </div>
+            <div class="info-item">
+              <label>Date & Time:</label>
+              <span>{{ selectedInterview.interviewDate | date:'medium' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Duration:</label>
+              <span>{{ selectedInterview.duration }} minutes</span>
+            </div>
+            <div class="info-item">
+              <label>Type:</label>
+              <span>{{ getInterviewTypeIcon(selectedInterview.interviewType) }} {{ selectedInterview.interviewType }}</span>
+            </div>
+            <div class="info-item">
+              <label>Status:</label>
+              <span class="status-badge" [style.background]="getStatusColor(selectedInterview.status)">
+                {{ getStatusLabel(selectedInterview.status) }}
+              </span>
+            </div>
+            <div *ngIf="selectedInterview.location" class="info-item full-width">
+              <label>Location:</label>
+              <span>{{ selectedInterview.location }}</span>
+            </div>
+            <div *ngIf="selectedInterview.interviewLink" class="info-item full-width">
+              <label>Interview Link:</label>
+              <a [href]="selectedInterview.interviewLink" target="_blank" class="interview-link">
+                {{ selectedInterview.interviewLink }}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Preparation Notes</h4>
+          <p class="preparation-notes">{{ selectedInterview.preparationNotes }}</p>
+        </div>
+
+        <div *ngIf="selectedInterview.feedback" class="detail-section">
+          <h4>Feedback</h4>
+          <p class="feedback">{{ selectedInterview.feedback }}</p>
+        </div>
+
+        <div *ngIf="isUpcoming(selectedInterview)" class="detail-actions">
+          <button (click)="joinInterview(selectedInterview)" class="btn-join-large">
+            Join Interview
+          </button>
+          <button (click)="editInterview(selectedInterview)" class="btn-edit">
+            Reschedule
+          </button>
+          <button (click)="cancelInterview(selectedInterview)" class="btn-cancel">
+            Cancel Interview
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interview Form -->
+    <div *ngIf="showInterviewForm" class="interview-form">
+      <div class="form-header">
+        <h3>{{ isEditing ? 'Edit Interview' : 'Schedule Interview' }}</h3>
+        <button (click)="showInterviewForm = false" class="btn-cancel">Cancel</button>
+      </div>
+
+      <form (ngSubmit)="saveInterview()" class="form">
+        <div class="form-section">
+          <h4>Interview Details</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Company Name *</label>
+              <input type="text" [(ngModel)]="newInterview.companyName" name="companyName" required>
+            </div>
+            <div class="form-group">
+              <label>Job Title *</label>
+              <input type="text" [(ngModel)]="newInterview.jobTitle" name="jobTitle" required>
+            </div>
+            <div class="form-group">
+              <label>Interview Type</label>
+              <select [(ngModel)]="newInterview.interviewType" name="interviewType">
+                <option value="phone">Phone</option>
+                <option value="video">Video</option>
+                <option value="onsite">On-site</option>
+                <option value="technical">Technical</option>
+                <option value="hr">HR</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Interviewer Name</label>
+              <input type="text" [(ngModel)]="newInterview.interviewer" name="interviewer">
+            </div>
+            <div class="form-group">
+              <label>Interview Date & Time *</label>
+              <input type="datetime-local" [(ngModel)]="newInterview.interviewDate" name="interviewDate" required>
+            </div>
+            <div class="form-group">
+              <label>Duration (minutes) *</label>
+              <input type="number" [(ngModel)]="newInterview.duration" name="duration" required min="15">
+            </div>
+            <div class="form-group">
+              <label>Interview Link (for virtual interviews)</label>
+              <input type="url" [(ngModel)]="newInterview.interviewLink" name="interviewLink">
+            </div>
+            <div class="form-group">
+              <label>Location (for on-site interviews)</label>
+              <input type="text" [(ngModel)]="newInterview.location" name="location">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Preparation Notes</h4>
+          <textarea [(ngModel)]="newInterview.preparationNotes" name="preparationNotes" 
+                    rows="4" placeholder="Add preparation notes, topics to review, questions to ask..."></textarea>
+        </div>
+
+        <div class="form-section">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <select [(ngModel)]="newInterview.status" name="status">
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="rescheduled">Rescheduled</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="newInterview.reminder" name="reminder">
+                Set Reminder
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-save" 
+                  [disabled]="!newInterview.companyName || !newInterview.jobTitle || !newInterview.interviewDate">
+            {{ isEditing ? 'Update Interview' : 'Schedule Interview' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Calendar View -->
+  <div *ngIf="calendarView === 'calendar'" class="calendar-view">
+    <div class="calendar-header">
+      <button (click)="changeMonth(-1)" class="btn-prev">← Previous</button>
+      <h3>{{ getMonthName() }} {{ currentYear }}</h3>
+      <button (click)="changeMonth(1)" class="btn-next">Next →</button>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="calendar-weekdays">
+        <div *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" 
+             class="weekday-header">
+          {{ day }}
+        </div>
+      </div>
+
+      <div class="calendar-days">
+        <div *ngFor="let day of getDaysInMonth()" 
+             class="calendar-day"
+             [class.today]="isToday(day)"
+             [class.has-interviews]="getInterviewsForDate(day).length > 0">
+          
+          <div class="day-number">{{ day.getDate() }}</div>
+          
+          <div class="day-interviews">
+            <div *ngFor="let interview of getInterviewsForDate(day)" 
+                 class="calendar-interview"
+                 [style.background]="getStatusColor(interview.status)">
+              <span class="interview-time">
+                {{ interview.interviewDate | date:'shortTime' }}
+              </span>
+              <span class="interview-company">{{ interview.companyName }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calendar-legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #3498db;"></div>
+        <span>Scheduled</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #27ae60;"></div>
+        <span>Completed</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #e74c3c;"></div>
+        <span>Cancelled</span>
+      </div>
+    </div>
+  </div>
+</div>

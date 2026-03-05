@@ -1,0 +1,124 @@
+/* ===============================
+   Clean Blue Navbar Styling
+   =============================== */
+
+.navbar {
+  background: linear-gradient(90deg, #0d6efd, #007bff); /* gradient blue */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  padding: 0.5rem 0;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Brand (Logo + Text) */
+.navbar-brand {
+  color: #fff !important;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+  color: #e3f2fd !important;
+}
+
+/* Nav links (Home, Dashboard, etc.) */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  list-style: none; /* removes bullets */
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  color: #ffffffcc !important;
+  text-decoration: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Buttons (Login / Register) */
+.btn {
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  transition: all 0.3s ease;
+}
+
+/* Register Button */
+.btn-light {
+  background-color: #ffffff;
+  color: #0d6efd;
+  border: none;
+}
+
+.btn-light:hover {
+  background-color: #e3f2fd;
+  color: #084298;
+}
+
+/* Login Button */
+.btn-outline-light {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.btn-outline-light:hover {
+  background-color: #ffffff;
+  color: #0d6efd;
+}
+
+/* Dropdown Styling */
+.dropdown-menu {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+  color: #0d6efd;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #e3f2fd;
+  color: #084298;
+}
+
+/* Responsive Fixes */
+.navbar-toggler {
+  border: none;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+.navbar-collapse {
+  justify-content: space-between;
+  align-items: center;
+}

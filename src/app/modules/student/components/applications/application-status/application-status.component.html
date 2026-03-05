@@ -1,0 +1,18 @@
+<div *ngFor="let application of applications" class="application-card">
+  <h3>{{ application.companyName }}</h3>
+  <p>{{ application.jobTitle }}</p>
+  
+  <div class="status-badge" [style.background]="getStatusColor(application.status)">
+    {{ getStatusLabel(application.status) }}
+  </div>
+
+  <div class="details">
+    <span>Applied: {{ application.appliedDate | date }}</span>
+    
+    <div *ngIf="application.interview?.scheduledDate">
+      Interview: {{ application.interview?.scheduledDate | date }}
+    </div>
+
+    <p *ngIf="application.notes">{{ application.notes }}</p>
+  </div>
+</div>

@@ -1,0 +1,184 @@
+.placement-drives-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h2 {
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+.drives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.drive-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.drive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.drive-card.registered {
+  border-color: #28a745;
+  background: #f8fff9;
+}
+
+.drive-card.expired {
+  border-color: #dc3545;
+  background: #fff8f8;
+  opacity: 0.8;
+}
+
+.drive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.drive-header h3 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 1.4em;
+}
+
+.package {
+  background: #3498db;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.job-title {
+  font-size: 1.1em;
+  color: #34495e;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.description {
+  color: #7f8c8d;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.drive-details {
+  margin-bottom: 15px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.detail-item .label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.eligibility {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.eligibility h4 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1em;
+}
+
+.eligibility ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.eligibility li {
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.drive-actions {
+  text-align: center;
+}
+
+.btn-register {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100%;
+}
+
+.btn-register:hover {
+  background: #219a52;
+}
+
+.btn-registered {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  width: 100%;
+  cursor: not-allowed;
+}
+
+.btn-expired {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  width: 100%;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .placement-drives-container {
+    padding: 15px;
+  }
+  
+  .drives-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .drive-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

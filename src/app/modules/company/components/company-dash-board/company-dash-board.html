@@ -1,0 +1,175 @@
+<!-- company-dash-board.html -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <img [src]="companyProfile.logo || 'assets/default-company-logo.png'" alt="Company Logo">
+      </div>
+      <h2 class="company-name">{{ companyProfile.name || 'Company Name' }}</h2>
+    </div>
+
+    <div class="company-status" [ngClass]="'status-' + companyProfile.status">
+      <i class="material-icons">
+        {{ companyProfile.status === 'approved' ? 'check_circle' :
+           companyProfile.status === 'rejected' ? 'cancel' : 'schedule' }}
+      </i>
+      <span>Status: {{ companyProfile.status | titlecase }}</span>
+    </div>
+
+    <nav class="nav-menu">
+      <a class="nav-item" [class.active]="activeSection === 'dashboard'" (click)="switchSection('dashboard')">
+        <i class="material-icons">dashboard</i>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'profile'" (click)="switchSection('profile')">
+        <i class="material-icons">business</i>
+        <span>Company Profile</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'jobs'" (click)="switchSection('jobs')">
+        <i class="material-icons">work</i>
+        <span>Job Postings</span>
+        <span class="badge">{{ dashboardStats.activeJobs }}</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'applications'" (click)="switchSection('applications')">
+        <i class="material-icons">description</i>
+        <span>Applications</span>
+        <span class="badge">{{ dashboardStats.totalApplications }}</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'drives'" (click)="switchSection('drives')">
+        <i class="material-icons">event</i>
+        <span>Placement Drives</span>
+        <span class="badge">{{ dashboardStats.upcomingDrives }}</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'analytics'" (click)="switchSection('analytics')">
+        <i class="material-icons">analytics</i>
+        <span>Analytics</span>
+      </a>
+
+      <a class="nav-item" [class.active]="activeSection === 'communication'" (click)="switchSection('communication')">
+        <i class="material-icons">message</i>
+        <span>Communication</span>
+        <span class="badge">{{ dashboardStats.unreadNotifications }}</span>
+      </a>
+
+      <!-- Screenshot Button -->
+      <a class="nav-item screenshot-btn" (click)="takeScreenshot()">
+        <i class="material-icons">photo_camera</i>
+        <span>Take Screenshot</span>
+      </a>
+    </nav>
+
+    <div class="user-footer">
+      <div class="user-info">
+        <img src="assets/default-avatar.png" alt="User Avatar">
+        <div class="user-details">
+          <p class="user-name">{{ userName }}</p>
+          <p class="user-role">{{ userRole }}</p>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="material-icons">logout</i>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="dashboard-header">
+      <h1>Company Dashboard</h1>
+      <button class="screenshot-action-btn" (click)="takeScreenshot()">
+        <i class="material-icons">photo_camera</i>
+        Capture Dashboard
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon primary">
+          <i class="material-icons">work</i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ dashboardStats.activeJobs }}</h3>
+          <p>Active Jobs</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <i class="material-icons">description</i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ dashboardStats.totalApplications }}</h3>
+          <p>Total Applications</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <i class="material-icons">schedule</i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ dashboardStats.pendingReviews }}</h3>
+          <p>Pending Reviews</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon info">
+          <i class="material-icons">event</i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ dashboardStats.upcomingDrives }}</h3>
+          <p>Upcoming Drives</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="action-buttons">
+        <button class="action-btn" (click)="postJob()">
+          <i class="material-icons">add</i>
+          Post New Job
+        </button>
+        <button class="action-btn" (click)="scheduleDrive()">
+          <i class="material-icons">event_available</i>
+          Schedule Drive
+        </button>
+        <button class="action-btn" (click)="viewApplications()">
+          <i class="material-icons">list_alt</i>
+          View Applications
+        </button>
+        <button class="action-btn" (click)="viewAnalytics()">
+          <i class="material-icons">analytics</i>
+          View Analytics
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="recent-activities">
+      <h2>Recent Activities</h2>
+      <div class="activity-list">
+        <div *ngFor="let activity of recentActivities" class="activity-item" [ngClass]="'activity-' + activity.type">
+          <div class="activity-icon">
+            <i class="material-icons">{{ activity.icon }}</i>
+          </div>
+          <div class="activity-content">
+            <p class="activity-message">{{ activity.message }}</p>
+            <span class="activity-time">{{ activity.time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <router-outlet></router-outlet>
+  </main>
+</div>

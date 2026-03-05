@@ -1,0 +1,64 @@
+<div class="placement-drives-container">
+  <div class="header">
+    <h2>Upcoming Placement Drives</h2>
+    <p>Register for companies visiting our campus</p>
+  </div>
+
+  <div class="drives-grid">
+    <div *ngFor="let drive of placementDrives" 
+         class="drive-card" 
+         [class.registered]="isRegistered(drive.id)"
+         [class.expired]="!canRegister(drive)">
+      
+      <div class="drive-header">
+        <h3>{{ drive.companyName }}</h3>
+        <span class="package">{{ drive.package }}</span>
+      </div>
+
+      <div class="drive-content">
+        <p class="job-title">{{ drive.jobTitle }}</p>
+        <p class="description">{{ drive.description }}</p>
+        
+        <div class="drive-details">
+          <div class="detail-item">
+            <span class="label">Location:</span>
+            <span>{{ drive.location }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Drive Date:</span>
+            <span>{{ drive.driveDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Registration Deadline:</span>
+            <span>{{ drive.registrationDeadline | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="eligibility">
+          <h4>Eligibility Criteria:</h4>
+          <ul>
+            <li>Min CGPA: {{ drive.eligibility.minCGPA }}</li>
+            <li>Branches: {{ drive.eligibility.allowedBranches.join(', ') }}</li>
+            <li>Backlogs: {{ drive.eligibility.backlogAllowed ? 'Allowed' : 'Not Allowed' }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="drive-actions">
+        <button *ngIf="!isRegistered(drive.id) && canRegister(drive)"
+                (click)="registerForDrive(drive.id)"
+                class="btn-register">
+          Register
+        </button>
+        <button *ngIf="isRegistered(drive.id)"
+                class="btn-registered" disabled>
+          Registered
+        </button>
+        <button *ngIf="!canRegister(drive)"
+                class="btn-expired" disabled>
+          Registration Closed
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

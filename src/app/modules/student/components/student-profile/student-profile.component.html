@@ -1,0 +1,442 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>Student Profile</h1>
+    <p>Manage your personal and academic information</p>
+  </div>
+
+  <div class="profile-content">
+    <!-- Sidebar Navigation -->
+    <div class="profile-sidebar">
+      <div class="sidebar-nav">
+        <button 
+          class="nav-item" 
+          [class.active]="activeTab === 'personal'"
+          (click)="setActiveTab('personal')">
+          <i class="fas fa-user"></i>
+          Personal Info
+        </button>
+        <button 
+          class="nav-item" 
+          [class.active]="activeTab === 'academic'"
+          (click)="setActiveTab('academic')">
+          <i class="fas fa-graduation-cap"></i>
+          Academic Info
+        </button>
+        <button 
+          class="nav-item" 
+          [class.active]="activeTab === 'education'"
+          (click)="setActiveTab('education')">
+          <i class="fas fa-book"></i>
+          Education
+        </button>
+        <button 
+          class="nav-item" 
+          [class.active]="activeTab === 'projects'"
+          (click)="setActiveTab('projects')">
+          <i class="fas fa-code"></i>
+          Projects
+        </button>
+        <button 
+          class="nav-item" 
+          [class.active]="activeTab === 'skills'"
+          (click)="setActiveTab('skills')">
+          <i class="fas fa-star"></i>
+          Skills
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="profile-main">
+      <!-- Personal Info Tab -->
+      <div *ngIf="activeTab === 'personal'" class="tab-content">
+        <div class="tab-header">
+          <h2>Personal Information</h2>
+          <button 
+            class="edit-btn"
+            (click)="isEditing = !isEditing">
+            {{ isEditing ? 'Cancel' : 'Edit' }}
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" *ngIf="student">
+          <div formGroupName="personalInfo" class="form-grid">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input 
+                type="text" 
+                formControlName="firstName"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Last Name *</label>
+              <input 
+                type="text" 
+                formControlName="lastName"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Email *</label>
+              <input 
+                type="email" 
+                formControlName="email"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Phone *</label>
+              <input 
+                type="tel" 
+                formControlName="phone"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group full-width">
+              <label>Address *</label>
+              <textarea 
+                formControlName="address"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing"
+                rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Date of Birth *</label>
+              <input 
+                type="date" 
+                formControlName="dateOfBirth"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+          </div>
+
+          <div *ngIf="isEditing" class="form-actions">
+            <button 
+              type="button" 
+              class="save-btn"
+              (click)="onSaveProfile()"
+              [disabled]="!profileForm.get('personalInfo')?.valid">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Academic Info Tab -->
+      <div *ngIf="activeTab === 'academic'" class="tab-content">
+        <div class="tab-header">
+          <h2>Academic Information</h2>
+          <button 
+            class="edit-btn"
+            (click)="isEditing = !isEditing">
+            {{ isEditing ? 'Cancel' : 'Edit' }}
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" *ngIf="student">
+          <div formGroupName="academicInfo" class="form-grid">
+            <div class="form-group">
+              <label>College/University *</label>
+              <input 
+                type="text" 
+                formControlName="college"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Degree *</label>
+              <select 
+                formControlName="degree"
+                [disabled]="!isEditing"
+                [class.editing]="isEditing">
+                <option value="">Select Degree</option>
+                <option value="B.Tech">B.Tech</option>
+                <option value="B.E">B.E</option>
+                <option value="B.Sc">B.Sc</option>
+                <option value="B.Com">B.Com</option>
+                <option value="MBA">MBA</option>
+                <option value="MCA">MCA</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Branch *</label>
+              <input 
+                type="text" 
+                formControlName="branch"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Current Semester *</label>
+              <select 
+                formControlName="semester"
+                [disabled]="!isEditing"
+                [class.editing]="isEditing">
+                <option value="">Select Semester</option>
+                <option *ngFor="let sem of [1,2,3,4,5,6,7,8]" [value]="sem">
+                  Semester {{ sem }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>CGPA *</label>
+              <input 
+                type="number" 
+                step="0.01"
+                min="0"
+                max="10"
+                formControlName="cgpa"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+
+            <div class="form-group">
+              <label>Graduation Year *</label>
+              <input 
+                type="number" 
+                formControlName="graduationYear"
+                [readonly]="!isEditing"
+                [class.editing]="isEditing">
+            </div>
+          </div>
+
+          <div *ngIf="isEditing" class="form-actions">
+            <button 
+              type="button" 
+              class="save-btn"
+              (click)="onSaveProfile()"
+              [disabled]="!profileForm.get('academicInfo')?.valid">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Education Tab -->
+      <div *ngIf="activeTab === 'education'" class="tab-content">
+        <div class="tab-header">
+          <h2>Education History</h2>
+        </div>
+
+        <!-- Add Education Form -->
+        <div class="add-section">
+          <h3>Add Education</h3>
+          <form [formGroup]="educationForm" class="education-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Institution *</label>
+                <input type="text" formControlName="institution">
+              </div>
+
+              <div class="form-group">
+                <label>Degree *</label>
+                <input type="text" formControlName="degree">
+              </div>
+
+              <div class="form-group">
+                <label>Field of Study *</label>
+                <input type="text" formControlName="fieldOfStudy">
+              </div>
+
+              <div class="form-group">
+                <label>Start Date *</label>
+                <input type="date" formControlName="startDate">
+              </div>
+
+              <div class="form-group">
+                <label>End Date *</label>
+                <input type="date" formControlName="endDate">
+              </div>
+
+              <div class="form-group">
+                <label>Percentage/CGPA *</label>
+                <input type="number" step="0.01" formControlName="percentage">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="save-btn"
+                (click)="onAddEducation()"
+                [disabled]="!educationForm.valid">
+                Add Education
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Education List -->
+        <div class="education-list" *ngIf="student?.education?.length">
+          <h3>Education History</h3>
+          <div class="education-item" *ngFor="let edu of student?.education || []">
+            <div class="edu-info">
+              <h4>{{ edu.degree }} in {{ edu.field }}</h4>
+              <p class="institution">{{ edu.institution }}</p>
+              <p class="duration">
+                {{ edu.startDate | date:'MMM yyyy' }} - {{ edu.endDate | date:'MMM yyyy' }} | 
+                {{ edu.percentage }}%
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Tab -->
+      <div *ngIf="activeTab === 'projects'" class="tab-content">
+        <div class="tab-header">
+          <h2>Projects</h2>
+        </div>
+
+        <!-- Add Project Form -->
+        <div class="add-section">
+          <h3>Add Project</h3>
+          <form [formGroup]="projectForm" class="project-form">
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Project Title *</label>
+                <input type="text" formControlName="title">
+              </div>
+
+              <div class="form-group full-width">
+                <label>Description *</label>
+                <textarea formControlName="description" rows="4"></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label>Technologies Used</label>
+                <div class="custom-chips-container">
+                  <div class="custom-chips">
+                    <span 
+                      *ngFor="let tech of projectForm.get('technologies')?.value" 
+                      class="custom-chip">
+                      {{ tech }}
+                      <span class="remove-chip" (click)="onTechnologyRemove(tech)">×</span>
+                    </span>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Add technology and press Enter"
+                    (keyup.enter)="addTechnology($event)"
+                    class="chip-input">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Duration</label>
+                <input type="text" formControlName="duration" placeholder="e.g., 3 months">
+              </div>
+
+              <div class="form-group">
+                <label>GitHub Link</label>
+                <input type="url" formControlName="githubLink">
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="button" 
+                class="save-btn"
+                (click)="onAddProject()"
+                [disabled]="!projectForm.valid">
+                Add Project
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Projects List -->
+        <div class="projects-list" *ngIf="student?.projects?.length">
+          <h3>Your Projects</h3>
+          <div class="project-item" *ngFor="let project of student?.projects || []">
+            <div class="project-header">
+              <h4>{{ project.title }}</h4>
+              <span class="duration">{{ project.duration }}</span>
+            </div>
+            <p class="project-desc">{{ project.description }}</p>
+            <div class="tech-tags">
+              <span class="tech-tag" *ngFor="let tech of project.technologies">
+                {{ tech }}
+              </span>
+            </div>
+            <a *ngIf="project.githubLink" [href]="project.githubLink" target="_blank" class="github-link">
+              <i class="fab fa-github"></i> View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Tab -->
+      <div *ngIf="activeTab === 'skills'" class="tab-content">
+        <div class="tab-header">
+          <h2>Skills</h2>
+        </div>
+
+        <div class="skills-section">
+          <h3>Add Skills</h3>
+          <div class="skills-input">
+            <div class="custom-chips-container">
+              <div class="custom-chips">
+                <span 
+                  *ngFor="let skill of profileForm.get('skills')?.value" 
+                  class="custom-chip">
+                  {{ skill }}
+                  <span class="remove-chip" (click)="onSkillRemove(skill)">×</span>
+                </span>
+              </div>
+              <input 
+                type="text" 
+                placeholder="Type skill and press Enter"
+                (keyup.enter)="addSkillInput($event)"
+                class="chip-input">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="button" 
+              class="save-btn"
+              (click)="onSaveProfile()">
+              Save Skills
+            </button>
+          </div>
+
+          <!-- Skills Categories -->
+          <div class="skills-categories">
+            <div class="category">
+              <h4>Technical Skills</h4>
+              <div class="skills-grid">
+                <span class="skill-suggestion" (click)="addSuggestedSkill('JavaScript')">JavaScript</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Python')">Python</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Java')">Java</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('React')">React</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Angular')">Angular</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Node.js')">Node.js</span>
+              </div>
+            </div>
+
+            <div class="category">
+              <h4>Soft Skills</h4>
+              <div class="skills-grid">
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Communication')">Communication</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Teamwork')">Teamwork</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Problem Solving')">Problem Solving</span>
+                <span class="skill-suggestion" (click)="addSuggestedSkill('Leadership')">Leadership</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

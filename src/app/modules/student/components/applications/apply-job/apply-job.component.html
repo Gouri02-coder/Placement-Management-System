@@ -1,0 +1,109 @@
+<div class="apply-job-container">
+  <div class="application-form">
+    <!-- Job Details -->
+    <div class="job-preview">
+      <h2>Apply for Position</h2>
+      
+      <div class="job-card">
+        <div class="job-header">
+          <h3>{{ job.title }}</h3>
+          <span class="company">{{ job.company }}</span>
+        </div>
+        
+        <div class="job-details">
+          <div class="detail-row">
+            <span class="label">Package:</span>
+            <span class="value">{{ job.package }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Location:</span>
+            <span class="value">{{ job.location }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Job Type:</span>
+            <span class="value">{{ job.type }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Application Deadline:</span>
+            <span class="value">{{ job.deadline | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="job-description">
+          <h4>Job Description</h4>
+          <p>{{ job.description }}</p>
+        </div>
+
+        <div class="job-requirements">
+          <h4>Requirements</h4>
+          <ul>
+            <li *ngFor="let requirement of job.requirements">{{ requirement }}</li>
+          </ul>
+        </div>
+
+        <div *ngIf="!canApply()" class="deadline-warning">
+          ⚠️ Application deadline has passed
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Form -->
+    <form #applyForm="ngForm" class="application-details" (ngSubmit)="onSubmit()">
+      <h3>Application Details</h3>
+
+      <div class="form-group">
+        <label for="resume">Select Resume *</label>
+        <select id="resume" [(ngModel)]="application.resume" name="resume" required>
+          <option value="">Choose a resume...</option>
+          <option *ngFor="let resume of resumes" [value]="resume">
+            {{ resume }}
+          </option>
+        </select>
+        <small>
+          <a routerLink="/student/resume-builder" class="link">Create new resume</a>
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="coverLetter">Cover Letter</label>
+        <textarea id="coverLetter" [(ngModel)]="application.coverLetter" 
+                  name="coverLetter" rows="6" 
+                  placeholder="Write a custom cover letter for this position..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="availability">Availability</label>
+        <select id="availability" [(ngModel)]="application.availability" name="availability">
+          <option value="immediately">Immediately</option>
+          <option value="2-weeks">2 Weeks Notice</option>
+          <option value="1-month">1 Month Notice</option>
+          <option value="2-months">2 Months Notice</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="expectedSalary">Expected Salary (Optional)</label>
+        <input type="text" id="expectedSalary" [(ngModel)]="application.expectedSalary" 
+               name="expectedSalary" placeholder="e.g., ₹12 LPA">
+      </div>
+
+      <div class="form-group">
+        <label for="additionalInfo">Additional Information</label>
+        <textarea id="additionalInfo" [(ngModel)]="application.additionalInfo" 
+                  name="additionalInfo" rows="4" 
+                  placeholder="Any additional information you'd like to share..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" (click)="onCancel()" class="btn-cancel">
+          Cancel
+        </button>
+        <button type="submit" 
+                [disabled]="!applyForm.valid || !canApply()" 
+                class="btn-submit">
+          {{ canApply() ? 'Submit Application' : 'Application Closed' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

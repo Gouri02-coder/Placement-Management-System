@@ -1,0 +1,178 @@
+<div class="job-search-container">
+  <div class="search-header">
+    <h1>Find Your Dream Job</h1>
+    <p>Discover opportunities that match your skills and interests</p>
+  </div>
+
+  <!-- Search Filters -->
+  <div class="search-filters">
+    <form [formGroup]="searchForm" class="filters-form">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Keywords</label>
+          <input 
+            type="text" 
+            formControlName="keyword"
+            placeholder="Job title, company, or skills...">
+        </div>
+
+        <div class="filter-group">
+          <label>Location</label>
+          <input 
+            type="text" 
+            formControlName="location"
+            placeholder="City or state...">
+        </div>
+
+        <div class="filter-group">
+          <label>Job Type</label>
+          <select formControlName="jobType">
+            <option value="">All Types</option>
+            <option value="full-time">Full Time</option>
+            <option value="part-time">Part Time</option>
+            <option value="internship">Internship</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Experience</label>
+          <select formControlName="experience">
+            <option value="">Any Experience</option>
+            <option value="fresher">Fresher</option>
+            <option value="0-2">0-2 years</option>
+            <option value="2-5">2-5 years</option>
+            <option value="5+">5+ years</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button 
+          type="button" 
+          class="clear-btn"
+          (click)="onClearFilters()">
+          Clear Filters
+        </button>
+        <button 
+          type="button" 
+          class="search-btn"
+          (click)="onSearch()">
+          Search Jobs
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results-section">
+    <div class="results-header">
+      <h2>Job Opportunities</h2>
+      <span class="results-count">{{ filteredJobs.length }} jobs found</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading jobs...</p>
+    </div>
+
+    <!-- Jobs List -->
+    <div *ngIf="!isLoading" class="jobs-list">
+      <div 
+        *ngFor="let job of filteredJobs" 
+        class="job-card"
+        [class.featured]="job.positions > 5">
+        
+        <!-- Job Header -->
+        <div class="job-header">
+          <div class="company-info">
+            <div class="company-logo">
+              {{ job.companyName.charAt(0) }}
+            </div>
+            <div class="job-details">
+              <h3 class="job-title">{{ job.title }}</h3>
+              <p class="company-name">{{ job.companyName }}</p>
+              <p class="job-location">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ job.location }}
+              </p>
+            </div>
+          </div>
+          <div class="job-meta">
+            <span class="job-type {{ getJobTypeClass(job.type) }}">
+              {{ job.type }}
+            </span>
+            <span class="salary">
+              ₹{{ job.salary.min/1000 }}k - ₹{{ job.salary.max/1000 }}k
+            </span>
+          </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="job-description">
+          <p>{{ job.description | slice:0:150 }}...</p>
+        </div>
+
+        <!-- Skills Required -->
+        <div class="skills-section">
+          <h4>Skills Required:</h4>
+          <div class="skills-list">
+            <span 
+              *ngFor="let skill of job.skillsRequired.slice(0, 4)" 
+              class="skill-tag">
+              {{ skill }}
+            </span>
+            <span *ngIf="job.skillsRequired.length > 4" class="skill-more">
+              +{{ job.skillsRequired.length - 4 }} more
+            </span>
+          </div>
+        </div>
+
+        <!-- Job Footer -->
+        <div class="job-footer">
+          <div class="job-stats">
+            <span class="deadline">
+              <i class="fas fa-clock"></i>
+              Apply before {{ job.applicationDeadline | date:'mediumDate' }}
+            </span>
+            <span class="positions">
+              <i class="fas fa-users"></i>
+              {{ job.positions }} positions
+            </span>
+          </div>
+          <div class="job-actions">
+        <button 
+          class="view-btn"
+          [routerLink]="['/job-details', job.id]">
+          View Details
+        </button>
+        <button 
+          class="apply-btn"
+          [routerLink]="['/apply-job', job.id]">
+          Apply Now
+        </button>
+      </div>
+
+        <!-- Featured Badge -->
+        <div *ngIf="job.positions > 5" class="featured-badge">
+          <i class="fas fa-star"></i>
+          Featured
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredJobs.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h3>No jobs found</h3>
+      <p>Try adjusting your search criteria or browse all jobs</p>
+      <button 
+        class="browse-all-btn"
+        (click)="onClearFilters()">
+        Browse All Jobs
+      </button>
+    </div>
+  </div>
+</div>

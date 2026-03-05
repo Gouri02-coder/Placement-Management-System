@@ -1,0 +1,73 @@
+<!-- <aside class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <div class="sidebar-brand" [hidden]="isCollapsed">
+      <div class="brand-logo">🎯</div>
+      <div class="brand-text">
+        <h3>Placement System</h3>
+        <span class="user-role">{{ getRoleDisplayName() }}</span>
+      </div>
+    </div>
+
+    <button class="toggle-btn" (click)="onToggleCollapse()" [title]="isCollapsed ? 'Expand' : 'Collapse'">
+      <span class="toggle-icon">{{ isCollapsed ? '→' : '←' }}</span>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section" *ngFor="let item of filteredItems">
+      <div 
+        class="nav-item parent"
+        [class.active]="isActiveRoute(item.route) || hasActiveChild(item)"
+        [class.expanded]="isItemExpanded(item)"
+        [class.has-children]="item.children && item.children.length > 0">
+        
+        <a 
+          *ngIf="!item.children || item.children.length === 0"
+          [routerLink]="item.route"
+          class="nav-link"
+          [title]="item.label">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label" [hidden]="isCollapsed">{{ item.label }}</span>
+        </a>
+
+        <button 
+          *ngIf="item.children && item.children.length > 0"
+          class="nav-link toggle-button"
+          (click)="toggleItem(item)"
+          [title]="item.label">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label" [hidden]="isCollapsed">{{ item.label }}</span>
+          <span class="chevron" [hidden]="isCollapsed">{{ isItemExpanded(item) ? '▼' : '▶' }}</span>
+        </button>
+
+        <div 
+          class="nav-children" 
+          *ngIf="item.children && item.children.length > 0"
+          [class.show]="isItemExpanded(item) && (!isCollapsed || isItemExpanded(item))">
+          
+          <a 
+            *ngFor="let child of item.children"
+            [routerLink]="child.route"
+            class="nav-child"
+            [class.active]="isActiveRoute(child.route)"
+            [title]="child.label">
+            <span class="child-icon">{{ child.icon }}</span>
+            <span class="child-label">{{ child.label }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer" [hidden]="isCollapsed || !currentUser">
+    <div class="user-info">
+      <div class="user-avatar">
+        {{ currentUser?.name?.charAt(0) || 'U' }}
+      </div>
+      <div class="user-details">
+        <div class="user-name">{{ currentUser?.name || 'User' }}</div>
+        <div class="user-email">{{ currentUser?.email || '' }}</div>
+      </div>
+    </div>
+  </div>
+</aside> -->

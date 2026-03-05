@@ -1,0 +1,224 @@
+<div class="application-list-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Applications</h1>
+      <p>Manage and review candidate applications</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="exportToExcel()">
+        <i class="material-icons">download</i> Export Excel
+      </button>
+      <button class="btn btn-outline" (click)="exportToPDF()">
+        <i class="material-icons">picture_as_pdf</i> Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="bulk-actions" *ngIf="selectedCount > 0">
+    <div class="bulk-info">
+      <strong>{{selectedCount}}</strong> application{{selectedCount !== 1 ? 's' : ''}} selected
+    </div>
+    <div class="bulk-buttons">
+      <button class="btn btn-outline btn-success" (click)="bulkUpdateStatus('shortlisted')">
+        <i class="material-icons">star</i> Shortlist
+      </button>
+      <button class="btn btn-outline btn-warning" (click)="bulkUpdateStatus('reviewed')">
+        <i class="material-icons">visibility</i> Mark Reviewed
+      </button>
+      <button class="btn btn-outline btn-danger" (click)="bulkUpdateStatus('rejected')">
+        <i class="material-icons">cancel</i> Reject
+      </button>
+      <button class="btn btn-outline btn-info" (click)="bulkUpdateStatus('hired')">
+        <i class="material-icons">check_circle</i> Mark Hired
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="material-icons">search</i>
+      <input type="text" placeholder="Search by name, email, or job title..." 
+             [(ngModel)]="searchTerm" (input)="searchApplications()">
+    </div>
+    
+    <div class="filter-group">
+      <label>Job:</label>
+      <select [(ngModel)]="jobFilter" (change)="applyFilters()">
+        <option value="all">All Jobs</option>
+        <option *ngFor="let job of getUniqueJobs()" [value]="job">{{job}}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Status:</label>
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="all">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="reviewed">Reviewed</option>
+        <option value="shortlisted">Shortlisted</option>
+        <option value="rejected">Rejected</option>
+        <option value="hired">Hired</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Branch:</label>
+      <select [(ngModel)]="branchFilter" (change)="applyFilters()">
+        <option value="all">All Branches</option>
+        <option *ngFor="let branch of getUniqueBranches()" [value]="branch">{{branch}}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Min CGPA:</label>
+      <input type="number" [(ngModel)]="minCGPAPicker" (change)="applyFilters()" 
+             step="0.1" min="0" max="10" placeholder="e.g., 7.5">
+    </div>
+
+    <button class="btn btn-outline btn-clear" (click)="clearFilters()">
+      <i class="material-icons">clear</i> Clear
+    </button>
+
+    <div class="results-count">
+      {{filteredApplications.length}} application{{filteredApplications.length !== 1 ? 's' : ''}} found
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="material-icons spin">refresh</i>
+    <p>Loading applications...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredApplications.length === 0">
+    <i class="material-icons">description</i>
+    <h3>No applications found</h3>
+    <p *ngIf="searchTerm || statusFilter !== 'all' || jobFilter !== 'all' || branchFilter !== 'all' || minCGPAPicker">
+      Try adjusting your search filters
+    </p>
+    <p *ngIf="!searchTerm && statusFilter === 'all' && jobFilter === 'all' && branchFilter === 'all' && !minCGPAPicker">
+      No applications have been submitted yet for your job postings.
+    </p>
+  </div>
+
+  <!-- Applications Table -->
+  <div class="applications-table" *ngIf="!isLoading && filteredApplications.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th class="select-column">
+            <label class="checkbox-option">
+              <input type="checkbox" [checked]="selectAll" (change)="toggleSelectAll()">
+              <span class="checkbox-checkmark"></span>
+            </label>
+          </th>
+          <th>Candidate</th>
+          <th>Job Applied</th>
+          <th>Branch</th>
+          <th>CGPA</th>
+          <th>Skills</th>
+          <th>Applied Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let application of paginatedApplications" 
+            [class.selected]="selectedApplications.has(application?.id || '')">
+          <td class="select-column">
+            <label class="checkbox-option">
+              <input type="checkbox" 
+                     [checked]="selectedApplications.has(application?.id || '')"
+                     (change)="toggleApplicationSelection(application?.id)">
+              <span class="checkbox-checkmark"></span>
+            </label>
+          </td>
+          <td class="candidate-info">
+            <div class="candidate-name">{{application?.candidateName}}</div>
+            <div class="candidate-email">{{application?.candidateEmail}}</div>
+            <div class="candidate-phone">{{application?.candidatePhone}}</div>
+          </td>
+          <td class="job-info">
+            <div class="job-title">{{application?.jobTitle}}</div>
+          </td>
+          <td class="branch">
+            {{application?.branch}}
+          </td>
+          <td class="cgpa">
+            <span class="cgpa-badge">{{application?.cgpa}}</span>
+          </td>
+          <td class="skills">
+            <div class="skills-tags">
+              <span class="skill-tag" *ngFor="let skill of application?.skills?.slice(0, 3)">{{skill}}</span>
+              <span class="skill-more" *ngIf="(application?.skills?.length || 0) > 3">
+                +{{(application?.skills?.length || 0) - 3}} more
+              </span>
+            </div>
+          </td>
+          <td class="applied-date">
+            {{application?.appliedAt | date:'mediumDate'}}
+          </td>
+          <td class="status">
+            <span class="status-badge" [class]="getStatusClass(application?.status)">
+              <i class="material-icons">{{getStatusIcon(application?.status)}}</i>
+              {{application?.status | uppercase}}
+            </span>
+          </td>
+          <td class="actions">
+            <div class="action-buttons">
+              <button class="btn-icon" (click)="viewCandidateProfile(application?.id)" 
+                      matTooltip="View Profile">
+                <i class="material-icons">person</i>
+              </button>
+              <button class="btn-icon" (click)="viewResume(application)" 
+                      matTooltip="View Resume">
+                <i class="material-icons">description</i>
+              </button>
+              <div class="status-dropdown">
+                <select [value]="application?.status" 
+                        (change)="updateApplicationStatus(application?.id, $any($event.target).value)">
+                  <option value="pending">Pending</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="shortlisted">Shortlisted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="hired">Hired</option>
+                </select>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && filteredApplications.length > 0">
+    <div class="pagination-info">
+      Showing {{(currentPage - 1) * itemsPerPage + 1}} to 
+      {{getEndIndex()}} of 
+      {{filteredApplications.length}} entries
+    </div>
+    
+    <div class="pagination-controls">
+      <button class="btn btn-outline" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+        <i class="material-icons">chevron_left</i> Previous
+      </button>
+      
+      <div class="page-numbers">
+        <button *ngFor="let page of getPages()" 
+                class="page-btn" 
+                [class.active]="page === currentPage"
+                (click)="changePage(page)">
+          {{page}}
+        </button>
+      </div>
+      
+      <button class="btn btn-outline" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        Next <i class="material-icons">chevron_right</i>
+      </button>
+    </div>
+  </div>
+</div>

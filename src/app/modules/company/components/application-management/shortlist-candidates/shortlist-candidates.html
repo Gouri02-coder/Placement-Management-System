@@ -1,0 +1,111 @@
+<div class="shortlist-container">
+  <div class="page-header">
+    <h1>Shortlisted Candidates</h1>
+    <p>Your top candidates ready for final review</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <i class="material-icons spin">refresh</i>
+    <p>Loading shortlisted candidates...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && shortlistedApplications.length === 0">
+    <i class="material-icons">star_border</i>
+    <h3>No shortlisted candidates</h3>
+    <p>You haven't shortlisted any candidates yet. Start reviewing applications to build your shortlist.</p>
+  </div>
+
+  <!-- Shortlisted Candidates Grid -->
+  <div class="candidates-grid" *ngIf="!isLoading && shortlistedApplications.length > 0">
+    <div class="candidate-card" *ngFor="let application of shortlistedApplications">
+      <div class="candidate-header">
+        <div class="candidate-avatar">
+          {{application.candidateName.charAt(0).toUpperCase()}}
+        </div>
+        <div class="candidate-basic-info">
+          <h3>{{application.candidateName}}</h3>
+          <p class="candidate-email">{{application.candidateEmail}}</p>
+          <p class="candidate-job">{{application.jobTitle}}</p>
+        </div>
+        <div class="candidate-status">
+          <span class="status-badge status-shortlisted">
+            <i class="material-icons">star</i>
+            SHORTLISTED
+          </span>
+        </div>
+      </div>
+
+      <div class="candidate-details">
+        <div class="detail-row">
+          <div class="detail-item">
+            <label>Branch</label>
+            <span>{{application.branch}}</span>
+          </div>
+          <div class="detail-item">
+            <label>CGPA</label>
+            <span class="cgpa">{{application.cgpa}}</span>
+          </div>
+          <div class="detail-item">
+            <label>Skills Level</label>
+            <span class="skill-level" [class]="getSkillLevelClass(application.skills)">
+              {{getSkillLevel(application.skills) | uppercase}}
+            </span>
+          </div>
+        </div>
+
+        <div class="skills-section">
+          <label>Key Skills</label>
+          <div class="skills-tags">
+            <span class="skill-tag" *ngFor="let skill of application.skills.slice(0, 5)">{{skill}}</span>
+            <span class="skill-more" *ngIf="application.skills.length > 5">
+              +{{application.skills.length - 5}} more
+            </span>
+          </div>
+        </div>
+
+        <div class="applied-info">
+          Applied: {{application.appliedAt | date:'mediumDate'}}
+        </div>
+      </div>
+
+      <div class="candidate-actions">
+        <button class="btn btn-outline" (click)="viewResume(application.resumeUrl)">
+          <i class="material-icons">description</i> View Resume
+        </button>
+        <button class="btn btn-success" (click)="hireCandidate(application.id)">
+          <i class="material-icons">check_circle</i> Hire
+        </button>
+        <button class="btn btn-outline btn-warning" (click)="removeFromShortlist(application.id)">
+          <i class="material-icons">remove_circle</i> Remove
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="summary-section" *ngIf="!isLoading && shortlistedApplications.length > 0">
+    <div class="summary-card">
+      <h3>Shortlist Summary</h3>
+      <div class="summary-stats">
+        <div class="stat">
+          <div class="stat-value">{{shortlistedApplications.length}}</div>
+          <div class="stat-label">Total Shortlisted</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">
+            {{getUniqueJobs().length}}
+          </div>
+          <div class="stat-label">Different Jobs</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">
+            {{getAverageCGPA()}}
+          </div>
+          <div class="stat-label">Average CGPA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

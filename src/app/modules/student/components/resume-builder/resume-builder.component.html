@@ -1,0 +1,215 @@
+<div class="resume-builder-container">
+  <div class="builder-header">
+    <h2>Resume Builder</h2>
+    <p>Create your professional resume</p>
+  </div>
+
+  <form #resumeForm="ngForm" class="resume-form">
+    <!-- Personal Information -->
+    <div class="form-section">
+      <h3>Personal Information</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" [(ngModel)]="student.personalInfo.firstName" 
+                 name="firstName" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" [(ngModel)]="student.personalInfo.lastName" 
+                 name="lastName" required>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="student.personalInfo.email" 
+                 name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input type="tel" [(ngModel)]="student.personalInfo.phone" 
+                 name="phone" required>
+        </div>
+        <div class="form-group full-width">
+          <label>Address</label>
+          <textarea [(ngModel)]="student.personalInfo.address" 
+                    name="address" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Date of Birth</label>
+          <input type="date" [(ngModel)]="student.personalInfo.dateOfBirth" 
+                 name="dateOfBirth">
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Information -->
+    <div class="form-section">
+      <h3>Academic Information</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>College *</label>
+          <input type="text" [(ngModel)]="student.academicInfo.college" 
+                 name="college" required>
+        </div>
+        <div class="form-group">
+          <label>Degree *</label>
+          <input type="text" [(ngModel)]="student.academicInfo.degree" 
+                 name="degree" required>
+        </div>
+        <div class="form-group">
+          <label>Branch *</label>
+          <input type="text" [(ngModel)]="student.academicInfo.branch" 
+                 name="branch" required>
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <input type="number" [(ngModel)]="student.academicInfo.semester" 
+                 name="semester" min="1" max="8">
+        </div>
+        <div class="form-group">
+          <label>CGPA</label>
+          <input type="number" [(ngModel)]="student.academicInfo.cgpa" 
+                 name="cgpa" step="0.1" min="0" max="10">
+        </div>
+        <div class="form-group">
+          <label>Graduation Year</label>
+          <input type="number" [(ngModel)]="student.academicInfo.graduationYear" 
+                 name="graduationYear">
+        </div>
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3>Education</h3>
+        <button type="button" (click)="addEducation()" class="btn-add">
+          Add Education
+        </button>
+      </div>
+      
+      <div *ngFor="let education of educations; let i = index" class="education-item">
+        <div class="item-header">
+          <h4>Education {{ i + 1 }}</h4>
+          <button *ngIf="educations.length > 1" type="button" 
+                  (click)="removeEducation(i)" class="btn-remove">
+            Remove
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Institution *</label>
+            <input type="text" [(ngModel)]="education.institution" 
+                   [name]="'institution' + i" required>
+          </div>
+          <div class="form-group">
+            <label>Degree *</label>
+            <input type="text" [(ngModel)]="education.degree" 
+                   [name]="'degree' + i" required>
+          </div>
+          <div class="form-group">
+            <label>Field of Study</label>
+            <input type="text" [(ngModel)]="education.field" 
+                   [name]="'field' + i">
+          </div>
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" [(ngModel)]="education.startDate" 
+                   [name]="'startDate' + i">
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" [(ngModel)]="education.endDate" 
+                   [name]="'endDate' + i">
+          </div>
+          <div class="form-group">
+            <label>Percentage/CGPA</label>
+            <input type="number" [(ngModel)]="education.percentage" 
+                   [name]="'percentage' + i" step="0.1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="form-section">
+      <h3>Skills</h3>
+      <div class="skills-input">
+        <input type="text" [(ngModel)]="newSkill" name="newSkill" 
+               placeholder="Add a skill" (keyup.enter)="addSkill()">
+        <button type="button" (click)="addSkill()" class="btn-add-skill">
+          Add
+        </button>
+      </div>
+      <div class="skills-list">
+        <span *ngFor="let skill of student.skills" class="skill-tag">
+          {{ skill }}
+          <button type="button" (click)="removeSkill(skill)" class="btn-remove-skill">
+            ×
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3>Projects</h3>
+        <button type="button" (click)="addProject()" class="btn-add">
+          Add Project
+        </button>
+      </div>
+      
+      <div *ngFor="let project of projects; let i = index" class="project-item">
+        <div class="item-header">
+          <h4>Project {{ i + 1 }}</h4>
+          <button *ngIf="projects.length > 1" type="button" 
+                  (click)="removeProject(i)" class="btn-remove">
+            Remove
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Project Title *</label>
+            <input type="text" [(ngModel)]="project.title" 
+                   [name]="'projectTitle' + i" required>
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea [(ngModel)]="project.description" 
+                      [name]="'projectDesc' + i" rows="4"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Technologies Used</label>
+            <input type="text" [(ngModel)]="project.technologies" 
+                   [name]="'technologies' + i" 
+                   placeholder="Separate technologies with commas">
+          </div>
+          <div class="form-group">
+            <label>Duration</label>
+            <input type="text" [(ngModel)]="project.duration" 
+                   [name]="'duration' + i" placeholder="e.g., 3 months">
+          </div>
+          <div class="form-group">
+            <label>GitHub Link</label>
+            <input type="url" [(ngModel)]="project.githubLink" 
+                   [name]="'githubLink' + i">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" (click)="saveResume()" class="btn-save">
+        Save Resume
+      </button>
+      <button type="button" (click)="previewResume()" class="btn-preview">
+        Preview Resume
+      </button>
+      <button type="button" (click)="downloadResume()" class="btn-download">
+        Download PDF
+      </button>
+    </div>
+  </form>
+</div>

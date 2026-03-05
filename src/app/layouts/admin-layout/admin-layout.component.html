@@ -1,0 +1,93 @@
+<div class="admin-layout">
+  <!-- Admin Navbar -->
+  <app-navbar></app-navbar>
+
+  <!-- Admin Sidebar -->
+  <app-sidebar 
+    [isCollapsed]="isSidebarCollapsed"
+    (toggleCollapse)="onToggleSidebar()">
+  </app-sidebar>
+
+  <!-- Main Content -->
+  <main class="admin-main" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <!-- Admin Header -->
+    <header class="admin-header">
+      <div class="header-content">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs" *ngIf="breadcrumbs.length > 0">
+          <a 
+            *ngFor="let breadcrumb of breadcrumbs; let last = last"
+            [routerLink]="breadcrumb.url"
+            class="breadcrumb-item"
+            [class.active]="last">
+            {{ breadcrumb.label }}
+            <span *ngIf="!last" class="breadcrumb-separator">/</span>
+          </a>
+        </nav>
+
+        <!-- Page Title and Actions -->
+        <div class="header-actions">
+          <div class="page-info">
+            <h1 class="page-title">
+              {{ breadcrumbs[breadcrumbs.length - 1]?.label || 'Admin Dashboard' }}
+            </h1>
+            <p class="page-subtitle" *ngIf="currentRoute === '/admin/dashboard'">
+              Welcome back, {{ getAdminRoleDisplay() }}! Here's what's happening today.
+            </p>
+          </div>
+
+          <div class="action-buttons">
+            <!-- Quick Stats on Dashboard -->
+            <div class="quick-stats" *ngIf="currentRoute === '/admin/dashboard'">
+              <div *ngFor="let stat of getAdminStats()" class="quick-stat">
+                <span class="stat-icon">{{ stat.icon }}</span>
+                <div class="stat-info">
+                  <div class="stat-value">{{ stat.value }}</div>
+                  <div class="stat-label">{{ stat.label }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Global Actions -->
+            <div class="global-actions">
+              <button class="action-btn" title="Notifications">
+                <span class="action-icon">🔔</span>
+                <span class="action-badge">3</span>
+              </button>
+              
+              <button class="action-btn" title="Help">
+                <span class="action-icon">❓</span>
+              </button>
+              
+              <button class="action-btn" title="Settings" routerLink="/admin/settings">
+                <span class="action-icon">⚙️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="admin-content">
+      <div class="content-wrapper">
+        <ng-content></ng-content>
+        
+        <!-- Router Outlet for Admin Components -->
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+
+    <!-- Admin Footer -->
+    <app-footer></app-footer>
+  </main>
+
+  <!-- Admin Loading Overlay -->
+  <app-loading-spinner 
+    *ngIf="false"
+    class="admin-loading"
+    type="spinner" 
+    size="large"
+    message="Processing...">
+  </app-loading-spinner>
+</div>

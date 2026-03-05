@@ -1,0 +1,23 @@
+<div class="loading-container" [class]="size">
+  <div class="loading-content" [class]="type">
+    <!-- Spinner Type -->
+    <div *ngIf="type === 'spinner'" class="spinner">
+      <div class="spinner-ring"></div>
+    </div>
+
+    <!-- Dots Type -->
+    <div *ngIf="type === 'dots'" class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <!-- Pulse Type -->
+    <div *ngIf="type === 'pulse'" class="pulse">
+      <div class="pulse-circle"></div>
+    </div>
+
+    <!-- Message -->
+    <p *ngIf="message" class="loading-message">{{ message }}</p>
+  </div>
+</div>
