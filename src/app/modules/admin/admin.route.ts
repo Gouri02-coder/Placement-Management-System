@@ -3,7 +3,7 @@ import { AuthGuard } from '../../core/guards/auth.guard';
 import { RoleGuard } from '../../core/guards/role.guard';
 
 // Admin Components
-import { AdminDashboard } from '../admin/components/admin-dashboard/admin-dashboard/admin-dashboard';
+import { AdminDashboard } from '../admin/components/admin-dashboard/admin-dashboard';
 import { CompanyList } from '../admin/components/admin-companies/company-list/company-list';
 import { CompanyDetails } from '../admin/components/admin-companies/company-details/company-details/company-details';
 import { CompanyApproval } from '../admin/components/admin-companies/company-approval/company-approval/company-approval';

@@ -1,0 +1,30 @@
+<div class="panel">
+  <div class="panel-header">
+    <div>
+      <p class="section-tag">Verify Companies</p>
+      <h2>Company onboarding reviews</h2>
+    </div>
+    <span class="panel-badge">{{ pendingCount }} pending</span>
+  </div>
+
+  <div class="company-list">
+    <article *ngFor="let company of companies" class="company-card">
+      <div>
+        <h3>{{ company.name }}</h3>
+        <p>{{ company.industry }} | {{ company.id }}</p>
+        <span>{{ company.contactPerson }}</span>
+      </div>
+
+      <div class="company-meta">
+        <p>{{ company.verificationStep }}</p>
+        <span class="status-pill" [class.success]="company.status === 'approved'">
+          {{ company.status }}
+        </span>
+      </div>
+
+      <button type="button" (click)="approveCompany(company.id)" [disabled]="company.status === 'approved'">
+        {{ company.status === 'approved' ? 'Approved' : 'Approve' }}
+      </button>
+    </article>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="panel">
+  <div class="panel-header">
+    <div>
+      <p class="section-tag">Verify Students</p>
+      <h2>Student verification queue</h2>
+    </div>
+    <span class="panel-badge">{{ pendingCount }} pending</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Department</th>
+          <th>CGPA</th>
+          <th>Resume</th>
+          <th>Pending Docs</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">
+          <td>
+            <strong>{{ student.name }}</strong>
+            <small>{{ student.id }}</small>
+          </td>
+          <td>{{ student.department }}</td>
+          <td>{{ student.cgpa }}</td>
+          <td>
+            <span class="status-pill" [class.warning]="student.resumeStatus === 'needs-update'">
+              {{ student.resumeStatus }}
+            </span>
+          </td>
+          <td>{{ student.documentsPending }}</td>
+          <td>
+            <span class="status-pill" [class.success]="student.status === 'approved'">
+              {{ student.status }}
+            </span>
+          </td>
+          <td>
+            <button type="button" (click)="approveStudent(student.id)" [disabled]="student.status === 'approved'">
+              {{ student.status === 'approved' ? 'Approved' : 'Approve' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

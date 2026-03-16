@@ -25,17 +25,32 @@ export class RoleGuard implements CanActivate {
       return true;
     }
 
-    // Use the new currentUserValue from AuthService
+    // Get current user
     const user = this.authService.currentUserValue;
 
-    if (!user || !requiredRoles.includes(user.role)) {
+    if (!user) {
+      this.notificationService.error('Access Denied', 'You need to login first.');
+      this.router.navigate(['/auth/login']);
+      return false;
+    }
+
+    console.log('RoleGuard - User role:', user.role);
+    console.log('RoleGuard - Required roles:', requiredRoles);
+
+    // Convert both to lowercase for case-insensitive comparison
+    const userRoleLower = user.role?.toLowerCase();
+    const hasRequiredRole = requiredRoles.some(role => 
+      role.toLowerCase() === userRoleLower
+    );
+
+    if (!hasRequiredRole) {
       this.notificationService.error(
         'Access Denied',
         'You do not have permission to access this page.'
       );
 
-      // Redirect to dashboard or login
-      this.redirectToDashboard(user ? user.role : null);
+      // Redirect to appropriate dashboard based on user's role
+      this.redirectToDashboard(user.role);
       return false;
     }
 
@@ -43,14 +58,16 @@ export class RoleGuard implements CanActivate {
   }
 
   private redirectToDashboard(role: string | null): void {
+    const roleLower = role?.toLowerCase();
+    
     const routes: { [key: string]: string } = {
       'student': '/student/dashboard',
-      'placement-officer': '/placement/dashboard', 
+      'pto': '/placement/dashboard', 
       'company': '/company/dashboard',
       'admin': '/admin/dashboard'
     };
     
-    const route = role ? routes[role] : '/auth/login';
+    const route = roleLower && routes[roleLower] ? routes[roleLower] : '/auth/login';
     this.router.navigate([route]);
   }
 }

@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { AuthService, User } from '../../../../core/services/auth.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService, User } from '../../../../core/services/auth.service';
 
 interface SidebarItem {
   label: string;
@@ -28,129 +28,148 @@ export class SidebarComponent implements OnInit {
   expandedItems: Set<string> = new Set();
 
   sidebarItems: SidebarItem[] = [
-    // Student Routes
     {
       label: 'Dashboard',
       route: '/student/dashboard',
-      icon: '📊',
+      icon: 'SD',
       roles: ['student']
     },
     {
       label: 'Job Search',
       route: '/student/jobs',
-      icon: '💼',
+      icon: 'JS',
       roles: ['student']
     },
     {
       label: 'My Applications',
       route: '/student/applications',
-      icon: '📝',
+      icon: 'AP',
       roles: ['student']
     },
     {
       label: 'Interviews',
       route: '/student/interviews',
-      icon: '🎯',
+      icon: 'IN',
       roles: ['student']
     },
     {
       label: 'My Profile',
       route: '/student/profile',
-      icon: '👤',
+      icon: 'PR',
       roles: ['student'],
       children: [
-        { label: 'Personal Info', route: '/student/profile/personal', icon: '📋', roles: ['student'] },
-        { label: 'Resume', route: '/student/profile/resume', icon: '📄', roles: ['student'] },
-        { label: 'Education', route: '/student/profile/education', icon: '🎓', roles: ['student'] },
-        { label: 'Skills', route: '/student/profile/skills', icon: '⚡', roles: ['student'] }
+        { label: 'Personal Info', route: '/student/profile/personal', icon: 'PI', roles: ['student'] },
+        { label: 'Resume', route: '/student/profile/resume', icon: 'RE', roles: ['student'] },
+        { label: 'Education', route: '/student/profile/education', icon: 'ED', roles: ['student'] },
+        { label: 'Skills', route: '/student/profile/skills', icon: 'SK', roles: ['student'] }
       ]
     },
-
-    // Company Routes
     {
       label: 'Dashboard',
       route: '/company/dashboard',
-      icon: '📊',
+      icon: 'CD',
       roles: ['company']
     },
     {
       label: 'Job Postings',
       route: '/company/jobs',
-      icon: '💼',
+      icon: 'JP',
       roles: ['company'],
       children: [
-        { label: 'All Jobs', route: '/company/jobs/list', icon: '📋', roles: ['company'] },
-        { label: 'Post New Job', route: '/company/jobs/create', icon: '➕', roles: ['company'] }
+        { label: 'All Jobs', route: '/company/jobs/list', icon: 'AJ', roles: ['company'] },
+        { label: 'Post New Job', route: '/company/jobs/create', icon: 'NJ', roles: ['company'] }
       ]
     },
     {
       label: 'Applications',
       route: '/company/applications',
-      icon: '📝',
+      icon: 'CA',
       roles: ['company']
     },
     {
       label: 'Interviews',
       route: '/company/interviews',
-      icon: '🎯',
+      icon: 'CI',
       roles: ['company']
     },
     {
       label: 'Company Profile',
       route: '/company/profile',
-      icon: '🏢',
+      icon: 'CP',
       roles: ['company']
     },
-
-    // Admin Routes
     {
       label: 'Dashboard',
       route: '/admin/dashboard',
-      icon: '📊',
+      icon: 'AD',
       roles: ['admin']
     },
     {
       label: 'Companies',
       route: '/admin/companies',
-      icon: '🏢',
+      icon: 'CO',
       roles: ['admin'],
       children: [
-        { label: 'All Companies', route: '/admin/companies', icon: '📋', roles: ['admin'] },
-        { label: 'Company Approval', route: '/admin/companies/approval', icon: '✅', roles: ['admin'] },
-        { label: 'Company Details', route: '/admin/companies/details', icon: '👁️', roles: ['admin'] }
+        { label: 'All Companies', route: '/admin/companies', icon: 'AC', roles: ['admin'] },
+        { label: 'Company Approval', route: '/admin/companies/approval', icon: 'CA', roles: ['admin'] },
+        { label: 'Company Details', route: '/admin/companies/details', icon: 'CD', roles: ['admin'] }
       ]
     },
     {
       label: 'Drives',
       route: '/admin/drives',
-      icon: '🚀',
+      icon: 'DR',
       roles: ['admin'],
       children: [
-        { label: 'Drive Management', route: '/admin/drives/management', icon: '⚙️', roles: ['admin'] },
-        { label: 'Schedule Drive', route: '/admin/drives/schedule', icon: '📅', roles: ['admin'] }
+        { label: 'Drive Management', route: '/admin/drives/management', icon: 'DM', roles: ['admin'] },
+        { label: 'Schedule Drive', route: '/admin/drives/schedule', icon: 'DS', roles: ['admin'] }
       ]
     },
     {
       label: 'Students',
       route: '/admin/students',
-      icon: '👨‍🎓',
+      icon: 'ST',
       roles: ['admin'],
       children: [
-        { label: 'Student List', route: '/admin/students/list', icon: '📋', roles: ['admin'] },
-        { label: 'Student Details', route: '/admin/students/details', icon: '👁️', roles: ['admin'] }
+        { label: 'Student List', route: '/admin/students/list', icon: 'SL', roles: ['admin'] },
+        { label: 'Student Details', route: '/admin/students/details', icon: 'SD', roles: ['admin'] }
       ]
     },
     {
       label: 'Reports',
       route: '/admin/reports',
-      icon: '📈',
+      icon: 'RP',
       roles: ['admin']
     },
     {
       label: 'Settings',
       route: '/admin/settings',
-      icon: '⚙️',
+      icon: 'SE',
       roles: ['admin']
+    },
+    {
+      label: 'Dashboard',
+      route: '/placement/dashboard',
+      icon: 'PD',
+      roles: ['placement-officer']
+    },
+    {
+      label: 'Verify Students',
+      route: '/placement/verify-students',
+      icon: 'VS',
+      roles: ['placement-officer']
+    },
+    {
+      label: 'Verify Companies',
+      route: '/placement/verify-companies',
+      icon: 'VC',
+      roles: ['placement-officer']
+    },
+    {
+      label: 'Monitor Placements',
+      route: '/placement/monitor-placements',
+      icon: 'MP',
+      roles: ['placement-officer']
     }
   ];
 
@@ -174,20 +193,24 @@ export class SidebarComponent implements OnInit {
   }
 
   get filteredItems(): SidebarItem[] {
-    if (!this.currentUser) return [];
-    return this.sidebarItems.filter(item =>
-      item.roles.includes(this.currentUser!.role)
-    );
+    if (!this.currentUser) {
+      return [];
+    }
+
+    return this.sidebarItems.filter(item => item.roles.includes(this.currentUser!.role));
   }
 
   toggleItem(item: SidebarItem): void {
-    if (item.children && item.children.length > 0) {
-      if (this.expandedItems.has(item.route)) {
-        this.expandedItems.delete(item.route);
-      } else {
-        this.expandedItems.add(item.route);
-      }
+    if (!item.children || item.children.length === 0) {
+      return;
     }
+
+    if (this.expandedItems.has(item.route)) {
+      this.expandedItems.delete(item.route);
+      return;
+    }
+
+    this.expandedItems.add(item.route);
   }
 
   isItemExpanded(item: SidebarItem): boolean {
@@ -195,7 +218,10 @@ export class SidebarComponent implements OnInit {
   }
 
   hasActiveChild(item: SidebarItem): boolean {
-    if (!item.children) return false;
+    if (!item.children) {
+      return false;
+    }
+
     return item.children.some(child => this.isActiveRoute(child.route));
   }
 
@@ -205,7 +231,7 @@ export class SidebarComponent implements OnInit {
 
   private autoExpandActiveItems(): void {
     this.expandedItems.clear();
-    
+
     this.filteredItems.forEach(item => {
       if (item.children && this.hasActiveChild(item)) {
         this.expandedItems.add(item.route);
@@ -215,21 +241,24 @@ export class SidebarComponent implements OnInit {
 
   onToggleCollapse(): void {
     this.toggleCollapse.emit();
-    
+
     if (this.isCollapsed) {
       this.expandedItems.clear();
     }
   }
 
   getRoleDisplayName(): string {
-    if (!this.currentUser) return '';
-    
+    if (!this.currentUser) {
+      return '';
+    }
+
     const roleMap: Record<User['role'], string> = {
-      'student': 'Student',
-      'admin': 'Admin',
-      'company': 'Company'
+      student: 'Student',
+      admin: 'Admin',
+      company: 'Company',
+      'placement-officer': 'Placement Officer'
     };
-    
+
     return roleMap[this.currentUser.role] || this.currentUser.role;
   }
 }

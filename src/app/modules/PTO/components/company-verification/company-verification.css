@@ -1,0 +1,101 @@
+.panel {
+  padding: 1.4rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-tag {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: #0e7a6d;
+}
+
+.panel-header h2,
+.company-card h3,
+.company-meta p {
+  margin: 0;
+}
+
+.panel-badge {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: #e9f7f5;
+  color: #0e7a6d;
+  font-weight: 600;
+}
+
+.company-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.company-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e6edf5;
+  border-radius: 18px;
+  background: #fbfdff;
+}
+
+.company-card p,
+.company-card span {
+  color: #66778c;
+}
+
+.company-meta p {
+  color: #132238;
+  line-height: 1.5;
+}
+
+.status-pill {
+  display: inline-flex;
+  margin-top: 0.45rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: #fff4dd;
+  color: #9a6700;
+  text-transform: capitalize;
+  font-size: 0.85rem;
+}
+
+.status-pill.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  background: #132238;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #98a6b7;
+  cursor: default;
+}
+
+@media (max-width: 900px) {
+  .company-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 1rem;
+  }
+}

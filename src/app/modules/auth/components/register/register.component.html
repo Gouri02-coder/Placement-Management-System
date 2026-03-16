@@ -46,6 +46,9 @@
           id="email" 
           formControlName="email" 
           placeholder="Enter your email">
+        <div class="email-requirement" *ngIf="selectedRole === 'student'">
+          ⓘ Please use your college email ID
+        </div>
         <div class="error" *ngIf="getFieldError('email')">{{getFieldError('email')}}</div>
       </div>
 
@@ -71,6 +74,20 @@
 
       <!-- Student Specific Fields -->
       <div *ngIf="selectedRole === 'student'" class="student-fields">
+        <!-- Parent Email Field (NEW) -->
+        <div class="form-group">
+          <label for="parentEmail">Parent's Email Address <span class="required-star">*</span></label>
+          <input 
+            type="email" 
+            id="parentEmail" 
+            formControlName="parentEmail" 
+            placeholder="Enter parent's email address">
+          <div class="email-requirement">
+            ⓘ Parent will receive placement updates and notifications
+          </div>
+          <div class="error" *ngIf="getFieldError('parentEmail')">{{getFieldError('parentEmail')}}</div>
+        </div>
+
         <div class="form-group">
           <label for="department">Department</label>
           <input 

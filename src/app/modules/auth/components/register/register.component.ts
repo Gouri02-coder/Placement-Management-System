@@ -15,6 +15,7 @@ export class RegisterComponent {
   selectedRole: 'student' | 'company' | null = null;
   isLoading = false;
   registerForm: FormGroup;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +28,7 @@ export class RegisterComponent {
   selectRole(role: 'student' | 'company'): void {
     this.selectedRole = role;
     this.registerForm = this.createForm();
+    this.errorMessage = '';
   }
 
   createForm(): FormGroup {
@@ -40,10 +42,11 @@ export class RegisterComponent {
     if (this.selectedRole === 'student') {
       return this.fb.group({
         ...baseForm,
+        parentEmail: ['', [Validators.required, Validators.email]],
         department: ['', [Validators.required]],
         course: ['', [Validators.required]],
-        year: [1, [Validators.required, Validators.min(1), Validators.max(4)]],
-        cgpa: [0, [Validators.required, Validators.min(0), Validators.max(10)]]
+        year: ['', [Validators.required, Validators.min(1), Validators.max(4)]],
+        cgpa: ['', [Validators.required, Validators.min(0), Validators.max(10)]]
       });
     } else if (this.selectedRole === 'company') {
       return this.fb.group({
@@ -63,10 +66,10 @@ export class RegisterComponent {
   onRegister(): void {
     if (this.registerForm.valid && this.selectedRole) {
       this.isLoading = true;
+      this.errorMessage = '';
 
       const formData = this.registerForm.value;
       
-      // Prepare registration data based on role
       const registerData: RegisterRequest = {
         name: formData.name,
         email: formData.email,
@@ -76,14 +79,11 @@ export class RegisterComponent {
         ...(this.selectedRole === 'student' && {
           department: formData.department,
           course: formData.course,
-          year: formData.year,
-          cgpa: formData.cgpa
+          year: Number(formData.year),
+          cgpa: Number(formData.cgpa),
+          parentEmail: formData.parentEmail
         }),
         ...(this.selectedRole === 'company' && {
-          department: 'N/A',
-          course: 'N/A',
-          year: 0,
-          cgpa: 0,
           companyName: formData.companyName,
           industry: formData.industry,
           website: formData.website,
@@ -93,24 +93,40 @@ export class RegisterComponent {
         })
       };
 
+      console.log('Sending registration data:', registerData);
+
       this.authService.register(registerData).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.isLoading = false;
-          alert('Registration successful! Please login with your credentials.');
-          this.router.navigate(['/auth/login']);
+          console.log('Registration response:', response);
+          
+          if (response && response.status === 'success') {
+            alert(response.message || 'Registration successful! Please wait for admin verification.');
+            this.router.navigate(['/auth/login']);
+          } else {
+            this.errorMessage = response?.message || 'Registration failed';
+            alert(this.errorMessage);
+          }
         },
         error: (error) => {
           this.isLoading = false;
-          // Show user-friendly error messages
-          if (error.error === 'INVALID_EMAIL_DOMAIN') {
-            alert(this.getEmailRequirement());
-          } else {
-            alert(error.message || 'Registration failed. Please try again.');
+          console.error('Registration error:', error);
+          
+          let errorMsg = 'Registration failed. Please try again.';
+          
+          if (error.error) {
+            if (typeof error.error === 'string') {
+              errorMsg = error.error;
+            } else if (error.error.message) {
+              errorMsg = error.error.message;
+            }
           }
+          
+          this.errorMessage = errorMsg;
+          alert(errorMsg);
         }
       });
     } else {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.registerForm.controls).forEach(key => {
         this.registerForm.get(key)?.markAsTouched();
       });
@@ -121,22 +137,10 @@ export class RegisterComponent {
     return this.selectedRole === 'student' ? 'Student' : 'Company';
   }
 
-  getEmailRequirement(): string {
-    if (!this.selectedRole) return '';
-    
-    const requirements = {
-      'student': 'Please register using your college email ID',
-      'company': 'Please register using a valid email id'
-    };
-    
-    return requirements[this.selectedRole];
-  }
-
   goToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
 
-  // Helper methods for validation messages
   getFieldError(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
     if (field?.errors && field.touched) {

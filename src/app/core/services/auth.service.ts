@@ -1,24 +1,16 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'student' | 'admin' | 'company';
-  avatar?: string;
-  isEmailVerified?: boolean;
-  createdAt?: Date;
-}
-
-export interface LoginResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
-  expiresIn: number;
+  role: string;
+  emailVerified: boolean;
+  token?: string;
 }
 
 export interface LoginRequest {
@@ -31,12 +23,13 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone: string;
-  role: 'student' | 'company';
+  role: string;
   // Student fields
   department?: string;
   course?: string;
   year?: number;
   cgpa?: number;
+  parentEmail?: string;
   // Company fields
   companyName?: string;
   industry?: string;
@@ -50,285 +43,264 @@ export interface RegisterRequest {
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = 'http://localhost:8080/api';
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private tokenExpirationTimer: any;
-  private router = inject(Router);
-  private http = inject(HttpClient);
+  
+  // For compatibility with existing code
+  public currentUserValue: User | null;
 
-  private apiUrl = 'http://localhost:8080/api/auth';
-
-  constructor() {
-    this.currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    // Initialize from localStorage
+    const storedUser = localStorage.getItem('currentUser');
+    this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
     this.currentUser = this.currentUserSubject.asObservable();
-    this.autoLogin();
+    this.currentUserValue = this.currentUserSubject.value;
+    
+    // Subscribe to update currentUserValue whenever subject changes
+    this.currentUser.subscribe(user => {
+      this.currentUserValue = user;
+    });
   }
 
-  /** Detect role based on email domain */
-  private detectRoleFromEmail(email: string): 'student' | 'admin' | 'company' | null {
-    const emailLower = email.toLowerCase();
-    
-    if (emailLower.endsWith('.edu.in')) {
-      return 'student';
-    } else if (emailLower.endsWith('.ac.in')) {
-      return 'admin';
-    } else if (emailLower.endsWith('@company.com')) { 
-      return 'company';
-    }
-    
-    return null;
+  /**
+   * Get the current user value (synchronous)
+   */
+  public get currentUserValueGetter(): User | null {
+    return this.currentUserSubject.value;
   }
 
-  /** LOGIN - Connect to Backend API */
-  /** LOGIN - Connect to Backend API */
-login(loginData: LoginRequest): Observable<LoginResponse> {
-  return this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginData).pipe(
-    tap(response => {
-      console.log('Login API Response:', response);
-      this.handleAuthentication(
-        response.user,
-        response.token,
-        response.refreshToken,
-        response.expiresIn
-      );
-      // FIX: Use the response user directly instead of currentUserValue
-      this.redirectToDashboardWithUser(response.user);
-    }),
-    catchError(error => {
-      console.error('Login error:', error);
-      return throwError(() => ({
-        error: error.error?.error || 'LOGIN_FAILED',
-        message: error.error?.message || 'Invalid email or password'
-      }));
-    })
-  );
-}
-
-/** ADD THIS NEW METHOD: */
-private redirectToDashboardWithUser(user: User): void {
-  console.log('Redirecting with user from response:', user);
-  
-  if (!user) { 
-    this.router.navigate(['/auth/login']); 
-    return; 
-  }
-  
-  const routes: Record<User['role'], string> = {
-    'student': '/student/dashboard',
-    'admin': '/admin/dashboard',
-    'company': '/company/dashboard'
-  };
-  
-  const targetRoute = routes[user.role];
-  console.log(`Navigating to: ${targetRoute}`);
-  
-  this.router.navigate([targetRoute]);
-}
-
-
-  /** REGISTER - Connect to Backend API */
-  register(data: RegisterRequest): Observable<{ message: string }> {
-    // Validate email domain for registration
-    const detectedRole = this.detectRoleFromEmail(data.email);
+  /**
+   * Login method
+   */
+  login(credentials: LoginRequest): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
     
-    if (!detectedRole) {
-      return throwError(() => ({
-        error: 'INVALID_EMAIL_DOMAIN',
-        message: 'Please use a valid educational or company email address.'
-      }));
-    }
-
-    // Ensure the detected role matches the requested role
-    if (detectedRole !== data.role) {
-      return throwError(() => ({
-        error: 'ROLE_MISMATCH',
-        message: 'Email domain does not match the selected role.'
-      }));
-    }
-
-    return this.http.post<{ message: string }>(`${this.apiUrl}/register`, data).pipe(
-      catchError(error => {
-        console.error('Registration error:', error);
-        return throwError(() => ({
-          error: error.error?.error || 'REGISTRATION_FAILED',
-          message: error.error?.message || 'Registration failed. Please try again.'
-        }));
+    return this.http.post(`${this.apiUrl}/auth/login`, credentials, { headers }).pipe(
+      tap((response: any) => {
+        console.log('Login response:', response);
+        if (response && response.status === 'success' && response.token) {
+          // Store token
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('refreshToken', response.refreshToken);
+          
+          // Get the role from backend (comes as "PTO", "STUDENT", "COMPANY", "ADMIN")
+          let userRole = response.user.role || '';
+          
+          // IMPORTANT: Map backend role to frontend expected role based on your folder structure
+          // Your PTO module is at path '/placement' and uses role 'pto' in routes
+          if (userRole.toUpperCase() === 'PTO') {
+            userRole = 'pto';  // Match what your pto.route.ts expects
+          } else {
+            userRole = userRole.toLowerCase(); // Convert others to lowercase
+          }
+          
+          console.log('Mapped user role:', userRole);
+          
+          // Create user object
+          const user: User = {
+            id: response.user.id,
+            email: response.user.email,
+            name: response.user.name,
+            role: userRole,  // Now 'pto' for PTO users
+            emailVerified: response.user.emailVerified || false,
+            token: response.token
+          };
+          
+          // Store user
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          localStorage.setItem('user', JSON.stringify(user)); // For compatibility
+          
+          // Update BehaviorSubject
+          this.currentUserSubject.next(user);
+          this.currentUserValue = user;
+          
+          // Set token expiry
+          if (response.expiresIn) {
+            const expiryTime = new Date().getTime() + response.expiresIn;
+            localStorage.setItem('tokenExpiry', expiryTime.toString());
+          }
+        }
       })
     );
   }
 
-  /** HANDLE AUTHENTICATION */
-  private handleAuthentication(user: User, token: string, refreshToken: string, expiresIn: number): void {
-    console.log('Handling authentication for user:', user);
+  /**
+   * Register method
+   */
+  register(userData: RegisterRequest): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
     
-    const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-
-    this.setStorageItem('currentUser', user);
-    this.setStorageItem('authToken', token);
-    this.setStorageItem('refreshToken', refreshToken);
-    this.setStorageItem('tokenExpiration', expirationDate.toISOString());
-
-    this.currentUserSubject.next(user);
-    this.autoLogout(expiresIn * 1000);
-    
-    // Debug: Verify storage
-    console.log('User stored in localStorage:', this.getUserFromStorage());
-    console.log('Token stored:', !!this.getStorageItem('authToken'));
+    return this.http.post(`${this.apiUrl}/auth/register`, userData, { headers });
   }
 
+  /**
+   * Logout method
+   */
   logout(): void {
-    console.log('Logging out user');
+    // Remove all stored data
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('user');
+    localStorage.removeItem('tokenExpiry');
     
-    this.removeStorageItem('currentUser');
-    this.removeStorageItem('authToken');
-    this.removeStorageItem('refreshToken');
-    this.removeStorageItem('tokenExpiration');
-
-    if (this.tokenExpirationTimer) {
-      clearTimeout(this.tokenExpirationTimer);
-      this.tokenExpirationTimer = null;
-    }
-
+    // Update BehaviorSubject
     this.currentUserSubject.next(null);
+    this.currentUserValue = null;
+    
+    // Navigate to login
     this.router.navigate(['/auth/login']);
   }
 
-  autoLogin(): void {
-    const userData = this.getUserFromStorage();
-    const token = this.getStorageItem('authToken');
-    const expirationDate = this.getStorageItem('tokenExpiration');
-
-    if (!userData || !token || !expirationDate) {
-      console.log('AutoLogin: No user data found');
-      return;
+  /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    
+    // Check if token is expired
+    const expiry = localStorage.getItem('tokenExpiry');
+    if (expiry) {
+      return new Date().getTime() < parseInt(expiry);
     }
-
-    const expiration = new Date(expirationDate);
-    if (expiration <= new Date()) {
-      console.log('AutoLogin: Token expired');
-      this.logout();
-      return;
-    }
-
-    const expiresIn = expiration.getTime() - new Date().getTime();
-    this.autoLogout(expiresIn);
-    this.currentUserSubject.next(userData);
-    console.log('AutoLogin: User restored', userData);
+    
+    return true;
   }
 
-  autoLogout(expirationDuration: number): void {
-    this.tokenExpirationTimer = setTimeout(() => {
-      this.logout();
-      console.log('Session expired due to inactivity');
-    }, expirationDuration);
+  /**
+   * Get token from localStorage
+   */
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 
-  refreshToken(): Observable<string> {
-    const refreshToken = this.getStorageItem('refreshToken');
+  /**
+   * Get refresh token
+   */
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
+  /**
+   * Refresh token method
+   */
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
-      this.logout();
       return throwError(() => new Error('No refresh token available'));
     }
     
-    // You can implement backend refresh token call here if needed
-    return throwError(() => new Error('Refresh token not implemented'));
+    return this.http.post(`${this.apiUrl}/auth/refresh`, { refreshToken }).pipe(
+      tap((response: any) => {
+        if (response && response.token) {
+          localStorage.setItem('token', response.token);
+          if (response.refreshToken) {
+            localStorage.setItem('refreshToken', response.refreshToken);
+          }
+          if (response.expiresIn) {
+            const expiryTime = new Date().getTime() + response.expiresIn;
+            localStorage.setItem('tokenExpiry', expiryTime.toString());
+          }
+        }
+      })
+    );
   }
 
-  // AUTH CHECKS
-  get currentUserValue(): User | null { 
-    return this.currentUserSubject.value; 
-  }
-  
-  isAuthenticated(): boolean { 
-    const token = this.getStorageItem('authToken');
-    const expiration = this.getStorageItem('tokenExpiration');
-    return !!token && !!expiration && new Date(expiration) > new Date();
-  }
-  
-  hasRole(role: User['role']): boolean { 
-    return this.currentUserValue?.role === role; 
-  }
-  
-  hasAnyRole(roles: User['role'][]): boolean { 
-    return roles.some(r => this.currentUserValue?.role === r); 
-  }
-
-  // STORAGE UTILS
-  private setStorageItem(key: string, value: any): void {
-    try { 
-      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value)); 
-    } catch (err) { 
-      console.error('Storage error:', err); 
-    }
-  }
-  
-  private getStorageItem(key: string): string | null { 
-    try { 
-      return localStorage.getItem(key); 
-    } catch { 
-      return null; 
-    }
-  }
-  
-  private removeStorageItem(key: string): void { 
-    try { 
-      localStorage.removeItem(key); 
-    } catch (err) {
-      console.error('Storage removal error:', err);
-    } 
-  }
-  
-  private getUserFromStorage(): User | null {
+  /**
+   * Get user from localStorage (compatibility method)
+   */
+  getUser(): any {
+    const userStr = localStorage.getItem('currentUser') || localStorage.getItem('user');
     try {
-      const userData = this.getStorageItem('currentUser');
-      return userData ? JSON.parse(userData) : null;
-    } catch (err) { 
-      console.error('Error parsing user data:', err);
-      return null; 
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (e) {
+      console.error('Error parsing user data:', e);
+      return null;
     }
   }
 
-  /** REDIRECT TO DASHBOARD BASED ON ROLE */
+  /**
+   * Get user role
+   */
+  getUserRole(): string | null {
+    const user = this.getUser();
+    return user ? user.role : null;
+  }
+
+  /**
+   * Redirect to dashboard based on role - MATCHING YOUR FOLDER STRUCTURE
+   */
   redirectToDashboard(): void {
-    const user = this.currentUserValue;
-    console.log('redirectToDashboard called - Current user:', user);
-    
-    if (!user) { 
-      console.log('No user found, redirecting to login');
-      this.router.navigate(['/auth/login']); 
-      return; 
+    const user = this.getUser();
+    if (!user) {
+      this.router.navigate(['/auth/login']);
+      return;
     }
+
+    const role = user.role?.toLowerCase();
+    console.log('Redirecting based on role:', role);
     
-    const routes: Record<User['role'], string> = {
-      'student': '/student/dashboard',
-      'admin': '/admin/dashboard',
-      'company': '/company/dashboard'
-    };
-    
-    const targetRoute = routes[user.role];
-    console.log(`Redirecting ${user.role} to: ${targetRoute}`);
-    
-    this.router.navigate([targetRoute]).then(success => {
-      if (success) {
-        console.log('Navigation successful');
-      } else {
-        console.error('Navigation failed - route might not exist');
-        // Fallback: redirect to home
+    // Match your folder structure exactly
+    switch(role) {
+      case 'admin':
+        this.router.navigate(['/admin']);
+        break;
+      case 'pto':  // Your PTO module uses 'pto' role and '/placement' path
+        this.router.navigate(['/placement']);
+        break;
+      case 'company':
+        this.router.navigate(['/company']);
+        break;
+      case 'student':
+        this.router.navigate(['/student']);
+        break;
+      default:
         this.router.navigate(['/']);
-      }
-    });
+    }
   }
 
-  // Helper method to check if routes exist (for debugging)
-  debugRoutes(): void {
-    const user = this.currentUserValue;
-    if (user) {
-      const routes: Record<User['role'], string> = {
-        'student': '/student/dashboard',
-        'admin': '/admin/dashboard',
-        'company': '/company/dashboard'
-      };
-      console.log('Available routes for debugging:', routes);
-    }
+  /**
+   * Check if user has specific role
+   */
+  hasRole(role: string): boolean {
+    const userRole = this.getUserRole();
+    return userRole?.toLowerCase() === role.toLowerCase();
+  }
+
+  /**
+   * Check if user is admin
+   */
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  /**
+   * Check if user is student
+   */
+  isStudent(): boolean {
+    return this.hasRole('student');
+  }
+
+  /**
+   * Check if user is company
+   */
+  isCompany(): boolean {
+    return this.hasRole('company');
+  }
+
+  /**
+   * Check if user is PTO
+   */
+  isPTO(): boolean {
+    return this.hasRole('pto');  // Now checking for 'pto' not 'placement-officer'
   }
 }
