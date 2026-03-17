@@ -46,7 +46,7 @@ describe('CompanyDashboardComponent', () => {
     ]);
 
     await TestBed.configureTestingModule({
-      declarations: [CompanyDashboardComponent],
+      imports: [CompanyDashboardComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: CompanyService, useValue: companyServiceSpy }

@@ -6,6 +6,7 @@ import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-shortlist-candidates',
+  standalone: true,
   imports: [DatePipe, UpperCasePipe,CommonModule],
   templateUrl: './shortlist-candidates.html',
   styleUrls: ['./shortlist-candidates.css']

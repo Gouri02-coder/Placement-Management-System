@@ -7,7 +7,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-list',
-  imports: [FormsModule,CommonModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './job-list.html',
   styleUrls: ['./job-list.css']
 })

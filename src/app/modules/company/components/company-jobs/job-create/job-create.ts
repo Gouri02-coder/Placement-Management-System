@@ -7,7 +7,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-create',
-  imports:[CommonModule,ReactiveFormsModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './job-create.html',
   styleUrls: ['./job-create.css']
 })
