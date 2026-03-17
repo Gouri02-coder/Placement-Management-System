@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CompanyProfileComponent } from './company-profile';
@@ -40,8 +39,7 @@ describe('CompanyProfileComponent', () => {
     ]);
 
     await TestBed.configureTestingModule({
-      declarations: [CompanyProfileComponent],
-      imports: [ReactiveFormsModule],
+      imports: [CompanyProfileComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: CompanyService, useValue: companyServiceSpy }

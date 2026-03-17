@@ -7,7 +7,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-edit',
-  imports: [CommonModule,ReactiveFormsModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './job-edit.html',
   styleUrls: ['./job-edit.css']
 })

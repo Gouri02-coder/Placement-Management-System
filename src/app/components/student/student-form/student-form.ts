@@ -23,6 +23,7 @@ interface StudentFormData {
 
 @Component({
   selector: 'app-student-form',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './student-form.html',
   styleUrl: './student-form.css'
