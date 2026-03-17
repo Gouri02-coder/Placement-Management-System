@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShortlistCandidates } from './shortlist-candidates';
+import { ShortlistCandidatesComponent } from './shortlist-candidates';
 
-describe('ShortlistCandidates', () => {
-  let component: ShortlistCandidates;
-  let fixture: ComponentFixture<ShortlistCandidates>;
+describe('ShortlistCandidatesComponent', () => {
+  let component: ShortlistCandidatesComponent;
+  let fixture: ComponentFixture<ShortlistCandidatesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ShortlistCandidates]
+      imports: [ShortlistCandidatesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ShortlistCandidates);
+    fixture = TestBed.createComponent(ShortlistCandidatesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

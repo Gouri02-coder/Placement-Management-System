@@ -39,6 +39,6 @@ describe('StudentForm', () => {
 
   it('should validate form correctly', () => {
     component.loadSampleData();
-    expect(component.validateForm()).toBe(true);
+    expect((component as any).validateForm()).toBe(true);
   });
 });
