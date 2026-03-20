@@ -1,1 +1,36 @@
-<p>admin-reports works!</p>
+<section class="page-card">
+  <header>
+    <h2>View Reports</h2>
+    <p>Generate placement analytics and export trend reports.</p>
+  </header>
+
+  <div class="metric-grid">
+    <article class="metric" *ngFor="let card of cards">
+      <p>{{ card.label }}</p>
+      <h3>{{ card.value }}</h3>
+    </article>
+  </div>
+
+  <div class="controls">
+    <label>
+      Time range
+      <select [(ngModel)]="range">
+        <option value="7d">Last 7 days</option>
+        <option value="30d">Last 30 days</option>
+        <option value="90d">Last 90 days</option>
+      </select>
+    </label>
+
+    <label>
+      Format
+      <select [(ngModel)]="selectedFormat">
+        <option value="PDF">PDF</option>
+        <option value="Excel">Excel</option>
+      </select>
+    </label>
+
+    <button type="button" (click)="downloadReport()">Generate</button>
+  </div>
+
+  <p class="message" *ngIf="message">{{ message }}</p>
+</section>

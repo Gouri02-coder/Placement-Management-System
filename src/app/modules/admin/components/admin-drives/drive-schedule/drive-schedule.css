@@ -1,0 +1,123 @@
+.schedule-card {
+  background: #ffffffd6;
+  border: 1px solid #d8e5f5;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 12px 26px rgba(13, 33, 55, 0.08);
+}
+
+header h2 {
+  margin: 0;
+}
+
+header p {
+  margin: 0.3rem 0 0.8rem;
+  color: #536681;
+}
+
+.drive-form {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+input {
+  border: 1px solid #c6d8ee;
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+}
+
+button {
+  border: 1px solid #94b7dc;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  background: #f0f7ff;
+  cursor: pointer;
+}
+
+.drive-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.drive-item {
+  border: 1px solid #dce9f8;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #f9fcff;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.title-row h3 {
+  margin: 0;
+}
+
+.title-row p {
+  margin: 0.2rem 0 0;
+  color: #56718e;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.Scheduled {
+  background: #fef3c7;
+  color: #8f6400;
+}
+
+.Published {
+  background: #dcfce7;
+  color: #0a7a45;
+}
+
+.Cancelled {
+  background: #fee2e2;
+  color: #9c1f1f;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+}
+
+.meta-grid p {
+  margin: 0;
+  color: #35516e;
+}
+
+.actions {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.danger {
+  border-color: #efb4b4;
+  background: #fff5f5;
+  color: #8f1d1d;
+}
+
+@media (max-width: 1020px) {
+  .drive-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .drive-form {
+    grid-template-columns: 1fr;
+  }
+}

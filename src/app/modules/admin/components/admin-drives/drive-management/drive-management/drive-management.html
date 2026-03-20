@@ -1,1 +1,23 @@
-<p>drive-management works!</p>
+<section class="page-card">
+  <header>
+    <h2>View Placements</h2>
+    <p>Track placement drives, fill-rates, and current drive stages.</p>
+  </header>
+
+  <div class="drive-grid">
+    <article class="drive-card" *ngFor="let drive of drives">
+      <div class="top-row">
+        <h3>{{ drive.title }}</h3>
+        <span class="chip" [class]="'chip ' + drive.stage">{{ drive.stage }}</span>
+      </div>
+
+      <p class="company">{{ drive.company }}</p>
+      <p class="meta">Placed {{ drive.placed }} of {{ drive.slots }}</p>
+
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="getPlacementRatio(drive)"></div>
+      </div>
+      <p class="ratio">{{ getPlacementRatio(drive) }}% completion</p>
+    </article>
+  </div>
+</section>
