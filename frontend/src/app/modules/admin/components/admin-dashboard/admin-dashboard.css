@@ -44,6 +44,9 @@
 }
 
 .hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   border: 0;
   background: #fff;
   color: #0f172a;
@@ -51,6 +54,16 @@
   border-radius: 12px;
   padding: 0.7rem 1rem;
   cursor: pointer;
+}
+
+.hero-action svg,
+.card-icon svg,
+.link-icon svg,
+.task-icon svg,
+.event-icon svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
 }
 
 .overview-grid {
@@ -68,6 +81,9 @@
 }
 
 .quick-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   border-radius: 999px;
   border: 1px solid #bfd8f6;
   background: #ffffff;
@@ -82,12 +98,35 @@
   background: #ebf5ff;
 }
 
+.link-icon,
+.card-icon,
+.task-icon,
+.event-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+}
+
+.link-icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  background: #e9f4ff;
+}
+
 .overview-card {
   background: #fff;
   border-radius: 16px;
   padding: 1.2rem;
   box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
   border: 1px solid #e6ebf2;
+}
+
+.card-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #e0f2fe, #dcfce7);
+  color: #0f4c81;
 }
 
 .card-label {
@@ -162,6 +201,21 @@
   border-bottom: 1px solid #eef2f7;
 }
 
+.task-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.task-icon,
+.event-icon {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .task-list h4 {
   margin: 0;
   font-size: 0.98rem;
@@ -200,15 +254,6 @@
   gap: 0.65rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid #eef2f7;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-top: 0.35rem;
-  background: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
 }
 
 .event-list p {

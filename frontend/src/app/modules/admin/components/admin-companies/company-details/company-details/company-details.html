@@ -1,1 +1,49 @@
-<p>company-details works!</p>
+<section class="detail-card">
+  <header class="head">
+    <div>
+      <h2>{{ currentCompany.name }}</h2>
+      <p>{{ currentCompany.id }} • {{ currentCompany.sector }}</p>
+    </div>
+    <a routerLink="/admin/companies">Back to Companies</a>
+  </header>
+
+  <div class="summary-grid">
+    <article>
+      <h4>Status</h4>
+      <p><span class="status" [class]="currentCompany.status">{{ currentCompany.status }}</span></p>
+    </article>
+    <article>
+      <h4>Active Jobs</h4>
+      <p>{{ currentCompany.activeJobs }}</p>
+    </article>
+    <article>
+      <h4>Total Hires</h4>
+      <p>{{ currentCompany.totalHires }}</p>
+    </article>
+  </div>
+
+  <div class="info-grid">
+    <article>
+      <h3>Company Info</h3>
+      <p><strong>Website:</strong> {{ currentCompany.website }}</p>
+      <p><strong>Contact:</strong> {{ currentCompany.contact }}</p>
+      <p>{{ currentCompany.description }}</p>
+    </article>
+
+    <article>
+      <h3>Recent Drives</h3>
+      <ul>
+        <li *ngFor="let drive of currentCompany.recentDrives">
+          <strong>{{ drive.title }}</strong>
+          <span>{{ drive.date }} • {{ drive.status }}</span>
+        </li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="actions">
+    <button type="button" (click)="setStatus('Approved')">Approve</button>
+    <button type="button" (click)="setStatus('Pending')">Mark Pending</button>
+    <button type="button" class="danger" (click)="setStatus('Rejected')">Reject</button>
+  </div>
+</section>

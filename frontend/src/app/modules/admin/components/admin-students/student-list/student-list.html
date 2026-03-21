@@ -1,1 +1,47 @@
-<p>student-list works!</p>
+<section class="page-card">
+  <header>
+    <h2>View All Students</h2>
+    <p>Filter by status, search by ID/name/department, and quickly review profiles.</p>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" [(ngModel)]="query" placeholder="Search students" />
+    <select [(ngModel)]="statusFilter">
+      <option value="All">All Status</option>
+      <option value="Placed">Placed</option>
+      <option value="In Process">In Process</option>
+      <option value="Not Started">Not Started</option>
+    </select>
+    <span class="count">{{ filteredStudents.length }} records</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>CGPA</th>
+          <th>Status</th>
+          <th>Company</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of filteredStudents">
+          <td>{{ student.id }}</td>
+          <td>{{ student.name }}</td>
+          <td>{{ student.department }}</td>
+          <td>{{ student.cgpa }}</td>
+          <td><span class="chip" [class]="'chip ' + student.status.replace(' ', '-')">{{ student.status }}</span></td>
+          <td>{{ student.company }}</td>
+          <td>
+            <button type="button" (click)="markReviewed(student)">Review</button>
+            <a [routerLink]="['/admin/students/details', student.id]">Details</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
