@@ -4,6 +4,7 @@ import com.placement.model.Company;
 import com.placement.repository.CompanyRepository;
 import com.placement.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Optional<Company> getCompanyById(Long id) {
+    public Optional<Company> getCompanyById(@NonNull Long id) {
         return companyRepository.findById(id);
     }
 
@@ -34,7 +35,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Company updateCompany(Long id, Company company) {
+    public Company updateCompany(@NonNull Long id, Company company) {
         Company existingCompany = companyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Company not found with id: " + id));
         
@@ -55,7 +56,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void deleteCompany(Long id) {
+    public void deleteCompany(@NonNull Long id) {
         if (!companyRepository.existsById(id)) {
             throw new RuntimeException("Company not found with id: " + id);
         }
