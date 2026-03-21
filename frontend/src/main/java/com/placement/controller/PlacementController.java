@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class PlacementController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Placement> getPlacementById(@PathVariable Long id) {
+    public ResponseEntity<Placement> getPlacementById(@PathVariable @NonNull Long id) {
         Optional<Placement> placement = placementService.getPlacementById(id);
         return placement.map(ResponseEntity::ok)
                        .orElse(ResponseEntity.notFound().build());
@@ -43,7 +44,7 @@ public class PlacementController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePlacement(@PathVariable Long id, @Valid @RequestBody Placement placement) {
+    public ResponseEntity<?> updatePlacement(@PathVariable @NonNull Long id, @Valid @RequestBody Placement placement) {
         try {
             Placement updatedPlacement = placementService.updatePlacement(id, placement);
             return ResponseEntity.ok(updatedPlacement);
@@ -53,7 +54,7 @@ public class PlacementController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlacement(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePlacement(@PathVariable @NonNull Long id) {
         try {
             placementService.deletePlacement(id);
             return ResponseEntity.noContent().build();
@@ -63,13 +64,13 @@ public class PlacementController {
     }
 
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<Placement>> getPlacementsByStudent(@PathVariable Long studentId) {
+    public ResponseEntity<List<Placement>> getPlacementsByStudent(@PathVariable @NonNull Long studentId) {
         List<Placement> placements = placementService.getPlacementsByStudent(studentId);
         return ResponseEntity.ok(placements);
     }
 
     @GetMapping("/job/{jobId}")
-    public ResponseEntity<List<Placement>> getPlacementsByJob(@PathVariable Long jobId) {
+    public ResponseEntity<List<Placement>> getPlacementsByJob(@PathVariable @NonNull Long jobId) {
         List<Placement> placements = placementService.getPlacementsByJob(jobId);
         return ResponseEntity.ok(placements);
     }
@@ -82,8 +83,8 @@ public class PlacementController {
 
     @GetMapping("/check-application")
     public ResponseEntity<Boolean> hasStudentAppliedForJob(
-            @RequestParam Long studentId, 
-            @RequestParam Long jobId) {
+            @RequestParam @NonNull Long studentId, 
+            @RequestParam @NonNull Long jobId) {
         boolean hasApplied = placementService.hasStudentAppliedForJob(studentId, jobId);
         return ResponseEntity.ok(hasApplied);
     }

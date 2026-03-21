@@ -4,6 +4,7 @@ import com.placement.model.Job;
 import com.placement.repository.JobRepository;
 import com.placement.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,17 +23,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Optional<Job> getJobById(Long id) {
+    public Optional<Job> getJobById(@NonNull Long id) {
         return jobRepository.findById(id);
     }
 
     @Override
-    public Job createJob(Job job) {
+    public Job createJob(@NonNull Job job) {
         return jobRepository.save(job);
     }
 
     @Override
-    public Job updateJob(Long id, Job job) {
+    public Job updateJob(@NonNull Long id, Job job) {
         Job existingJob = jobRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + id));
         
@@ -49,7 +50,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void deleteJob(Long id) {
+    public void deleteJob(@NonNull Long id) {
         if (!jobRepository.existsById(id)) {
             throw new RuntimeException("Job not found with id: " + id);
         }
@@ -57,7 +58,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Job> getJobsByCompany(Long companyId) {
+    public List<Job> getJobsByCompany(@NonNull Long companyId) {
         return jobRepository.findByCompanyId(companyId);
     }
 
