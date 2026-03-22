@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlacementForm } from './placement-form';
+import { ScheduleDrive } from './schedule-drive';
 
-describe('PlacementForm', () => {
-  let component: PlacementForm;
-  let fixture: ComponentFixture<PlacementForm>;
+describe('ScheduleDrive', () => {
+  let component: ScheduleDrive;
+  let fixture: ComponentFixture<ScheduleDrive>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlacementForm]
+      imports: [ScheduleDrive]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PlacementForm);
+    fixture = TestBed.createComponent(ScheduleDrive);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

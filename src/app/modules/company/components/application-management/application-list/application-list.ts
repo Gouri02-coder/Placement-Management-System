@@ -121,6 +121,7 @@ export class ApplicationListComponent implements OnInit {
 
   private calculateTotalPages(): void {
     this.totalPages = Math.ceil((this.filteredApplications?.length || 0) / this.itemsPerPage);
+    if (this.totalPages === 0) this.totalPages = 1;
   }
 
   get paginatedApplications(): Application[] {
@@ -131,6 +132,7 @@ export class ApplicationListComponent implements OnInit {
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -151,6 +153,10 @@ export class ApplicationListComponent implements OnInit {
     return pages;
   }
 
+  getStartIndex(): number {
+    return (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+
   getEndIndex(): number {
     const endIndex = this.currentPage * this.itemsPerPage;
     return Math.min(endIndex, this.filteredApplications?.length || 0);
@@ -159,13 +165,15 @@ export class ApplicationListComponent implements OnInit {
   // Selection methods
   toggleSelectAll(): void {
     if (this.selectAll) {
+      this.selectedApplications.clear();
+      this.selectAll = false;
+    } else {
       this.paginatedApplications.forEach(app => {
         if (app?.id) {
           this.selectedApplications.add(app.id);
         }
       });
-    } else {
-      this.selectedApplications.clear();
+      this.selectAll = true;
     }
   }
 
@@ -183,8 +191,9 @@ export class ApplicationListComponent implements OnInit {
 
   private updateSelectAllState(): void {
     const paginatedApps = this.paginatedApplications;
-    this.selectAll = paginatedApps.length > 0 && 
-                    paginatedApps.every(app => app?.id && this.selectedApplications.has(app.id));
+    const validApps = paginatedApps.filter(app => app?.id);
+    this.selectAll = validApps.length > 0 && 
+                    validApps.every(app => app?.id && this.selectedApplications.has(app.id));
   }
 
   get selectedCount(): number {
@@ -205,6 +214,8 @@ export class ApplicationListComponent implements OnInit {
           this.applications[index] = updatedApplication;
         }
         this.applyFilters();
+        this.selectedApplications.clear();
+        this.selectAll = false;
       },
       error: (error) => {
         console.error('Error updating application status:', error);
@@ -219,7 +230,7 @@ export class ApplicationListComponent implements OnInit {
       return;
     }
 
-    if (confirm(`Are you sure you want to update ${this.selectedApplications.size} application(s) to ${newStatus}?`)) {
+    if (confirm(`Are you sure you want to update ${this.selectedApplications.size} application(s) to ${newStatus.toUpperCase()}?`)) {
       const applicationIds = Array.from(this.selectedApplications);
       this.applicationService.bulkUpdateApplicationStatus(applicationIds, newStatus).subscribe({
         next: () => {
@@ -241,7 +252,8 @@ export class ApplicationListComponent implements OnInit {
     const companyId = this.getCompanyId();
     this.applicationService.downloadApplicationsExcel(companyId, this.filters).subscribe({
       next: (blob) => {
-        this.downloadFile(blob, 'applications.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        this.downloadFile(blob, `applications_${new Date().toISOString().split('T')[0]}.xlsx`, 
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       },
       error: (error) => {
         console.error('Error exporting to Excel:', error);
@@ -254,7 +266,7 @@ export class ApplicationListComponent implements OnInit {
     const companyId = this.getCompanyId();
     this.applicationService.downloadApplicationsPDF(companyId, this.filters).subscribe({
       next: (blob) => {
-        this.downloadFile(blob, 'applications.pdf', 'application/pdf');
+        this.downloadFile(blob, `applications_${new Date().toISOString().split('T')[0]}.pdf`, 'application/pdf');
       },
       error: (error) => {
         console.error('Error exporting to PDF:', error);
@@ -268,7 +280,9 @@ export class ApplicationListComponent implements OnInit {
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   }
 
@@ -279,7 +293,10 @@ export class ApplicationListComponent implements OnInit {
   }
 
   viewResume(application: Application | undefined): void {
-    if (!application?.resumeUrl) return;
+    if (!application?.resumeUrl) {
+      alert('Resume not available.');
+      return;
+    }
     window.open(application.resumeUrl, '_blank');
   }
 

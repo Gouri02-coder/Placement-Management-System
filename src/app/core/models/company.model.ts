@@ -1,4 +1,5 @@
 import { User } from './user.model';
+import { SocialLinks, VerificationDocument } from '../../modules/company/models/company.model';
 
 export interface Company extends User {
   companyName: string;
@@ -25,4 +26,26 @@ export interface CompanyRegistration {
   industry: string;
   website: string;
   description: string;
+}
+
+export interface CompanyProfile extends Company {
+  hrContacts: HRContact[];
+  socialLinks: SocialLinks;
+  verificationDocuments: VerificationDocument[];
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+export interface HRContact {
+  name: string;
+  email: string;
+  phone: string;
+  designation: string;
+}
+
+export interface CompanyStats {
+  totalJobPostings: number;
+  activeJobPostings: number;
+  totalApplicants: number;
+  averageTimeToHire: number; // in days
+  topHiringDepartments: string[];
 }

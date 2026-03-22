@@ -1,8 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { CompanyService } from '../../services/company.service';
-import { Company, CompanyStats } from '../../models/company.model';
+import { Company } from '../../models/company.model';
 import { CommonModule } from '@angular/common';
+
+interface CompanyStats {
+  activeJobs: number;
+  totalApplications: number;
+  localHires: number;
+  pendingReviews: number;
+  upcomingDrives: number;
+  unreadNotifications: number;
+}
 
 @Component({
   selector: 'app-company-dashboard',
@@ -23,15 +32,12 @@ export class CompanyDashboardComponent implements OnInit {
     website: '',
     address: '',
     description: '',
-    hrContact: {
-      name: '',
-      email: '',
-      phone: '',
-      position: ''
-    },
+    hrContacts: [],
     status: 'pending',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    socialLinks: {},
+    verificationDocuments: []
   };
 
   dashboardStats: CompanyStats = {
@@ -100,7 +106,7 @@ export class CompanyDashboardComponent implements OnInit {
     const companyId = this.getCompanyId();
     this.companyService.getCompanyStats(companyId).subscribe({
       next: (stats) => {
-        this.dashboardStats = stats;
+        this.dashboardStats = stats as unknown as CompanyStats;
       },
       error: (error) => {
         console.error('Error loading company stats:', error);
@@ -120,9 +126,9 @@ export class CompanyDashboardComponent implements OnInit {
       profile: '/company/profile',
       jobs: '/company/jobs',
       applications: '/company/applications',
-      drives: '/company/drives',
-      analytics: '/company/analytics',
-      communication: '/company/communication'
+      drives: '/company/dashboard',
+      analytics: '/company/dashboard',
+      communication: '/company/dashboard'
     };
     
     if (routes[section as keyof typeof routes]) {
@@ -131,7 +137,7 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   postJob(): void {
-    this.router.navigate(['/company/jobs/post']);
+    this.router.navigate(['/company/jobs/create']);
   }
 
   manageJobs(): void {
@@ -143,11 +149,11 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   scheduleDrive(): void {
-    this.router.navigate(['/company/drives/schedule']);
+    this.router.navigate(['/company/dashboard']);
   }
 
   viewAnalytics(): void {
-    this.router.navigate(['/company/analytics']);
+    this.router.navigate(['/company/dashboard']);
   }
 
   editProfile(): void {
@@ -155,7 +161,7 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   viewNotifications(): void {
-    this.router.navigate(['/company/notifications']);
+    this.router.navigate(['/company/dashboard']);
   }
 
   logout(): void {
