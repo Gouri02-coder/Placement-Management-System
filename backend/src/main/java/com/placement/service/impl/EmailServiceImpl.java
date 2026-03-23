@@ -20,8 +20,20 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
-        } catch (Exception e) {
+        } catch (org.springframework.mail.MailException e) {
             System.err.println("Error sending email: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void sendAbsentInterviewEmail(String toEmail, String studentName, String companyName, String interviewDate) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Interview Absence Notification");
+        message.setText("Dear " + studentName + ",\n\n" +
+                "We regret to inform you that you were marked as absent for your interview with " + companyName + " scheduled on " + interviewDate + ".\n\n" +
+                "Please contact the placement office for further assistance.\n\n" +
+                "Best regards,\nPlacement Management System");
+        mailSender.send(message);
     }
 }
