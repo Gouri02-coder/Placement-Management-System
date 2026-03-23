@@ -3,14 +3,10 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-interface ApprovalItem {
-  id: string;
-  name: string;
-  sector: string;
-  contact: string;
-  submittedOn: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
-}
+import {
+  AdminApprovalStoreService,
+  ApprovalItem
+} from '../../../../admin-approval-store.service';
 
 @Component({
   selector: 'app-company-approval',
@@ -23,11 +19,11 @@ export class CompanyApproval {
   query = '';
   showOnlyPending = true;
 
-  approvals: ApprovalItem[] = [
-    { id: 'CMP-102', name: 'Skyline Mobility', sector: 'Automotive', contact: 'hr@skyline.com', submittedOn: '2026-03-02', status: 'Pending' },
-    { id: 'CMP-105', name: 'CoreMatrix', sector: 'Semiconductor', contact: 'people@corematrix.com', submittedOn: '2026-03-01', status: 'Pending' },
-    { id: 'CMP-110', name: 'QuantNest', sector: 'Fintech', contact: 'recruit@quantnest.com', submittedOn: '2026-02-27', status: 'Approved' }
-  ];
+  constructor(private approvalStore: AdminApprovalStoreService) {}
+
+  get approvals(): ApprovalItem[] {
+    return this.approvalStore.approvals;
+  }
 
   get filteredApprovals(): ApprovalItem[] {
     return this.approvals.filter((item) => {
@@ -43,10 +39,11 @@ export class CompanyApproval {
   }
 
   approve(item: ApprovalItem): void {
-    item.status = 'Approved';
+    this.approvalStore.approve(item);
   }
 
   reject(item: ApprovalItem): void {
-    item.status = 'Rejected';
+    this.approvalStore.reject(item);
   }
 }
+

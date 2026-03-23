@@ -2,6 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
+import {
+  AdminApprovalStoreService,
+  ApprovalItem
+} from '../../admin-approval-store.service';
+
 interface OverviewCard {
   label: string;
   value: string;
@@ -11,12 +16,6 @@ interface OverviewCard {
 
 interface QuickLink {
   label: string;
-  route: string;
-}
-
-interface PendingTask {
-  title: string;
-  priority: 'high' | 'medium' | 'low';
   route: string;
 }
 
@@ -48,25 +47,30 @@ export class AdminDashboard {
     { label: 'View Reports', route: '/admin/reports' }
   ];
 
-  pendingTasks: PendingTask[] = [
-    { title: 'Verify 12 company profiles', priority: 'high', route: '/admin/companies/approval' },
-    { title: 'Review 7 new drive requests', priority: 'medium', route: '/admin/drives/schedule' },
-    { title: 'Approve 19 student documents', priority: 'low', route: '/admin/students/list' }
-  ];
-
   recentEvents: RecentEvent[] = [
     { event: 'Placement drive scheduled by Nexora Labs', time: '15 mins ago' },
     { event: 'New company ByteCraft completed verification', time: '1 hour ago' },
     { event: 'Admin exported monthly placement report', time: '3 hours ago' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private approvalStore: AdminApprovalStoreService
+  ) {}
+
+  get pendingApprovals(): ApprovalItem[] {
+    return this.approvalStore.pendingApprovals;
+  }
 
   openReports(): void {
     this.router.navigate(['/admin/reports']);
   }
 
-  reviewTask(route: string): void {
-    this.router.navigate([route]);
+  openApprovalQueue(): void {
+    this.router.navigate(['/admin/companies/approval']);
+  }
+
+  reviewApproval(item: ApprovalItem): void {
+    this.router.navigate(['/admin/companies/details', item.id]);
   }
 }

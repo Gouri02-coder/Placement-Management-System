@@ -159,6 +159,19 @@
   color: #047857;
 }
 
+.empty-state {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.empty-state p {
+  margin: 0 0 0.75rem;
+  color: #4a5570;
+}
+
 .task-list,
 .event-list {
   margin: 0.9rem 0 0;
@@ -194,18 +207,6 @@
   padding: 0.45rem 0.75rem;
   font-weight: 600;
   cursor: pointer;
-}
-
-.priority-high {
-  color: #b91c1c;
-}
-
-.priority-medium {
-  color: #b45309;
-}
-
-.priority-low {
-  color: #047857;
 }
 
 .event-list li {

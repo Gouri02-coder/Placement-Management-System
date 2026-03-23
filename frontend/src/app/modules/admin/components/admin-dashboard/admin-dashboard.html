@@ -31,16 +31,22 @@
   <section class="dashboard-grid">
     <article class="panel">
       <div class="panel-head">
-        <h3>Pending Tasks</h3>
-        <span class="pill">{{ pendingTasks.length }} open</span>
+        <h3>New Company Requests</h3>
+        <span class="pill">{{ pendingApprovals.length }} pending</span>
       </div>
-      <ul class="task-list">
-        <li *ngFor="let task of pendingTasks">
+
+      <div class="empty-state" *ngIf="pendingApprovals.length === 0">
+        <p>No new requests found.</p>
+        <button type="button" class="ghost-btn" (click)="openApprovalQueue()">Open Approval Queue</button>
+      </div>
+
+      <ul class="task-list" *ngIf="pendingApprovals.length > 0">
+        <li *ngFor="let item of pendingApprovals">
           <div>
-            <h4>{{ task.title }}</h4>
-            <p>Priority: <strong [class]="'priority-' + task.priority">{{ task.priority }}</strong></p>
+            <h4>{{ item.name }}</h4>
+            <p>{{ item.sector }} · {{ item.submittedOn }} · {{ item.contact }}</p>
           </div>
-          <button type="button" class="ghost-btn" (click)="reviewTask(task.route)">Review</button>
+          <button type="button" class="ghost-btn" (click)="reviewApproval(item)">Review</button>
         </li>
       </ul>
     </article>
