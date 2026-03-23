@@ -1,50 +1,130 @@
 <div class="application-filters">
+  <!-- Search Filter -->
   <div class="filter-group">
-    <label>Search</label>
+    <label for="searchInput">
+      <i class="material-icons" aria-hidden="true">search</i>
+      Search
+    </label>
     <div class="search-box">
-      <i class="material-icons">search</i>
-      <input type="text" placeholder="Search applications..." 
-             [(ngModel)]="searchTerm" (input)="onSearchChange()">
+      <i class="material-icons" aria-hidden="true">search</i>
+      <input 
+        type="text" 
+        id="searchInput"
+        placeholder="Search by name, email, or job title..." 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearchChange()"
+        aria-label="Search applications">
     </div>
+    <span class="filter-hint" *ngIf="searchTerm">Searching for: "{{searchTerm}}"</span>
   </div>
 
+  <!-- Job Filter -->
   <div class="filter-group">
-    <label>Job</label>
-    <select [(ngModel)]="jobFilter" (change)="applyFilters()">
-      <option value="all">All Jobs</option>
+    <label for="jobFilter">
+      <i class="material-icons" aria-hidden="true">work</i>
+      Job Position
+    </label>
+    <select 
+      id="jobFilter"
+      [(ngModel)]="jobFilter" 
+      (change)="applyFilters()"
+      aria-label="Filter by job position">
+      <option value="all">All Jobs ({{getUniqueJobs().length}})</option>
       <option *ngFor="let job of getUniqueJobs()" [value]="job">{{job}}</option>
     </select>
   </div>
 
+  <!-- Status Filter -->
   <div class="filter-group">
-    <label>Status</label>
-    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
-      <option value="all">All Status</option>
-      <option value="pending">Pending</option>
-      <option value="reviewed">Reviewed</option>
-      <option value="shortlisted">Shortlisted</option>
-      <option value="rejected">Rejected</option>
-      <option value="hired">Hired</option>
+    <label for="statusFilter">
+      <i class="material-icons" aria-hidden="true">flag</i>
+      Application Status
+    </label>
+    <select 
+      id="statusFilter"
+      [(ngModel)]="statusFilter" 
+      (change)="applyFilters()"
+      aria-label="Filter by status">
+      <option *ngFor="let option of statusOptions" [value]="option.value">{{option.label}}</option>
     </select>
   </div>
 
+  <!-- Branch Filter -->
   <div class="filter-group">
-    <label>Branch</label>
-    <select [(ngModel)]="branchFilter" (change)="applyFilters()">
-      <option value="all">All Branches</option>
+    <label for="branchFilter">
+      <i class="material-icons" aria-hidden="true">school</i>
+      Branch
+    </label>
+    <select 
+      id="branchFilter"
+      [(ngModel)]="branchFilter" 
+      (change)="applyFilters()"
+      aria-label="Filter by branch">
+      <option value="all">All Branches ({{getUniqueBranches().length}})</option>
       <option *ngFor="let branch of getUniqueBranches()" [value]="branch">{{branch}}</option>
     </select>
   </div>
 
+  <!-- CGPA Filter -->
   <div class="filter-group">
-    <label>Min CGPA</label>
-    <input type="number" [(ngModel)]="minCGPA" (change)="applyFilters()" 
-           step="0.1" min="0" max="10" placeholder="e.g., 7.5">
+    <label for="cgpaFilter">
+      <i class="material-icons" aria-hidden="true">trending_up</i>
+      Minimum CGPA
+    </label>
+    <input 
+      type="number" 
+      id="cgpaFilter"
+      [(ngModel)]="minCGPA" 
+      (change)="applyFilters()" 
+      step="0.1" 
+      min="0" 
+      max="10" 
+      placeholder="e.g., 7.5"
+      aria-label="Filter by minimum CGPA">
+    <span class="filter-hint" *ngIf="minCGPA">CGPA ≥ {{getCGPAValue()}}</span>
   </div>
 
+  <!-- Filter Actions -->
   <div class="filter-actions">
-    <button class="btn btn-outline btn-clear" (click)="clearFilters()">
-      <i class="material-icons">clear</i> Clear
+    <button 
+      class="btn btn-outline btn-clear" 
+      (click)="clearFilters()"
+      aria-label="Clear all filters">
+      <i class="material-icons" aria-hidden="true">clear</i> 
+      Clear All
+      <span class="filter-count" *ngIf="hasActiveFilters()">{{getActiveFiltersCount()}}</span>
     </button>
+  </div>
+</div>
+
+<!-- Active Filters Display -->
+<div class="active-filters" *ngIf="hasActiveFilters()">
+  <span class="active-filters-label">Active Filters:</span>
+  <div class="filter-tags">
+    <span class="filter-tag" *ngIf="searchTerm">
+      <i class="material-icons" aria-hidden="true">search</i>
+      "{{searchTerm}}"
+      <button class="remove-filter" (click)="resetFilter('search')" aria-label="Remove search filter">×</button>
+    </span>
+    <span class="filter-tag" *ngIf="jobFilter !== 'all'">
+      <i class="material-icons" aria-hidden="true">work</i>
+      {{jobFilter}}
+      <button class="remove-filter" (click)="resetFilter('job')" aria-label="Remove job filter">×</button>
+    </span>
+    <span class="filter-tag" *ngIf="statusFilter !== 'all'">
+      <i class="material-icons" aria-hidden="true">flag</i>
+      {{statusFilter | uppercase}}
+      <button class="remove-filter" (click)="resetFilter('status')" aria-label="Remove status filter">×</button>
+    </span>
+    <span class="filter-tag" *ngIf="branchFilter !== 'all'">
+      <i class="material-icons" aria-hidden="true">school</i>
+      {{branchFilter}}
+      <button class="remove-filter" (click)="resetFilter('branch')" aria-label="Remove branch filter">×</button>
+    </span>
+    <span class="filter-tag" *ngIf="minCGPA">
+      <i class="material-icons" aria-hidden="true">trending_up</i>
+      CGPA ≥ {{getCGPAValue()}}
+      <button class="remove-filter" (click)="resetFilter('cgpa')" aria-label="Remove CGPA filter">×</button>
+    </span>
   </div>
 </div>

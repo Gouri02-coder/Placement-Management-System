@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-edit',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './job-edit.html',
   styleUrls: ['./job-edit.css']
@@ -60,11 +59,11 @@ export class JobEditComponent implements OnInit {
       
       compensationType: ['salary'],
       salary: this.fb.group({
-        min: [null],
-        max: [null],
+        min: [null, [Validators.min(0)]],
+        max: [null, [Validators.min(0)]],
         currency: ['INR']
       }),
-      stipend: [null],
+      stipend: [null, [Validators.min(0)]],
       
       eligibility: this.fb.group({
         branches: [[], [Validators.required]],
@@ -135,7 +134,11 @@ export class JobEditComponent implements OnInit {
   }
 
   private formatDateForInput(date: Date): string {
-    return new Date(date).toISOString().split('T')[0];
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   get compensationType(): string {
@@ -151,7 +154,7 @@ export class JobEditComponent implements OnInit {
   }
 
   toggleBranch(branch: string): void {
-    const branches = this.selectedBranches;
+    const branches = [...this.selectedBranches];
     const index = branches.indexOf(branch);
     
     if (index > -1) {
@@ -160,11 +163,11 @@ export class JobEditComponent implements OnInit {
       branches.push(branch);
     }
     
-    this.jobForm.get('eligibility.branches')?.setValue([...branches]);
+    this.jobForm.get('eligibility.branches')?.setValue(branches);
   }
 
   toggleSkill(skill: string): void {
-    const skills = this.selectedSkills;
+    const skills = [...this.selectedSkills];
     const index = skills.indexOf(skill);
     
     if (index > -1) {
@@ -173,7 +176,7 @@ export class JobEditComponent implements OnInit {
       skills.push(skill);
     }
     
-    this.jobForm.get('eligibility.requiredSkills')?.setValue([...skills]);
+    this.jobForm.get('eligibility.requiredSkills')?.setValue(skills);
   }
 
   addCustomSkill(event: any): void {
@@ -189,7 +192,7 @@ export class JobEditComponent implements OnInit {
     if (this.compensationType === 'salary') {
       this.jobForm.get('stipend')?.setValue(null);
     } else {
-      this.jobForm.get('salary')?.patchValue({ min: null, max: null });
+      this.jobForm.get('salary')?.patchValue({ min: null, max: null, currency: 'INR' });
     }
   }
 
@@ -218,8 +221,9 @@ export class JobEditComponent implements OnInit {
       if (formValue.compensationType === 'salary' && formValue.salary.min) {
         jobData.salary = {
           min: formValue.salary.min,
-          max: formValue.salary.max,
-          currency: formValue.salary.currency
+          max: formValue.salary.max || formValue.salary.min,
+          currency: formValue.salary.currency,
+          type: formValue.salary.max && formValue.salary.max > formValue.salary.min ? 'range' : 'fixed'
         };
         jobData.stipend = undefined;
       } else if (formValue.compensationType === 'stipend' && formValue.stipend) {
@@ -241,6 +245,11 @@ export class JobEditComponent implements OnInit {
       });
     } else {
       this.markFormGroupTouched(this.jobForm);
+      // Scroll to first error
+      const firstError = document.querySelector('.error-message');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   }
 
@@ -256,7 +265,11 @@ export class JobEditComponent implements OnInit {
   }
 
   cancel(): void {
-    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+    if (this.jobForm.dirty) {
+      if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+        this.router.navigate(['/company/jobs']);
+      }
+    } else {
       this.router.navigate(['/company/jobs']);
     }
   }

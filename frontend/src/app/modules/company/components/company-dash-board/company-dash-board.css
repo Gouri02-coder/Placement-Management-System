@@ -49,7 +49,7 @@
   margin: 1rem;
   border-radius: 8px;
   background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(10px);
+  
 }
 
 .status-approved { background: rgba(76, 175, 80, 0.2) !important; }

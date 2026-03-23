@@ -1,18 +1,17 @@
-<<<<<<< HEAD
-# PlacementManagementSystem
+# Placement Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
-=======
-# Frontend
+This repository contains:
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
->>>>>>> 53b036966c30718bb2f8410656ebe2d0f4e00ad4
+- `frontend/`: Angular application (generated with Angular CLI)
+- `backend/`: Spring Boot application (Maven)
 
 ## Development server
 
-To start a local development server, run:
+To start the Angular development server, run:
 
 ```bash
+cd frontend
+npm install
 ng serve
 ```
 
@@ -34,9 +33,10 @@ ng generate --help
 
 ## Building
 
-To build the project run:
+To build the Angular project run:
 
 ```bash
+cd frontend
 ng build
 ```
 
@@ -47,6 +47,7 @@ This will compile your project and store the build artifacts in the `dist/` dire
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
 ```bash
+cd frontend
 ng test
 ```
 
@@ -63,3 +64,12 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Backend
+
+To run the Spring Boot backend locally:
+
+```bash
+cd backend
+mvn spring-boot:run
+```
