@@ -1,0 +1,50 @@
+<div class="dashboard-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-box">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h2>HireHub <span>PTO</span></h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-title">MANAGEMENT</p>
+      
+      <a routerLink="/pto/dashboard" routerLinkActive="active-link" class="nav-item">
+        <span class="icon">📊</span>
+        Dashboard
+      </a>
+      
+      <a routerLink="/pto/student-management/student-list" routerLinkActive="active-link" class="nav-item">
+        <span class="icon">👨‍🎓</span>
+        Student List
+      </a>
+
+      <a routerLink="/pto/verifications" routerLinkActive="active-link" class="nav-item">
+        <span class="icon">✅</span>
+        Verifications
+      </a>
+
+      <p class="nav-title">SETTINGS</p>
+      
+      <a routerLink="/pto/profile" routerLinkActive="active-link" class="nav-item">
+        <span class="icon">⚙️</span>
+        Preferences
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">AD</div>
+        <div class="details">
+          <p class="name">Admin User</p>
+          <p class="role">PTO Coordinator</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

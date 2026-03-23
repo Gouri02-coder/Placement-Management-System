@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CompanyProfileComponent } from './company-profile';
@@ -18,12 +19,14 @@ describe('CompanyProfileComponent', () => {
     website: 'https://test.com',
     address: 'Test Address, City, State 12345',
     description: 'This is a test company description that is long enough to meet validation requirements.',
-    hrContact: {
+    hrContacts: [{
       name: 'John Doe',
       email: 'john@test.com',
       phone: '1234567890',
       position: 'HR Manager'
-    },
+    }],
+    socialLinks: [{}] as any,
+    verificationDocuments: [],
     status: 'approved',
     createdAt: new Date(),
     updatedAt: new Date()
@@ -39,7 +42,8 @@ describe('CompanyProfileComponent', () => {
     ]);
 
     await TestBed.configureTestingModule({
-      imports: [CompanyProfileComponent],
+      declarations: [CompanyProfileComponent],
+      imports: [ReactiveFormsModule],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: CompanyService, useValue: companyServiceSpy }

@@ -62,22 +62,6 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  fillDemoCredentials(role: 'student' | 'company' | 'admin'): void {
-    const demoMap = {
-      student: { email: 'student@college.edu.in', password: 'Student@123' },
-      company: { email: 'hr@company.com', password: 'Company@123' },
-      admin: { email: 'admin@campus.ac.in', password: 'Admin@123' }
-    };
-
-    this.loginForm.patchValue(demoMap[role]);
-    this.authError = '';
-  }
-
-  loginWithDemoAdmin(): void {
-    this.fillDemoCredentials('admin');
-    this.onLogin();
-  }
-
   goToRegister(): void {
     this.router.navigate(['/auth/register']);
   }

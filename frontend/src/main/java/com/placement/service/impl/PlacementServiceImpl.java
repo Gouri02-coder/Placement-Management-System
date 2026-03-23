@@ -4,6 +4,7 @@ import com.placement.model.Placement;
 import com.placement.repository.PlacementRepository;
 import com.placement.service.PlacementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class PlacementServiceImpl implements PlacementService {
     }
 
     @Override
-    public Optional<Placement> getPlacementById(Long id) {
+    public Optional<Placement> getPlacementById(@NonNull Long id) {
         return placementRepository.findById(id);
     }
 
@@ -36,7 +37,7 @@ public class PlacementServiceImpl implements PlacementService {
     }
 
     @Override
-    public Placement updatePlacement(Long id, Placement placement) {
+    public Placement updatePlacement(@NonNull Long id, Placement placement) {
         Placement existingPlacement = placementRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Placement not found with id: " + id));
         
@@ -50,7 +51,7 @@ public class PlacementServiceImpl implements PlacementService {
     }
 
     @Override
-    public void deletePlacement(Long id) {
+    public void deletePlacement(@NonNull Long id) {
         if (!placementRepository.existsById(id)) {
             throw new RuntimeException("Placement not found with id: " + id);
         }
@@ -58,12 +59,12 @@ public class PlacementServiceImpl implements PlacementService {
     }
 
     @Override
-    public List<Placement> getPlacementsByStudent(Long studentId) {
+    public List<Placement> getPlacementsByStudent(@NonNull Long studentId) {
         return placementRepository.findByStudentId(studentId);
     }
 
     @Override
-    public List<Placement> getPlacementsByJob(Long jobId) {
+    public List<Placement> getPlacementsByJob(@NonNull Long jobId) {
         return placementRepository.findByJobId(jobId);
     }
 
@@ -73,7 +74,7 @@ public class PlacementServiceImpl implements PlacementService {
     }
 
     @Override
-    public boolean hasStudentAppliedForJob(Long studentId, Long jobId) {
+    public boolean hasStudentAppliedForJob(@NonNull Long studentId, @NonNull Long jobId) {
         return placementRepository.existsByStudentIdAndJobId(studentId, jobId);
     }
 

@@ -1,0 +1,74 @@
+.pto-component-shell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  color: #1e293b;
+}
+
+.hero-card,
+.metric-card,
+.content-card {
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.hero-card,
+.content-card {
+  padding: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  color: #2563eb;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-card h2,
+.content-card h3,
+.hero-card p {
+  margin-top: 0;
+}
+
+.subtitle,
+.metric-card span,
+.metric-card p,
+.content-card li {
+  color: #64748b;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  padding: 1.25rem;
+}
+
+.metric-card strong {
+  display: block;
+  margin: 0.5rem 0;
+  font-size: 1.7rem;
+  color: #0f172a;
+}
+
+.content-card ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.content-card li + li {
+  margin-top: 0.65rem;
+}
+
+@media (max-width: 768px) {
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+}

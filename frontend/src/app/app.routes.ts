@@ -22,7 +22,7 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/company/company.route').then(m => m.COMPANY_ROUTES)
   },
   {
-    path: 'placement',
+    path: 'pto',
     loadChildren: () => import('./modules/PTO/pto.route').then(m => m.PTO_ROUTES)
   },
   { path: '**', redirectTo: '' }

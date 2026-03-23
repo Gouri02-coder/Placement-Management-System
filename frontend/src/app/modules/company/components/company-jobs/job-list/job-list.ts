@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { JobService } from '../../../services/job.service';
-import { Job } from '../../../models/job.model';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-list',
-  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './job-list.html',
   styleUrls: ['./job-list.css']
@@ -41,7 +39,7 @@ export class JobListComponent implements OnInit {
     this.jobService.getJobsByCompany(companyId).subscribe({
       next: (jobs) => {
         this.jobs = jobs;
-        this.filteredJobs = jobs;
+        this.filteredJobs = [...jobs];
         this.calculateTotalPages();
         this.isLoading = false;
       },
@@ -73,6 +71,7 @@ export class JobListComponent implements OnInit {
 
   private calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredJobs.length / this.itemsPerPage);
+    if (this.totalPages === 0) this.totalPages = 1;
   }
 
   get paginatedJobs(): Job[] {
@@ -138,6 +137,11 @@ export class JobListComponent implements OnInit {
     const newDeadline = prompt('Enter new deadline (YYYY-MM-DD):');
     if (newDeadline) {
       const deadlineDate = new Date(newDeadline);
+      if (isNaN(deadlineDate.getTime())) {
+        alert('Invalid date format. Please use YYYY-MM-DD format.');
+        return;
+      }
+      
       this.jobService.extendDeadline(jobId, deadlineDate).subscribe({
         next: (updatedJob) => {
           const index = this.jobs.findIndex(j => j.id === jobId);
@@ -186,4 +190,41 @@ export class JobListComponent implements OnInit {
   isJobExpired(job: Job): boolean {
     return new Date(job.applicationDeadline) < new Date() && job.status === 'active';
   }
+}
+
+// job.model.ts
+export interface Eligibility {
+  branches: string[];
+  minCGPA: number;
+  yearOfPassing: number[];
+  requiredSkills: string[];
+  additionalRequirements?: string;
+}
+
+export interface Salary {
+  min: number;
+  max: number;
+  currency: string;
+  type: 'fixed' | 'range';
+}
+
+export interface Job {
+  id: string;
+  companyId: string;  // Required - links job to company
+  title: string;
+  description: string;
+  category: string;  // Required - job category (e.g., 'Engineering', 'Sales', 'Marketing')
+  status: 'active' | 'draft' | 'closed' | 'expired';
+  type: 'fulltime' | 'parttime' | 'internship';
+  location: 'remote' | 'hybrid' | 'onsite';
+  applicationDeadline: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  applicationsCount: number;
+  eligibility: Eligibility;
+  salary?: Salary;
+  stipend?: number;
+  // Optional fields you might have
+  experience?: string;
+  vacancies?: number;
 }
