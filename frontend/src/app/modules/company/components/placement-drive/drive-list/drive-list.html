@@ -1,1 +1,273 @@
-<p>drive-list works!</p>
+<div class="drive-list-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h1>Placement Drives</h1>
+      <p>Explore and register for upcoming placement opportunities</p>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="material-icons" aria-hidden="true">work</i>
+      </div>
+      <div class="stat-info">
+        <h3>{{stats.total}}</h3>
+        <p>Total Drives</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon upcoming">
+        <i class="material-icons" aria-hidden="true">event</i>
+      </div>
+      <div class="stat-info">
+        <h3>{{stats.upcoming}}</h3>
+        <p>Upcoming</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon ongoing">
+        <i class="material-icons" aria-hidden="true">play_circle</i>
+      </div>
+      <div class="stat-info">
+        <h3>{{stats.ongoing}}</h3>
+        <p>Ongoing</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon completed">
+        <i class="material-icons" aria-hidden="true">check_circle</i>
+      </div>
+      <div class="stat-info">
+        <h3>{{stats.completed}}</h3>
+        <p>Completed</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="material-icons" aria-hidden="true">search</i>
+      <input 
+        type="text" 
+        placeholder="Search by drive name, company, or description..." 
+        [(ngModel)]="searchTerm" 
+        (input)="applyFilters()"
+        aria-label="Search drives">
+    </div>
+    
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="statusFilter" class="filter-label">Status</label>
+        <select 
+          id="statusFilter"
+          [(ngModel)]="selectedStatus" 
+          (change)="applyFilters()"
+          aria-label="Filter by status">
+          <option *ngFor="let status of driveStatuses" [value]="status.value">{{status.label}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="typeFilter" class="filter-label">Drive Type</label>
+        <select 
+          id="typeFilter"
+          [(ngModel)]="selectedType" 
+          (change)="applyFilters()"
+          aria-label="Filter by drive type">
+          <option *ngFor="let type of driveTypes" [value]="type.value">{{type.label}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="branchFilter" class="filter-label">Eligible Branch</label>
+        <select 
+          id="branchFilter"
+          [(ngModel)]="selectedBranch" 
+          (change)="applyFilters()"
+          aria-label="Filter by eligible branch">
+          <option value="all">All Branches</option>
+          <option *ngFor="let branch of branches" [value]="branch">{{branch}}</option>
+        </select>
+      </div>
+
+      <button class="btn-clear" (click)="clearFilters()" aria-label="Clear all filters">
+        <i class="material-icons" aria-hidden="true">clear</i> Clear All
+      </button>
+    </div>
+
+    <div class="results-info">
+      <span class="results-count">
+        <i class="material-icons" aria-hidden="true">list</i>
+        Showing {{filteredDrives.length}} of {{drives.length}} drives
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading placement drives...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && filteredDrives.length === 0">
+    <i class="material-icons" aria-hidden="true">event_busy</i>
+    <h3>No Drives Found</h3>
+    <p>Try adjusting your search filters or check back later for new opportunities</p>
+    <button class="btn-primary" (click)="clearFilters()" aria-label="Clear all filters">
+      <i class="material-icons" aria-hidden="true">refresh</i> Clear Filters
+    </button>
+  </div>
+
+  <!-- Drives Grid -->
+  <div class="drives-grid" *ngIf="!isLoading && filteredDrives.length > 0">
+    <div class="drive-card" *ngFor="let drive of paginatedDrives">
+      <div class="card-badge" [class]="drive.status">
+        <i class="material-icons" aria-hidden="true">{{getStatusIcon(drive.status)}}</i>
+        {{drive.status | uppercase}}
+      </div>
+      
+      <div class="card-header">
+        <div class="company-logo">
+          <img [src]="drive.companyLogo" [alt]="drive.companyName + ' logo'" [title]="drive.companyName">
+        </div>
+        <div class="company-info">
+          <h3>{{drive.driveName}}</h3>
+          <p class="company-name">{{drive.companyName}}</p>
+          <div class="drive-type" [class]="drive.driveType">
+            <i class="material-icons" aria-hidden="true">{{getDriveTypeIcon(drive.driveType)}}</i>
+            {{drive.driveType | uppercase}}
+          </div>
+        </div>
+      </div>
+
+      <div class="drive-details">
+        <div class="detail-row">
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">event</i>
+            <div>
+              <span class="detail-label">Date & Time</span>
+              <span class="detail-value">{{formatDate(drive.driveDate)}} at {{drive.driveTime}}</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">location_on</i>
+            <div>
+              <span class="detail-label">Venue</span>
+              <span class="detail-value">{{drive.venue}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">people</i>
+            <div>
+              <span class="detail-label">Registered</span>
+              <span class="detail-value">{{drive.registeredCount}} / {{drive.vacancies}} Students</span>
+            </div>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">school</i>
+            <div>
+              <span class="detail-label">Min CGPA</span>
+              <span class="detail-value">{{drive.minCGPA || 'No minimum'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-item full-width">
+          <i class="material-icons" aria-hidden="true">work</i>
+          <div>
+            <span class="detail-label">Positions Available</span>
+            <div class="tags">
+              <span class="tag" *ngFor="let position of drive.positions">{{position}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-item full-width">
+          <i class="material-icons" aria-hidden="true">check_circle</i>
+          <div>
+            <span class="detail-label">Eligible Branches</span>
+            <div class="tags">
+              <span class="tag" *ngFor="let branch of drive.eligibleBranches.slice(0, 3)">{{branch}}</span>
+              <span class="tag more" *ngIf="drive.eligibleBranches.length > 3">+{{drive.eligibleBranches.length - 3}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drive-description">
+        <p>{{drive.description | slice:0:120}}{{drive.description.length > 120 ? '...' : ''}}</p>
+      </div>
+
+      <div class="drive-footer">
+        <div class="deadline-info" [class.urgent]="getDaysRemaining(drive.registrationDeadline) <= 7 && drive.status === 'scheduled'">
+          <i class="material-icons" aria-hidden="true">schedule</i>
+          <span *ngIf="!isRegistrationOpen(drive.registrationDeadline, drive.status) && drive.status === 'scheduled'">
+            Registration closed on {{formatDate(drive.registrationDeadline)}}
+          </span>
+          <span *ngIf="isRegistrationOpen(drive.registrationDeadline, drive.status)">
+            Registration closes in {{getDaysRemaining(drive.registrationDeadline)}} days
+          </span>
+          <span *ngIf="drive.status === 'ongoing'">
+            Drive in progress
+          </span>
+          <span *ngIf="drive.status === 'completed'">
+            Drive completed
+          </span>
+        </div>
+        
+        <div class="card-actions">
+          <button class="btn-outline" (click)="viewDetails(drive)" aria-label="View details for {{drive.driveName}}">
+            <i class="material-icons" aria-hidden="true">visibility</i> View Details
+          </button>
+          <button 
+            class="btn-primary" 
+            (click)="registerForDrive(drive)" 
+            [disabled]="!isRegistrationOpen(drive.registrationDeadline, drive.status)"
+            [attr.aria-label]="isRegistrationOpen(drive.registrationDeadline, drive.status) ? 'Register for ' + drive.driveName : 'Registration closed for ' + drive.driveName">
+            <i class="material-icons" aria-hidden="true">how_to_reg</i>
+            {{isRegistrationOpen(drive.registrationDeadline, drive.status) ? 'Register Now' : 'Registration Closed'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && filteredDrives.length > 0 && totalPages > 1" role="navigation" aria-label="Pagination">
+    <button 
+      class="page-btn" 
+      (click)="changePage(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      aria-label="Previous page">
+      <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+    </button>
+    
+    <div class="page-numbers">
+      <button 
+        *ngFor="let page of getPages()" 
+        class="page-number" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)"
+        [attr.aria-label]="'Go to page ' + page"
+        [attr.aria-current]="page === currentPage ? 'page' : null">
+        {{page}}
+      </button>
+    </div>
+    
+    <button 
+      class="page-btn" 
+      (click)="changePage(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      aria-label="Next page">
+      Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+    </button>
+  </div>
+</div>

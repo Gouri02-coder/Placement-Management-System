@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlacementList } from './placement-list';
+import { DriveList } from './drive-list';
 
-describe('PlacementList', () => {
-  let component: PlacementList;
-  let fixture: ComponentFixture<PlacementList>;
+describe('DriveList', () => {
+  let component: DriveList;
+  let fixture: ComponentFixture<DriveList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlacementList]
+      imports: [DriveList]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PlacementList);
+    fixture = TestBed.createComponent(DriveList);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -13,12 +13,21 @@
   <div class="filters-section">
     <div class="search-box">
       <i class="material-icons">search</i>
-      <input type="text" placeholder="Search jobs..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      <input 
+        type="text" 
+        placeholder="Search jobs by title or description..." 
+        [(ngModel)]="searchTerm" 
+        (input)="applyFilters()"
+        aria-label="Search jobs">
     </div>
     
     <div class="filter-group">
-      <label>Status:</label>
-      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+      <label for="statusFilter">Status:</label>
+      <select 
+        id="statusFilter"
+        [(ngModel)]="statusFilter" 
+        (change)="applyFilters()"
+        aria-label="Filter by status">
         <option value="all">All Status</option>
         <option value="active">Active</option>
         <option value="draft">Draft</option>
@@ -28,8 +37,12 @@
     </div>
 
     <div class="filter-group">
-      <label>Type:</label>
-      <select [(ngModel)]="typeFilter" (change)="applyFilters()">
+      <label for="typeFilter">Type:</label>
+      <select 
+        id="typeFilter"
+        [(ngModel)]="typeFilter" 
+        (change)="applyFilters()"
+        aria-label="Filter by job type">
         <option value="all">All Types</option>
         <option value="fulltime">Full-time</option>
         <option value="parttime">Part-time</option>
@@ -37,13 +50,13 @@
       </select>
     </div>
 
-    <div class="results-count">
+    <div class="results-count" aria-live="polite">
       {{filteredJobs.length}} job{{filteredJobs.length !== 1 ? 's' : ''}} found
     </div>
   </div>
 
   <!-- Loading State -->
-  <div class="loading-state" *ngIf="isLoading">
+  <div class="loading-state" *ngIf="isLoading" aria-label="Loading jobs">
     <i class="material-icons spin">refresh</i>
     <p>Loading jobs...</p>
   </div>
@@ -53,10 +66,10 @@
     <i class="material-icons">work_outline</i>
     <h3>No jobs found</h3>
     <p *ngIf="searchTerm || statusFilter !== 'all' || typeFilter !== 'all'">
-      Try adjusting your search filters
+      Try adjusting your search filters to see more results
     </p>
     <p *ngIf="!searchTerm && statusFilter === 'all' && typeFilter === 'all'">
-      You haven't posted any jobs yet. Create your first job posting!
+      You haven't posted any jobs yet. Create your first job posting to start receiving applications!
     </p>
     <button class="btn btn-primary" (click)="createJob()">
       <i class="material-icons">add</i> Post Your First Job
@@ -97,7 +110,7 @@
         </div>
         <div class="detail-item">
           <i class="material-icons">people</i>
-          <span>{{job.applicationsCount}} Applications</span>
+          <span>{{job.applicationsCount || 0}} Applications</span>
         </div>
         <div class="detail-item" *ngIf="job.salary">
           <i class="material-icons">payments</i>
@@ -112,13 +125,13 @@
       </div>
 
       <div class="job-requirements">
-        <div class="requirements-section">
+        <div class="requirements-section" *ngIf="job.eligibility.branches.length">
           <strong>Eligible Branches:</strong>
           <div class="tags">
             <span class="tag" *ngFor="let branch of job.eligibility.branches">{{branch}}</span>
           </div>
         </div>
-        <div class="requirements-section">
+        <div class="requirements-section" *ngIf="job.eligibility.requiredSkills.length">
           <strong>Required Skills:</strong>
           <div class="tags">
             <span class="tag skill-tag" *ngFor="let skill of job.eligibility.requiredSkills">{{skill}}</span>
@@ -130,19 +143,27 @@
       </div>
 
       <div class="job-actions">
-        <button class="btn btn-outline" (click)="viewApplications(job.id)">
+        <button class="btn btn-outline" (click)="viewApplications(job.id)" aria-label="View applications for {{job.title}}">
           <i class="material-icons">list_alt</i>
           View Applications
         </button>
-        <button class="btn btn-outline" (click)="editJob(job.id)">
+        <button class="btn btn-outline" (click)="editJob(job.id)" aria-label="Edit {{job.title}}">
           <i class="material-icons">edit</i>
           Edit
         </button>
-        <button *ngIf="job.status === 'active'" class="btn btn-outline btn-warning" (click)="closeJob(job.id)">
+        <button 
+          *ngIf="job.status === 'active'" 
+          class="btn btn-outline btn-warning" 
+          (click)="closeJob(job.id)"
+          aria-label="Close {{job.title}}">
           <i class="material-icons">lock</i>
           Close
         </button>
-        <button *ngIf="job.status === 'active'" class="btn btn-outline btn-info" (click)="extendDeadline(job.id)">
+        <button 
+          *ngIf="job.status === 'active'" 
+          class="btn btn-outline btn-info" 
+          (click)="extendDeadline(job.id)"
+          aria-label="Extend deadline for {{job.title}}">
           <i class="material-icons">schedule</i>
           Extend
         </button>
@@ -160,21 +181,32 @@
   </div>
 
   <!-- Pagination -->
-  <div class="pagination" *ngIf="!isLoading && filteredJobs.length > 0">
-    <button class="btn btn-outline" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+  <div class="pagination" *ngIf="!isLoading && filteredJobs.length > 0 && totalPages > 1">
+    <button 
+      class="btn btn-outline" 
+      (click)="changePage(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      aria-label="Previous page">
       <i class="material-icons">chevron_left</i> Previous
     </button>
     
     <div class="page-numbers">
-      <button *ngFor="let page of getPages()" 
-              class="page-btn" 
-              [class.active]="page === currentPage"
-              (click)="changePage(page)">
+      <button 
+        *ngFor="let page of getPages()" 
+        class="page-btn" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)"
+        [attr.aria-label]="'Go to page ' + page"
+        [attr.aria-current]="page === currentPage ? 'page' : null">
         {{page}}
       </button>
     </div>
     
-    <button class="btn btn-outline" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+    <button 
+      class="btn btn-outline" 
+      (click)="changePage(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      aria-label="Next page">
       Next <i class="material-icons">chevron_right</i>
     </button>
   </div>

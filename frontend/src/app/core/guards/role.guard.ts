@@ -62,7 +62,7 @@ export class RoleGuard implements CanActivate {
     
     const routes: { [key: string]: string } = {
       'student': '/student/dashboard',
-      'pto': '/placement/dashboard', 
+      'pto': '/pto/dashboard', 
       'company': '/company/dashboard',
       'admin': '/admin/dashboard'
     };

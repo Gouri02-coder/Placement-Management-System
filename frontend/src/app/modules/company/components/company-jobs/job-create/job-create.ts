@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { JobService } from '../../../services/job.service';
 import { JobCreateRequest } from '../../../models/job.model';
@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-job-create',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './job-create.html',
   styleUrls: ['./job-create.css']
@@ -46,41 +45,45 @@ export class JobCreateComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(5)]],
-      description: ['', [Validators.required, Validators.minLength(100)]],
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      description: ['', [Validators.required, Validators.minLength(100), Validators.maxLength(5000)]],
       type: ['fulltime', [Validators.required]],
       location: ['onsite', [Validators.required]],
-      category: ['', [Validators.required]],
+      category: ['', [Validators.required, Validators.minLength(3)]],
       
       // Salary/Stipend
       compensationType: ['salary'],
       salary: this.fb.group({
-        min: [null],
-        max: [null],
+        min: [null, [Validators.min(0)]],
+        max: [null, [Validators.min(0)]],
         currency: ['INR']
       }),
-      stipend: [null],
+      stipend: [null, [Validators.min(0)]],
       
       // Eligibility
       eligibility: this.fb.group({
-        branches: [[], [Validators.required]],
+        branches: [[], [Validators.required, Validators.minLength(1)]],
         minCGPA: [null, [Validators.min(0), Validators.max(10)]],
         yearOfPassing: [[new Date().getFullYear()], [Validators.required]],
-        requiredSkills: [[], [Validators.required]],
+        requiredSkills: [[], [Validators.required, Validators.minLength(1)]],
         additionalRequirements: ['']
       }),
       
       applicationDeadline: ['', [Validators.required]],
       status: ['draft']
-    });
+    }, { validators: this.salaryRangeValidator });
   }
 
-  get branchesArray(): FormArray {
-    return this.jobForm.get('eligibility.branches') as FormArray;
-  }
-
-  get skillsArray(): FormArray {
-    return this.jobForm.get('eligibility.requiredSkills') as FormArray;
+  private salaryRangeValidator(group: FormGroup): any {
+    const compensationType = group.get('compensationType')?.value;
+    if (compensationType === 'salary') {
+      const min = group.get('salary.min')?.value;
+      const max = group.get('salary.max')?.value;
+      if (min && max && min > max) {
+        return { salaryRangeInvalid: true };
+      }
+    }
+    return null;
   }
 
   get compensationType(): string {
@@ -88,7 +91,7 @@ export class JobCreateComponent implements OnInit {
   }
 
   toggleBranch(branch: string): void {
-    const branches = this.jobForm.get('eligibility.branches')?.value as string[];
+    const branches = [...(this.jobForm.get('eligibility.branches')?.value || [])];
     const index = branches.indexOf(branch);
     
     if (index > -1) {
@@ -97,11 +100,12 @@ export class JobCreateComponent implements OnInit {
       branches.push(branch);
     }
     
-    this.jobForm.get('eligibility.branches')?.setValue([...branches]);
+    this.jobForm.get('eligibility.branches')?.setValue(branches);
+    this.jobForm.get('eligibility.branches')?.markAsTouched();
   }
 
   toggleSkill(skill: string): void {
-    const skills = this.jobForm.get('eligibility.requiredSkills')?.value as string[];
+    const skills = [...(this.jobForm.get('eligibility.requiredSkills')?.value || [])];
     const index = skills.indexOf(skill);
     
     if (index > -1) {
@@ -110,7 +114,8 @@ export class JobCreateComponent implements OnInit {
       skills.push(skill);
     }
     
-    this.jobForm.get('eligibility.requiredSkills')?.setValue([...skills]);
+    this.jobForm.get('eligibility.requiredSkills')?.setValue(skills);
+    this.jobForm.get('eligibility.requiredSkills')?.markAsTouched();
   }
 
   addCustomSkill(event: any): void {
@@ -125,66 +130,79 @@ export class JobCreateComponent implements OnInit {
   onCompensationTypeChange(): void {
     if (this.compensationType === 'salary') {
       this.jobForm.get('stipend')?.setValue(null);
+      this.jobForm.get('stipend')?.clearValidators();
+      this.jobForm.get('salary.min')?.setValidators([Validators.min(0)]);
+      this.jobForm.get('salary.max')?.setValidators([Validators.min(0)]);
     } else {
-      this.jobForm.get('salary')?.patchValue({ min: null, max: null });
+      this.jobForm.get('salary')?.patchValue({ min: null, max: null, currency: 'INR' });
+      this.jobForm.get('salary.min')?.clearValidators();
+      this.jobForm.get('salary.max')?.clearValidators();
+      this.jobForm.get('stipend')?.setValidators([Validators.min(0)]);
     }
+    this.jobForm.get('salary.min')?.updateValueAndValidity();
+    this.jobForm.get('salary.max')?.updateValueAndValidity();
+    this.jobForm.get('stipend')?.updateValueAndValidity();
   }
 
-  onSubmit(): void {
+  onSubmit(isPublish: boolean = false): void {
     if (this.jobForm.valid) {
       this.isSubmitting = true;
       const formValue = this.jobForm.value;
       
+      // Prepare salary data - without the 'type' property
+      let salaryData = undefined;
+      if (formValue.compensationType === 'salary' && formValue.salary.min) {
+        salaryData = {
+          min: formValue.salary.min,
+          max: formValue.salary.max || formValue.salary.min,
+          currency: formValue.salary.currency
+        };
+      }
+      
       const jobData: JobCreateRequest = {
-        title: formValue.title,
-        description: formValue.description,
+        title: formValue.title.trim(),
+        description: formValue.description.trim(),
         type: formValue.type,
         location: formValue.location,
-        salary: formValue.compensationType === 'salary' && formValue.salary.min ? {
-          min: formValue.salary.min,
-          max: formValue.salary.max,
-          currency: formValue.salary.currency
-        } : undefined,
+        category: formValue.category.trim(),
+        salary: salaryData,
         stipend: formValue.compensationType === 'stipend' ? formValue.stipend : undefined,
         eligibility: {
           branches: formValue.eligibility.branches,
           minCGPA: formValue.eligibility.minCGPA,
           yearOfPassing: formValue.eligibility.yearOfPassing,
           requiredSkills: formValue.eligibility.requiredSkills,
-          additionalRequirements: formValue.eligibility.additionalRequirements
+          additionalRequirements: formValue.eligibility.additionalRequirements?.trim() || ''
         },
-        applicationDeadline: new Date(formValue.applicationDeadline)
+        applicationDeadline: new Date(formValue.applicationDeadline),
+        status: isPublish ? 'active' : 'draft'
       };
 
       this.jobService.createJob(jobData).subscribe({
         next: (createdJob) => {
           this.isSubmitting = false;
-          alert('Job created successfully!');
-          if (formValue.status === 'active') {
-            this.router.navigate(['/company/jobs']);
-          } else {
-            this.router.navigate(['/company/jobs'], { queryParams: { draft: true } });
-          }
+          const message = isPublish ? 'Job published successfully!' : 'Job saved as draft successfully!';
+          alert(message);
+          this.router.navigate(['/company/jobs']);
         },
         error: (error) => {
           console.error('Error creating job:', error);
           this.isSubmitting = false;
-          alert('Error creating job. Please try again.');
+          alert(error.error?.message || 'Error creating job. Please try again.');
         }
       });
     } else {
       this.markFormGroupTouched(this.jobForm);
+      this.scrollToFirstError();
     }
   }
 
   saveAsDraft(): void {
-    this.jobForm.patchValue({ status: 'draft' });
-    this.onSubmit();
+    this.onSubmit(false);
   }
 
   publishJob(): void {
-    this.jobForm.patchValue({ status: 'active' });
-    this.onSubmit();
+    this.onSubmit(true);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
@@ -198,8 +216,19 @@ export class JobCreateComponent implements OnInit {
     });
   }
 
+  private scrollToFirstError(): void {
+    const firstError = document.querySelector('.error-message');
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
   cancel(): void {
-    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+    if (this.jobForm.dirty) {
+      if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+        this.router.navigate(['/company/jobs']);
+      }
+    } else {
       this.router.navigate(['/company/jobs']);
     }
   }
@@ -213,8 +242,8 @@ export class JobCreateComponent implements OnInit {
   get applicationDeadline() { return this.jobForm.get('applicationDeadline'); }
   get minCGPA() { return this.jobForm.get('eligibility.minCGPA'); }
   get requiredSkills() { return this.jobForm.get('eligibility.requiredSkills'); }
-  get selectedBranches() { return this.jobForm.get('eligibility.branches')?.value as string[]; }
-  get selectedSkills() { return this.jobForm.get('eligibility.requiredSkills')?.value as string[]; }
+  get selectedBranches(): string[] { return this.jobForm.get('eligibility.branches')?.value || []; }
+  get selectedSkills(): string[] { return this.jobForm.get('eligibility.requiredSkills')?.value || []; }
 
   get minDate(): string {
     const tomorrow = new Date();
@@ -226,5 +255,10 @@ export class JobCreateComponent implements OnInit {
     const nextYear = new Date();
     nextYear.setFullYear(nextYear.getFullYear() + 1);
     return nextYear.toISOString().split('T')[0];
+  }
+
+  get salaryRangeError(): boolean {
+    return this.jobForm.hasError('salaryRangeInvalid') && 
+           this.jobForm.get('compensationType')?.value === 'salary';
   }
 }

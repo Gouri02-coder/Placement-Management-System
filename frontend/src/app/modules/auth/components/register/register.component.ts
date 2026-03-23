@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { AuthService, RegisterRequest } from '../../../../core/services/auth.service';
 
 @Component({
@@ -14,8 +15,14 @@ import { AuthService, RegisterRequest } from '../../../../core/services/auth.ser
 export class RegisterComponent {
   selectedRole: 'student' | 'company' | null = null;
   isLoading = false;
+  showPassword = false;
+  errorMessage = '';
+  successMessage = '';
   registerForm: FormGroup;
-  errorMessage: string = '';
+  readonly roleHighlights = {
+    student: ['Smart job recommendations', 'Interview tracking', 'Resume and profile scoring'],
+    company: ['Candidate pipeline management', 'Role posting and shortlisting', 'Placement analytics and reports']
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -29,6 +36,7 @@ export class RegisterComponent {
     this.selectedRole = role;
     this.registerForm = this.createForm();
     this.errorMessage = '';
+    this.successMessage = '';
   }
 
   createForm(): FormGroup {
@@ -48,7 +56,9 @@ export class RegisterComponent {
         year: ['', [Validators.required, Validators.min(1), Validators.max(4)]],
         cgpa: ['', [Validators.required, Validators.min(0), Validators.max(10)]]
       });
-    } else if (this.selectedRole === 'company') {
+    }
+
+    if (this.selectedRole === 'company') {
       return this.fb.group({
         ...baseForm,
         companyName: ['', [Validators.required]],
@@ -64,89 +74,134 @@ export class RegisterComponent {
   }
 
   onRegister(): void {
-    if (this.registerForm.valid && this.selectedRole) {
-      this.isLoading = true;
-      this.errorMessage = '';
-
-      const formData = this.registerForm.value;
-      
-      const registerData: RegisterRequest = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        role: this.selectedRole,
-        ...(this.selectedRole === 'student' && {
-          department: formData.department,
-          course: formData.course,
-          year: Number(formData.year),
-          cgpa: Number(formData.cgpa),
-          parentEmail: formData.parentEmail
-        }),
-        ...(this.selectedRole === 'company' && {
-          companyName: formData.companyName,
-          industry: formData.industry,
-          website: formData.website,
-          companySize: formData.companySize,
-          address: formData.address,
-          description: formData.description
-        })
-      };
-
-      console.log('Sending registration data:', registerData);
-
-      this.authService.register(registerData).subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          console.log('Registration response:', response);
-          
-          if (response && response.status === 'success') {
-            alert(response.message || 'Registration successful! Please wait for admin verification.');
-            this.router.navigate(['/auth/login']);
-          } else {
-            this.errorMessage = response?.message || 'Registration failed';
-            alert(this.errorMessage);
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          console.error('Registration error:', error);
-          
-          let errorMsg = 'Registration failed. Please try again.';
-          
-          if (error.error) {
-            if (typeof error.error === 'string') {
-              errorMsg = error.error;
-            } else if (error.error.message) {
-              errorMsg = error.error.message;
-            }
-          }
-          
-          this.errorMessage = errorMsg;
-          alert(errorMsg);
-        }
-      });
-    } else {
-      Object.keys(this.registerForm.controls).forEach(key => {
+    if (!this.selectedRole || this.registerForm.invalid) {
+      Object.keys(this.registerForm.controls).forEach((key) => {
         this.registerForm.get(key)?.markAsTouched();
       });
+      return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const formData = this.registerForm.value;
+    const registerData: RegisterRequest = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      role: this.selectedRole,
+      ...(this.selectedRole === 'student' && {
+        department: formData.department,
+        course: formData.course,
+        year: Number(formData.year),
+        cgpa: Number(formData.cgpa),
+        parentEmail: formData.parentEmail
+      }),
+      ...(this.selectedRole === 'company' && {
+        companyName: formData.companyName,
+        industry: formData.industry,
+        website: formData.website,
+        companySize: formData.companySize,
+        address: formData.address,
+        description: formData.description
+      })
+    };
+
+    this.authService.register(registerData).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+
+        if (response?.status === 'success') {
+          this.successMessage = response.message || 'Registration successful. Redirecting to login...';
+          setTimeout(() => this.router.navigate(['/auth/login']), 1200);
+          return;
+        }
+
+        this.errorMessage = response?.message || 'Registration failed.';
+      },
+      error: (error) => {
+        this.isLoading = false;
+
+        if (error?.error) {
+          if (typeof error.error === 'string') {
+            this.errorMessage = error.error;
+            return;
+          }
+
+          if (error.error.message) {
+            this.errorMessage = error.error.message;
+            return;
+          }
+        }
+
+        this.errorMessage = 'Registration failed. Please try again.';
+      }
+    });
   }
 
   getRoleDisplayName(): string {
     return this.selectedRole === 'student' ? 'Student' : 'Company';
   }
 
+  getEmailRequirement(): string {
+    if (!this.selectedRole) {
+      return '';
+    }
+
+    return this.selectedRole === 'student'
+      ? 'Please register using your college email ID.'
+      : 'Please register using a valid company email ID.';
+  }
+
   goToLogin(): void {
     this.router.navigate(['/auth/login']);
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  get completionPercentage(): number {
+    const controls = Object.values(this.registerForm.controls);
+
+    if (!controls.length) {
+      return 0;
+    }
+
+    const validCount = controls.filter((control) => control.valid && !!control.value).length;
+    return Math.round((validCount / controls.length) * 100);
+  }
+
+  get passwordStrengthScore(): number {
+    const password = this.registerForm.get('password')?.value || '';
+    let score = 0;
+
+    if (password.length >= 6) score += 25;
+    if (password.length >= 10) score += 25;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 25;
+    if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) score += 25;
+
+    return score;
+  }
+
+  get passwordStrengthLabel(): string {
+    if (this.passwordStrengthScore >= 100) return 'Strong';
+    if (this.passwordStrengthScore >= 75) return 'Good';
+    if (this.passwordStrengthScore >= 50) return 'Fair';
+    return 'Weak';
+  }
+
   getFieldError(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
+
     if (field?.errors && field.touched) {
       if (field.errors['required']) return 'This field is required';
       if (field.errors['email']) return 'Please enter a valid email';
-      if (field.errors['minlength']) return `Minimum ${field.errors['minlength'].requiredLength} characters required`;
+      if (field.errors['minlength']) {
+        return `Minimum ${field.errors['minlength'].requiredLength} characters required`;
+      }
       if (field.errors['pattern']) {
         if (fieldName === 'phone') return 'Please enter a valid 10-digit phone number';
         if (fieldName === 'website') return 'Please enter a valid website URL';
@@ -154,6 +209,7 @@ export class RegisterComponent {
       if (field.errors['min']) return `Value must be at least ${field.errors['min'].min}`;
       if (field.errors['max']) return `Value must be at most ${field.errors['max'].max}`;
     }
+
     return '';
   }
 }

@@ -9,13 +9,14 @@
     <div class="promo-cards">
       <article><h4>Students</h4><p>Applications, interviews, and profile insights</p></article>
       <article><h4>Companies</h4><p>Post jobs, shortlist candidates, and schedule drives</p></article>
+      <article><h4>PTO</h4><p>Manage placements, approve companies, track student progress</p></article>
       <article><h4>Admins</h4><p>Monitor reports, placements, and system health</p></article>
     </div>
   </section>
 
   <section class="login-card">
     <h2>Sign In</h2>
-    <p class="subtitle">Use your role-specific credentials to continue.</p>
+    <p class="subtitle">Use your credentials to continue.</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
       <div class="form-group">
@@ -52,17 +53,6 @@
       <button type="submit" class="login-btn" [disabled]="loginForm.invalid || isLoading">
         {{ isLoading ? 'Signing in...' : 'Sign In' }}
       </button>
-
-      <button type="button" class="demo-admin-btn" (click)="loginWithDemoAdmin()" [disabled]="isLoading">
-        Enter Demo Admin Dashboard
-      </button>
-
-      <div class="demo-strip">
-        <span>Quick fill:</span>
-        <button type="button" (click)="fillDemoCredentials('student')">Student</button>
-        <button type="button" (click)="fillDemoCredentials('company')">Company</button>
-        <button type="button" (click)="fillDemoCredentials('admin')">Admin</button>
-      </div>
 
       <p class="register-link">
         New here? <a (click)="goToRegister()">Create your account</a>

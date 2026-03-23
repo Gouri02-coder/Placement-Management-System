@@ -1,6 +1,6 @@
 <div class="job-edit-container">
   <div class="page-header">
-    <button class="btn btn-back" (click)="cancel()">
+    <button class="btn-back" (click)="cancel()">
       <i class="material-icons">arrow_back</i> Back to Jobs
     </button>
     <h1>Edit Job</h1>
@@ -26,7 +26,7 @@
           {{job.type | uppercase}}
         </span>
         <span class="job-location">
-          <i class="material-icons">{{job.location === 'remote' ? 'home' : 'business'}}</i>
+          <i class="material-icons">{{job.location === 'remote' ? 'home' : job.location === 'hybrid' ? 'sync' : 'business'}}</i>
           {{job.location | uppercase}}
         </span>
         <span class="job-status {{job.status}}">
@@ -36,7 +36,7 @@
     </div>
     <div class="job-stats">
       <div class="stat">
-        <strong>{{job.applicationsCount}}</strong>
+        <strong>{{job.applicationsCount || 0}}</strong>
         <span>Applications</span>
       </div>
       <div class="stat">
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div *ngIf="!canEditJob() && !isLoading" class="alert alert-warning">
+  <div *ngIf="!canEditJob() && !isLoading && job" class="alert alert-warning">
     <i class="material-icons">warning</i>
     <div>
       <strong>This job cannot be edited</strong>
@@ -77,10 +77,10 @@
                   [class.error]="description?.invalid && description?.touched"></textarea>
         <div class="error-message" *ngIf="description?.invalid && description?.touched">
           <span *ngIf="description?.errors?.['required']">Job description is required</span>
-          <span *ngIf="description?.errors?.['minlength']">Description must be at least 100 characters</span>
+          <span *ngIf="description?.errors?.['minlength']">Description must be at least 100 characters (current: {{description?.value?.length || 0}})</span>
         </div>
         <div class="char-count" [class.warning]="description?.value?.length < 100">
-          {{ description?.value?.length || 0 }}/100 characters
+          {{ description?.value?.length || 0 }}/100 characters minimum
         </div>
       </div>
 
@@ -106,11 +106,12 @@
         <div class="form-group">
           <label for="jobCategory">Category *</label>
           <input type="text" id="jobCategory" formControlName="category" 
-                 placeholder="e.g., Software Development, Data Science"
+                 placeholder="e.g., Software Development, Data Science, Marketing"
                  [class.error]="category?.invalid && category?.touched">
           <div class="error-message" *ngIf="category?.invalid && category?.touched">
             <span *ngIf="category?.errors?.['required']">Category is required</span>
           </div>
+          <div class="help-text">e.g., Engineering, Sales, Marketing, Design</div>
         </div>
       </div>
     </div>
@@ -137,29 +138,35 @@
 
       <div class="form-row" *ngIf="compensationType === 'salary'">
         <div class="form-group">
-          <label for="minSalary">Minimum Salary (₹)</label>
+          <label for="minSalary">Minimum Salary *</label>
           <input type="number" id="minSalary" formControlName="salary.min" 
-                 placeholder="e.g., 500000" min="0">
+                 placeholder="e.g., 500000" min="0" step="10000">
+          <div class="help-text">Annual salary in your selected currency</div>
         </div>
         <div class="form-group">
-          <label for="maxSalary">Maximum Salary (₹)</label>
+          <label for="maxSalary">Maximum Salary</label>
           <input type="number" id="maxSalary" formControlName="salary.max" 
-                 placeholder="e.g., 800000" min="0">
+                 placeholder="e.g., 800000" min="0" step="10000">
+          <div class="help-text">Leave empty if fixed salary</div>
         </div>
         <div class="form-group">
           <label for="salaryCurrency">Currency</label>
           <select id="salaryCurrency" formControlName="salary.currency">
-            <option value="INR">INR (₹)</option>
-            <option value="USD">USD ($)</option>
-            <option value="EUR">EUR (€)</option>
+            <option value="INR">INR (₹) - Indian Rupee</option>
+            <option value="USD">USD ($) - US Dollar</option>
+            <option value="EUR">EUR (€) - Euro</option>
+            <option value="GBP">GBP (£) - British Pound</option>
+            <option value="CAD">CAD ($) - Canadian Dollar</option>
+            <option value="AUD">AUD ($) - Australian Dollar</option>
           </select>
         </div>
       </div>
 
       <div class="form-group" *ngIf="compensationType === 'stipend'">
-        <label for="stipendAmount">Stipend Amount (per month)</label>
+        <label for="stipendAmount">Stipend Amount (per month) *</label>
         <input type="number" id="stipendAmount" formControlName="stipend" 
-               placeholder="e.g., 25000" min="0">
+               placeholder="e.g., 25000" min="0" step="1000">
+        <div class="help-text">Monthly stipend amount in INR</div>
       </div>
     </div>
 
@@ -169,44 +176,50 @@
       
       <div class="form-group">
         <label>Eligible Branches *</label>
-        <div class="error-message" *ngIf="requiredSkills?.invalid && requiredSkills?.touched">
-          <span *ngIf="requiredSkills?.errors?.['required']">At least one branch must be selected</span>
+        <div class="error-message" *ngIf="jobForm.get('eligibility.branches')?.invalid && jobForm.get('eligibility.branches')?.touched">
+          <span>At least one branch must be selected</span>
         </div>
         <div class="checkbox-grid">
           <label class="checkbox-option" *ngFor="let branch of branches">
-            <input type="checkbox" [checked]="selectedBranches?.includes(branch)" 
+            <input type="checkbox" [checked]="selectedBranches.includes(branch)" 
                    (change)="toggleBranch(branch)">
             <span class="checkbox-checkmark"></span>
             {{ branch }}
           </label>
         </div>
+        <div class="help-text">Select all branches eligible for this position</div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="minCGPA">Minimum CGPA</label>
+          <label for="minCGPA">Minimum CGPA (Optional)</label>
           <input type="number" id="minCGPA" formControlName="eligibility.minCGPA" 
                  step="0.1" min="0" max="10" placeholder="e.g., 7.5">
           <div class="error-message" *ngIf="minCGPA?.invalid && minCGPA?.touched">
             <span *ngIf="minCGPA?.errors?.['min']">CGPA cannot be negative</span>
             <span *ngIf="minCGPA?.errors?.['max']">CGPA cannot exceed 10</span>
           </div>
+          <div class="help-text">Minimum CGPA required (leave blank if no minimum)</div>
         </div>
 
         <div class="form-group">
-          <label for="passingYear">Year of Passing</label>
+          <label for="passingYear">Year of Passing *</label>
           <select id="passingYear" formControlName="eligibility.yearOfPassing" multiple>
-            <option *ngFor="let year of [2023, 2024, 2025, 2026]" [value]="year"
-                    [selected]="selectedBranches?.includes(year.toString())">{{ year }}</option>
+            <option *ngFor="let year of [2022, 2023, 2024, 2025, 2026, 2027]" [value]="year">
+              {{ year }}
+            </option>
           </select>
-          <div class="help-text">Hold Ctrl to select multiple years</div>
+          <div class="help-text">Hold Ctrl (Cmd on Mac) to select multiple years</div>
+          <div class="error-message" *ngIf="jobForm.get('eligibility.yearOfPassing')?.invalid && jobForm.get('eligibility.yearOfPassing')?.touched">
+            <span>At least one year must be selected</span>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
         <label>Required Skills *</label>
         <div class="error-message" *ngIf="requiredSkills?.invalid && requiredSkills?.touched">
-          <span *ngIf="requiredSkills?.errors?.['required']">At least one skill must be selected</span>
+          <span>At least one skill must be selected</span>
         </div>
         
         <div class="skills-section">
@@ -214,7 +227,7 @@
             <h4>Common Skills</h4>
             <div class="skills-grid">
               <span class="skill-tag" *ngFor="let skill of commonSkills" 
-                    [class.selected]="selectedSkills?.includes(skill)"
+                    [class.selected]="selectedSkills.includes(skill)"
                     (click)="toggleSkill(skill)">
                 {{ skill }}
               </span>
@@ -225,6 +238,7 @@
             <label for="customSkill">Add Custom Skill</label>
             <input type="text" id="customSkill" placeholder="Enter a skill and press Enter" 
                    (keyup.enter)="addCustomSkill($event)">
+            <div class="help-text">Press Enter to add a custom skill</div>
           </div>
         </div>
       </div>
@@ -232,7 +246,8 @@
       <div class="form-group">
         <label for="additionalRequirements">Additional Requirements</label>
         <textarea id="additionalRequirements" formControlName="eligibility.additionalRequirements" 
-                  rows="3" placeholder="Any additional requirements or preferences..."></textarea>
+                  rows="3" placeholder="Any additional requirements or preferences (e.g., certifications, portfolio, specific experience)..."></textarea>
+        <div class="help-text">Optional: Add any special requirements or preferences</div>
       </div>
     </div>
 
@@ -248,7 +263,7 @@
         <div class="error-message" *ngIf="applicationDeadline?.invalid && applicationDeadline?.touched">
           <span *ngIf="applicationDeadline?.errors?.['required']">Application deadline is required</span>
         </div>
-        <div class="help-text">Deadline must be at least 1 day from today</div>
+        <div class="help-text">Deadline must be between {{minDate}} and {{maxDate}}</div>
       </div>
     </div>
 
@@ -257,10 +272,18 @@
       <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSubmitting">
         Cancel
       </button>
-      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting || !jobForm.valid">
         <i class="material-icons" *ngIf="isSubmitting" class="spin">refresh</i>
         {{ isSubmitting ? 'Updating...' : 'Update Job' }}
       </button>
     </div>
   </form>
+
+  <!-- Error State if job not found -->
+  <div *ngIf="!isLoading && !job" class="empty-state">
+    <i class="material-icons">error_outline</i>
+    <h3>Job Not Found</h3>
+    <p>The job you're trying to edit doesn't exist or has been removed.</p>
+    <button class="btn btn-primary" (click)="cancel()">Back to Jobs</button>
+  </div>
 </div>
