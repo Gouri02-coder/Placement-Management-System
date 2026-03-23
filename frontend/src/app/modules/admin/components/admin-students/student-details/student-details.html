@@ -1,1 +1,56 @@
-<p>student-details works!</p>
+<section class="detail-card">
+  <header class="head">
+    <div>
+      <h2>{{ currentStudent.name }}</h2>
+      <p>{{ currentStudent.id }} • {{ currentStudent.department }} • CGPA {{ currentStudent.cgpa }}</p>
+    </div>
+    <a routerLink="/admin/students/list">Back to Students</a>
+  </header>
+
+  <div class="summary-grid">
+    <article>
+      <h4>Status</h4>
+      <p><span class="chip" [class]="currentStudent.status.replace(' ', '-')">{{ currentStudent.status }}</span></p>
+    </article>
+    <article>
+      <h4>Current Company</h4>
+      <p>{{ currentStudent.currentCompany }}</p>
+    </article>
+    <article>
+      <h4>Contact</h4>
+      <p>{{ currentStudent.email }}</p>
+      <p>{{ currentStudent.phone }}</p>
+    </article>
+  </div>
+
+  <div class="info-grid">
+    <article>
+      <h3>Skills</h3>
+      <div class="skills">
+        <span *ngFor="let skill of currentStudent.skills">{{ skill }}</span>
+      </div>
+    </article>
+
+    <article>
+      <h3>Applications</h3>
+      <ul>
+        <li *ngFor="let app of currentStudent.applications">
+          <strong>{{ app.role }}</strong>
+          <span>{{ app.company }} • {{ app.status }}</span>
+        </li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="status-actions">
+    <button type="button" (click)="updateStatus('In Process')">Mark In Process</button>
+    <button type="button" (click)="updateStatus('Placed')">Mark Placed</button>
+    <button type="button" class="muted" (click)="updateStatus('Not Started')">Reset</button>
+  </div>
+
+  <div class="note-box">
+    <label for="adminNote">Admin Notes</label>
+    <textarea id="adminNote" [(ngModel)]="adminNote" rows="3" placeholder="Add review notes"></textarea>
+    <button type="button" (click)="saveNote()">Save Note</button>
+  </div>
+</section>

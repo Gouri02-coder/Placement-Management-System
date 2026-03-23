@@ -1,45 +1,62 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>Welcome Back! 👋</h2>
-    <p class="subtitle">Sign in to your account</p>
+<div class="login-shell">
+  <section class="login-promo">
+    <p class="eyebrow">Placement Platform</p>
+    <h1>Welcome back</h1>
+    <p>
+      Continue where you left off. Access your dashboard, track progress, and manage placements from one secure workspace.
+    </p>
 
-    <!-- Login Form -->
+    <div class="promo-cards">
+      <article><h4>Students</h4><p>Applications, interviews, and profile insights</p></article>
+      <article><h4>Companies</h4><p>Post jobs, shortlist candidates, and schedule drives</p></article>
+      <article><h4>PTO</h4><p>Manage placements, approve companies, track student progress</p></article>
+      <article><h4>Admins</h4><p>Monitor reports, placements, and system health</p></article>
+    </div>
+  </section>
+
+  <section class="login-card">
+    <h2>Sign In</h2>
+    <p class="subtitle">Use your credentials to continue.</p>
+
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
       <div class="form-group">
         <label for="email">Email Address</label>
-        <input 
-          type="email" 
-          id="email" 
-          formControlName="email" 
-          placeholder="Enter your email address">
+        <input type="email" id="email" formControlName="email" placeholder="you@example.com" />
         <div class="error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          Valid email is required
+          Enter a valid email address.
         </div>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          formControlName="password" 
-          placeholder="Enter your password">
+        <div class="password-wrap">
+          <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" placeholder="Enter your password" />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
         <div class="error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          Password is required
+          Password is required.
         </div>
       </div>
 
-      <button 
-        type="submit" 
-        class="login-btn" 
-        [disabled]="loginForm.invalid || isLoading">
-        {{isLoading ? 'Signing in...' : 'Sign In'}}
+      <div class="form-meta">
+        <label class="remember-option">
+          <input type="checkbox" [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}" />
+          <span>Remember me</span>
+        </label>
+        <a class="helper-link" routerLink="/auth/register">Need an account?</a>
+      </div>
+
+      <div class="error global" *ngIf="authError">{{ authError }}</div>
+
+      <button type="submit" class="login-btn" [disabled]="loginForm.invalid || isLoading">
+        {{ isLoading ? 'Signing in...' : 'Sign In' }}
       </button>
 
-
-      <div class="register-link">
-        Don't have an account? <a (click)="goToRegister()">Create one here</a>
-      </div>
+      <p class="register-link">
+        New here? <a (click)="goToRegister()">Create your account</a>
+      </p>
     </form>
-  </div>
+  </section>
 </div>

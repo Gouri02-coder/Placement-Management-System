@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,20 +27,20 @@ public class JobController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Job> getJobById(@PathVariable Long id) {
+    public ResponseEntity<Job> getJobById(@PathVariable @NonNull Long id) {
         Optional<Job> job = jobService.getJobById(id);
         return job.map(ResponseEntity::ok)
                   .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
+    public ResponseEntity<Job> createJob(@Valid @RequestBody @NonNull Job job) {
         Job createdJob = jobService.createJob(job);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdJob);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateJob(@PathVariable Long id, @Valid @RequestBody Job job) {
+    public ResponseEntity<?> updateJob(@PathVariable @NonNull Long id, @Valid @RequestBody Job job) {
         try {
             Job updatedJob = jobService.updateJob(id, job);
             return ResponseEntity.ok(updatedJob);
@@ -49,7 +50,7 @@ public class JobController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteJob(@PathVariable @NonNull Long id) {
         try {
             jobService.deleteJob(id);
             return ResponseEntity.noContent().build();
@@ -59,7 +60,7 @@ public class JobController {
     }
 
     @GetMapping("/company/{companyId}")
-    public ResponseEntity<List<Job>> getJobsByCompany(@PathVariable Long companyId) {
+    public ResponseEntity<List<Job>> getJobsByCompany(@PathVariable @NonNull Long companyId) {
         List<Job> jobs = jobService.getJobsByCompany(companyId);
         return ResponseEntity.ok(jobs);
     }

@@ -4,6 +4,7 @@ import com.placement.model.Student;
 import com.placement.repository.StudentRepository;
 import com.placement.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Optional<Student> getStudentById(Long id) {
+    public Optional<Student> getStudentById(@NonNull Long id) {
         return studentRepository.findById(id);
     }
 
@@ -34,7 +35,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student updateStudent(Long id, Student student) {
+    public Student updateStudent(@NonNull Long id, Student student) {
         Student existingStudent = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
         
@@ -56,7 +57,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void deleteStudent(Long id) {
+    public void deleteStudent(@NonNull Long id) {
         if (!studentRepository.existsById(id)) {
             throw new RuntimeException("Student not found with id: " + id);
         }

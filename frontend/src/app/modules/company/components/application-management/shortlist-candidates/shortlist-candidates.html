@@ -4,34 +4,79 @@
     <p>Your top candidates ready for final review</p>
   </div>
 
+<!-- Filters Section -->
+<div class="filters-section" *ngIf="!isLoading && shortlistedApplications.length > 0">
+  <div class="search-box">
+    <i class="material-icons" aria-hidden="true">search</i>
+    <input 
+      type="text" 
+      placeholder="Search by name, email, or job title..." 
+      [(ngModel)]="searchTerm" 
+      (input)="applyFilters()"
+      aria-label="Search candidates">
+  </div>
+  
+  <div class="filter-group">
+    <label for="jobFilter" class="filter-label">Filter by Job</label>
+    <select 
+      id="jobFilter"
+      [(ngModel)]="selectedJobFilter" 
+      (change)="applyFilters()"
+      aria-label="Filter by job">
+      <option value="all">All Jobs</option>
+      <option *ngFor="let job of getUniqueJobs()" [value]="job">{{job}}</option>
+    </select>
+  </div>
+
+  <button class="btn-export" (click)="exportToCSV()" aria-label="Export to CSV">
+    <i class="material-icons" aria-hidden="true">download</i> Export
+  </button>
+</div>
+
   <!-- Loading State -->
-  <div class="loading-state" *ngIf="isLoading">
-    <i class="material-icons spin">refresh</i>
+  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
     <p>Loading shortlisted candidates...</p>
   </div>
 
   <!-- Empty State -->
   <div class="empty-state" *ngIf="!isLoading && shortlistedApplications.length === 0">
-    <i class="material-icons">star_border</i>
+    <i class="material-icons" aria-hidden="true">star_border</i>
     <h3>No shortlisted candidates</h3>
     <p>You haven't shortlisted any candidates yet. Start reviewing applications to build your shortlist.</p>
   </div>
 
+  <!-- No Results State -->
+  <div class="empty-state" *ngIf="!isLoading && shortlistedApplications.length > 0 && filteredApplications.length === 0">
+    <i class="material-icons" aria-hidden="true">search_off</i>
+    <h3>No matching candidates</h3>
+    <p>Try adjusting your search or filter criteria.</p>
+    <button class="btn-primary" (click)="searchTerm = ''; selectedJobFilter = 'all'; applyFilters()">
+      Clear Filters
+    </button>
+  </div>
+
   <!-- Shortlisted Candidates Grid -->
-  <div class="candidates-grid" *ngIf="!isLoading && shortlistedApplications.length > 0">
-    <div class="candidate-card" *ngFor="let application of shortlistedApplications">
+  <div class="candidates-grid" *ngIf="!isLoading && filteredApplications.length > 0">
+    <div class="candidate-card" *ngFor="let application of paginatedApplications">
       <div class="candidate-header">
-        <div class="candidate-avatar">
+        <div class="candidate-avatar" [style.background]="'linear-gradient(135deg, ' + getAvatarColor(application.candidateName) + ')'">
           {{application.candidateName.charAt(0).toUpperCase()}}
         </div>
         <div class="candidate-basic-info">
           <h3>{{application.candidateName}}</h3>
-          <p class="candidate-email">{{application.candidateEmail}}</p>
-          <p class="candidate-job">{{application.jobTitle}}</p>
+          <p class="candidate-email">
+            <i class="material-icons" aria-hidden="true">email</i>
+            {{application.candidateEmail}}
+          </p>
+          <p class="candidate-job">
+            <i class="material-icons" aria-hidden="true">work</i>
+            {{application.jobTitle}}
+          </p>
         </div>
         <div class="candidate-status">
           <span class="status-badge status-shortlisted">
-            <i class="material-icons">star</i>
+            <i class="material-icons" aria-hidden="true">star</i>
             SHORTLISTED
           </span>
         </div>
@@ -41,11 +86,17 @@
         <div class="detail-row">
           <div class="detail-item">
             <label>Branch</label>
-            <span>{{application.branch}}</span>
+            <span>
+              <i class="material-icons" aria-hidden="true">school</i>
+              {{application.branch}}
+            </span>
           </div>
           <div class="detail-item">
             <label>CGPA</label>
-            <span class="cgpa">{{application.cgpa}}</span>
+            <span class="cgpa">
+              <i class="material-icons" aria-hidden="true">trending_up</i>
+              {{application.cgpa | number:'1.1-2'}}
+            </span>
           </div>
           <div class="detail-item">
             <label>Skills Level</label>
@@ -58,7 +109,9 @@
         <div class="skills-section">
           <label>Key Skills</label>
           <div class="skills-tags">
-            <span class="skill-tag" *ngFor="let skill of application.skills.slice(0, 5)">{{skill}}</span>
+            <span class="skill-tag" *ngFor="let skill of application.skills.slice(0, 5)">
+              {{skill}}
+            </span>
             <span class="skill-more" *ngIf="application.skills.length > 5">
               +{{application.skills.length - 5}} more
             </span>
@@ -66,22 +119,54 @@
         </div>
 
         <div class="applied-info">
+          <i class="material-icons" aria-hidden="true">event</i>
           Applied: {{application.appliedAt | date:'mediumDate'}}
         </div>
       </div>
 
       <div class="candidate-actions">
-        <button class="btn btn-outline" (click)="viewResume(application.resumeUrl)">
-          <i class="material-icons">description</i> View Resume
+        <button class="btn btn-outline" (click)="viewResume(application.resumeUrl)" aria-label="View resume">
+          <i class="material-icons" aria-hidden="true">description</i> View Resume
         </button>
-        <button class="btn btn-success" (click)="hireCandidate(application.id)">
-          <i class="material-icons">check_circle</i> Hire
+        <button class="btn btn-success" (click)="hireCandidate(application.id)" aria-label="Hire candidate">
+          <i class="material-icons" aria-hidden="true">check_circle</i> Hire
         </button>
-        <button class="btn btn-outline btn-warning" (click)="removeFromShortlist(application.id)">
-          <i class="material-icons">remove_circle</i> Remove
+        <button class="btn btn-outline btn-warning" (click)="removeFromShortlist(application.id)" aria-label="Remove from shortlist">
+          <i class="material-icons" aria-hidden="true">remove_circle</i> Remove
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && filteredApplications.length > 0 && totalPages > 1">
+    <button 
+      class="page-btn" 
+      (click)="changePage(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      aria-label="Previous page">
+      <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+    </button>
+    
+    <div class="page-numbers">
+      <button 
+        *ngFor="let page of getPages()" 
+        class="page-number" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)"
+        [attr.aria-label]="'Go to page ' + page"
+        [attr.aria-current]="page === currentPage ? 'page' : null">
+        {{page}}
+      </button>
+    </div>
+    
+    <button 
+      class="page-btn" 
+      (click)="changePage(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      aria-label="Next page">
+      Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+    </button>
   </div>
 
   <!-- Summary Section -->
@@ -90,21 +175,24 @@
       <h3>Shortlist Summary</h3>
       <div class="summary-stats">
         <div class="stat">
-          <div class="stat-value">{{shortlistedApplications.length}}</div>
+          <div class="stat-value">{{getTotalCandidates()}}</div>
           <div class="stat-label">Total Shortlisted</div>
         </div>
         <div class="stat">
-          <div class="stat-value">
-            {{getUniqueJobs().length}}
-          </div>
+          <div class="stat-value">{{getUniqueJobs().length}}</div>
           <div class="stat-label">Different Jobs</div>
         </div>
         <div class="stat">
-          <div class="stat-value">
-            {{getAverageCGPA()}}
-          </div>
+          <div class="stat-value">{{getAverageCGPA()}}</div>
           <div class="stat-label">Average CGPA</div>
         </div>
+        <div class="stat">
+          <div class="stat-value">{{getHiringProgress()}}%</div>
+          <div class="stat-label">Hiring Progress</div>
+        </div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getHiringProgress()"></div>
       </div>
     </div>
   </div>

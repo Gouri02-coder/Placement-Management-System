@@ -1,20 +1,22 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   isLoading = false;
+  showPassword = false;
+  rememberMe = true;
+  authError = '';
   loginForm: FormGroup;
-  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -28,53 +30,36 @@ export class LoginComponent {
   }
 
   onLogin(): void {
-    if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      
-      const { email, password } = this.loginForm.value;
-      const loginRequest = { email, password };
-
-      console.log('Attempting login with:', email);
-
-      this.authService.login(loginRequest).subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          console.log('Login response:', response);
-          
-          if (response && response.status === 'success') {
-            if (response.user) {
-              console.log('Login successful, user role:', response.user.role);
-              this.authService.redirectToDashboard();
-            }
-          } else {
-            this.errorMessage = response?.message || 'Login failed';
-            alert(this.errorMessage);
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          console.error('Login error:', error);
-          
-          let errorMsg = 'Login failed. Please try again.';
-          
-          if (error.error) {
-            if (typeof error.error === 'string') {
-              errorMsg = error.error;
-            } else if (error.error.message) {
-              errorMsg = error.error.message;
-            }
-          }
-          
-          this.errorMessage = errorMsg;
-          alert(errorMsg);
-        }
-      });
-    } else {
-      Object.keys(this.loginForm.controls).forEach(key => {
+    if (!this.loginForm.valid) {
+      Object.keys(this.loginForm.controls).forEach((key) => {
         this.loginForm.get(key)?.markAsTouched();
       });
+      return;
     }
+
+    this.isLoading = true;
+    this.authError = '';
+
+    const { email, password } = this.loginForm.value;
+    this.authService.login({ email, password }).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        if (response?.user) {
+          this.authService.redirectToDashboard();
+          return;
+        }
+
+        this.authError = response?.message || 'Login failed. Please check your credentials.';
+      },
+      error: (error) => {
+        this.authError = error.error?.message || error.message || 'Login failed. Please check your credentials.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   goToRegister(): void {

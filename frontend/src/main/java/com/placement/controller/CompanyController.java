@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
+    public ResponseEntity<Company> getCompanyById(@PathVariable @NonNull Long id) {
         Optional<Company> company = companyService.getCompanyById(id);
         return company.map(ResponseEntity::ok)
                      .orElse(ResponseEntity.notFound().build());
@@ -43,7 +44,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCompany(@PathVariable Long id, @Valid @RequestBody Company company) {
+    public ResponseEntity<?> updateCompany(@PathVariable @NonNull Long id, @Valid @RequestBody Company company) {
         try {
             Company updatedCompany = companyService.updateCompany(id, company);
             return ResponseEntity.ok(updatedCompany);
@@ -53,7 +54,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCompany(@PathVariable @NonNull Long id) {
         try {
             companyService.deleteCompany(id);
             return ResponseEntity.noContent().build();
