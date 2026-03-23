@@ -1,0 +1,185 @@
+<div class="student-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Student Management</h1>
+    <p>Manage and verify student records for placement activities</p>
+  </div>
+
+  <!-- Debug Section -->
+  <div class="debug-section" *ngIf="debugInfo">
+    <div class="debug-content">
+      <h3>Debug Information</h3>
+      <pre>{{ debugInfo }}</pre>
+      <button (click)="debugInfo = ''" class="close-debug">Close</button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards">
+    <div class="stat-card total">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>{{ totalStudents }}</h3>
+        <p>Total Students</p>
+      </div>
+    </div>
+    <div class="stat-card approved">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{ approved }}</h3>
+        <p>Approved</p>
+      </div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <h3>{{ pendingReview }}</h3>
+        <p>Pending Review</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="filterStudents()"
+        placeholder="Search by name, email, department, or ID..."
+        class="search-input"
+      />
+      <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="filter-buttons">
+      <button 
+        [class.active]="selectedFilter === 'all'" 
+        (click)="selectedFilter = 'all'; filterStudents()"
+        class="filter-btn">
+        All
+      </button>
+      <button 
+        [class.active]="selectedFilter === 'approved'" 
+        (click)="selectedFilter = 'approved'; filterStudents()"
+        class="filter-btn">
+        Approved
+      </button>
+      <button 
+        [class.active]="selectedFilter === 'pending'" 
+        (click)="selectedFilter = 'pending'; filterStudents()"
+        class="filter-btn">
+        Pending
+      </button>
+    </div>
+    
+    <div class="action-buttons">
+      <button (click)="refresh()" class="refresh-btn" [disabled]="loading">
+        🔄 Refresh
+      </button>
+      <button (click)="debugToken()" class="debug-btn">
+        🐛 Debug
+      </button>
+      <button (click)="testApi()" class="test-api-btn">
+        📡 Test API
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    <span class="error-icon">⚠️</span>
+    <span>{{ error }}</span>
+    <button (click)="error = ''" class="close-error">×</button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading students...</p>
+  </div>
+
+  <!-- Student Table -->
+  <div *ngIf="!loading && filteredStudents.length > 0" class="table-container">
+    <table class="student-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Department</th>
+          <th>Year</th>
+          <th>CGPA</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of paginatedStudents">
+          <td class="student-id">{{ student.id || student.rollNumber || 'N/A' }}</td>
+          <td class="student-name">
+            <div class="name-cell">
+              <span class="avatar">{{ (student.name || 'S')[0] }}</span>
+              <span>{{ student.name || 'Unknown' }}</span>
+            </div>
+          </td>
+          <td>{{ student.email || 'N/A' }}</td>
+          <td>{{ student.department || 'N/A' }}</td>
+          <td>{{ student.year || 'N/A' }}</td>
+          <td>{{ student.cgpa || 'N/A' }}</td>
+          <td>
+            <span [class]="'status-badge ' + (student.verified || student.approved ? 'approved' : 'pending')">
+              {{ student.verified || student.approved ? 'Approved' : 'Pending' }}
+            </span>
+          </td>
+          <td class="action-buttons-cell">
+            <button (click)="viewStudentDetails(student.id)" class="view-btn" title="View Details">
+              👁️
+            </button>
+            <button 
+              *ngIf="!(student.verified || student.approved)" 
+              (click)="approveStudent(student)" 
+              class="approve-btn" 
+              title="Approve">
+              ✅
+            </button>
+            <button 
+              *ngIf="!(student.verified || student.approved)" 
+              (click)="rejectStudent(student)" 
+              class="reject-btn" 
+              title="Reject">
+              ❌
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredStudents.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No students found</h3>
+    <p>Try adjusting your search or filter criteria</p>
+    <button (click)="refresh()" class="refresh-btn">Refresh List</button>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && filteredStudents.length > 0" class="pagination">
+    <button 
+      (click)="changePage(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      class="page-btn">
+      Previous
+    </button>
+    <span class="page-info">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+    <button 
+      (click)="changePage(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      class="page-btn">
+      Next
+    </button>
+  </div>
+</div>

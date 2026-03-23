@@ -1,0 +1,48 @@
+<section class="verification-board">
+  <div class="header-card">
+    <div>
+      <p class="eyebrow">Verification Queue</p>
+      <h2>Company Verification</h2>
+      <p>Review company registrations from the database and persist PTO approval decisions.</p>
+    </div>
+    <div class="count-card">
+      <strong>{{ pendingCount }}</strong>
+      <span>Pending approvals</span>
+    </div>
+  </div>
+
+  <section class="state-card" *ngIf="isLoading">Loading company verification queue...</section>
+  <section class="state-card error" *ngIf="!isLoading && errorMessage">{{ errorMessage }}</section>
+
+  <div class="queue" *ngIf="!isLoading && !errorMessage">
+    <article class="verification-card" *ngFor="let company of companies">
+      <div class="card-top">
+        <div>
+          <h3>{{ company.name }}</h3>
+          <p>{{ company.industry }} • {{ company.location }}</p>
+        </div>
+        <span class="badge" [class.pending]="company.status === 'Pending'" [class.review]="company.status !== 'Approved' && company.status !== 'Pending'">
+          {{ company.status }}
+        </span>
+      </div>
+
+      <textarea
+        [(ngModel)]="remarks[company.id]"
+        rows="3"
+        placeholder="Add PTO remarks for approval or rejection"
+      ></textarea>
+
+      <div class="actions">
+        <a [routerLink]="'/placement/companies/details'" [queryParams]="{ id: company.id }">View details</a>
+        <div class="button-group">
+          <button type="button" class="secondary" [disabled]="activeCompanyId === company.id" (click)="updateStatus(company.id, 'REJECTED')">
+            Reject
+          </button>
+          <button type="button" class="primary" [disabled]="activeCompanyId === company.id" (click)="updateStatus(company.id, 'APPROVED')">
+            Approve
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
