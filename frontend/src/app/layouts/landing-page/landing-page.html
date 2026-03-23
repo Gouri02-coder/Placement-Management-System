@@ -1,0 +1,100 @@
+<div class="landing-shell">
+  <header class="top-nav">
+    <a class="brand" routerLink="/">
+      <span class="brand-mark">PM</span>
+      <span>Placement Management</span>
+    </a>
+
+    <button type="button" class="menu-btn" (click)="toggleMobileMenu()">Menu</button>
+
+    <nav [class.open]="mobileMenuOpen">
+      <button type="button" (click)="scrollTo('features')">Features</button>
+      <button type="button" (click)="scrollTo('workflow')">Workflow</button>
+      <button type="button" (click)="scrollTo('contact')">Contact</button>
+      <a routerLink="/auth/login" class="ghost">Login</a>
+      <a routerLink="/auth/register" class="solid">Get Started</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Modern Campus Recruitment Platform</p>
+      <h1>Make placement operations faster, clearer, and data-driven.</h1>
+      <p>
+        Manage students, companies, applications, interviews, and reporting in one cohesive system built for placement teams.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/auth/register" class="cta-main">Create Account</a>
+        <button type="button" class="cta-alt" (click)="scrollTo('features')">Explore Features</button>
+      </div>
+    </div>
+
+    <div class="hero-panel">
+      <h3>Platform Snapshot</h3>
+      <div class="stat-grid">
+        <article *ngFor="let stat of statCards">
+          <h4>{{ stat.value }}{{ stat.suffix || '' }}</h4>
+          <p>{{ stat.label }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="feature-zone">
+    <header>
+      <h2>Role-focused experiences</h2>
+      <p>Switch views to see what each role gets out of the platform.</p>
+    </header>
+
+    <div class="feature-toggle">
+      <button type="button" [class.active]="activeFeature === 'students'" (click)="selectFeature('students')">Students</button>
+      <button type="button" [class.active]="activeFeature === 'companies'" (click)="selectFeature('companies')">Companies</button>
+      <button type="button" [class.active]="activeFeature === 'admin'" (click)="selectFeature('admin')">Admin</button>
+    </div>
+
+    <div class="feature-card" *ngIf="activeFeature === 'students'">
+      <h3>Student Dashboard</h3>
+      <ul>
+        <li>Job discovery with personalized recommendations</li>
+        <li>Application status timeline and interview schedule</li>
+        <li>Profile and resume completion insights</li>
+      </ul>
+    </div>
+
+    <div class="feature-card" *ngIf="activeFeature === 'companies'">
+      <h3>Company Workspace</h3>
+      <ul>
+        <li>Job posting and candidate pipeline management</li>
+        <li>Quick actions for interview drives and shortlisting</li>
+        <li>Recruitment analytics and response metrics</li>
+      </ul>
+    </div>
+
+    <div class="feature-card" *ngIf="activeFeature === 'admin'">
+      <h3>Admin Command Center</h3>
+      <ul>
+        <li>Student, company, and placement oversight</li>
+        <li>Report exports and live system monitoring</li>
+        <li>Centralized review workflows and governance</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="workflow" class="workflow">
+    <h2>How it works</h2>
+    <div class="steps">
+      <article><span>1</span><p>Students build profiles and apply.</p></article>
+      <article><span>2</span><p>Companies post jobs and shortlist candidates.</p></article>
+      <article><span>3</span><p>Admins monitor progress and publish outcomes.</p></article>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <h2>Ready to streamline placements?</h2>
+    <p>Start with role-based onboarding and manage campus recruitment end-to-end.</p>
+    <div class="contact-actions">
+      <a routerLink="/auth/register" class="solid">Sign Up</a>
+      <a routerLink="/auth/login" class="ghost">Go to Login</a>
+    </div>
+  </section>
+</div>
