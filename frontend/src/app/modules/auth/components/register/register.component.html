@@ -1,111 +1,156 @@
-<div class="register-container">
-  <div class="register-card">
-    <h2>Create Account</h2>
-    <p class="subtitle">Join our placement platform</p>
+<div class="register-shell">
+  <section class="register-promo">
+    <div class="promo-content">
+      <p class="eyebrow">Placement Platform</p>
+      <h1>Create your account</h1>
+      <p class="subtitle-copy">
+        Join as a student or company and manage applications, hiring workflows, and placement outcomes in one modern workspace.
+      </p>
 
-    <!-- Role Selection -->
-    <div class="role-selection">
-      <div 
-        class="role-option" 
-        [class.active]="selectedRole === 'student'"
-        (click)="selectRole('student')">
-        <div class="role-icon">🎓</div>
-        <h3>Student</h3>
-        <p>Find internships and job opportunities</p>
-      </div>
-
-      <div 
-        class="role-option" 
-        [class.active]="selectedRole === 'company'"
-        (click)="selectRole('company')">
-        <div class="role-icon">🏢</div>
-        <h3>Company</h3>
-        <p>Hire talented students</p>
+      <div class="promo-cards">
+        <article>
+          <h4>Fast Onboarding</h4>
+          <p>Role-driven forms and instant validation feedback.</p>
+        </article>
+        <article>
+          <h4>Smart Workflows</h4>
+          <p>Purpose-built dashboards for students and recruiters.</p>
+        </article>
+        <article>
+          <h4>Actionable Insights</h4>
+          <p>Track placement progress through clear analytics.</p>
+        </article>
       </div>
     </div>
+  </section>
 
-    <!-- Registration Form -->
-    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="register-form" *ngIf="selectedRole">
-      <h3>Register as {{getRoleDisplayName()}}</h3>
-      
-      <!-- Common Fields -->
+  <section class="register-card">
+    <div class="card-head">
+      <div>
+        <h2>Sign Up</h2>
+        <p>Select your role and complete registration.</p>
+      </div>
+      <a class="signin-link" (click)="goToLogin()">Sign In</a>
+    </div>
+
+    <div class="role-selection">
+      <button
+        type="button"
+        class="role-option"
+        [class.active]="selectedRole === 'student'"
+        (click)="selectRole('student')"
+      >
+        <div class="role-icon">ST</div>
+        <div>
+          <h3>Student</h3>
+          <p>Apply and track opportunities.</p>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        class="role-option"
+        [class.active]="selectedRole === 'company'"
+        (click)="selectRole('company')"
+      >
+        <div class="role-icon">CO</div>
+        <div>
+          <h3>Company</h3>
+          <p>Hire and manage candidate pipelines.</p>
+        </div>
+      </button>
+    </div>
+
+    <div class="role-insight" *ngIf="selectedRole">
+      <h4>{{ getRoleDisplayName() }} account benefits</h4>
+      <ul>
+        <li *ngFor="let item of roleHighlights[selectedRole]">{{ item }}</li>
+      </ul>
+    </div>
+
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="onRegister()"
+      class="register-form"
+      *ngIf="selectedRole"
+    >
+      <div class="progress-head">
+        <span>Profile completion</span>
+        <strong>{{ completionPercentage }}%</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="completionPercentage"></div>
+      </div>
+
       <div class="form-group">
-        <label for="name">Full Name {{selectedRole === 'company' ? '(Contact Person)' : ''}}</label>
-        <input 
-          type="text" 
-          id="name" 
-          formControlName="name" 
-          placeholder="Enter your full name">
-        <div class="error" *ngIf="getFieldError('name')">{{getFieldError('name')}}</div>
+        <label for="name">Full Name {{ selectedRole === 'company' ? '(Contact Person)' : '' }}</label>
+        <input type="text" id="name" formControlName="name" placeholder="Enter your full name" />
+        <div class="error" *ngIf="getFieldError('name')">{{ getFieldError('name') }}</div>
       </div>
 
       <div class="form-group">
         <label for="email">Email Address</label>
-        <input 
-          type="email" 
-          id="email" 
-          formControlName="email" 
-          placeholder="Enter your email">
-        <div class="email-requirement" *ngIf="selectedRole === 'student'">
-          ⓘ Please use your college email ID
-        </div>
-        <div class="error" *ngIf="getFieldError('email')">{{getFieldError('email')}}</div>
+        <input type="email" id="email" formControlName="email" placeholder="Enter your email" />
+        <div class="helper">{{ getEmailRequirement() }}</div>
+        <div class="error" *ngIf="getFieldError('email')">{{ getFieldError('email') }}</div>
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          formControlName="password" 
-          placeholder="Create a password (min. 6 characters)">
-        <div class="error" *ngIf="getFieldError('password')">{{getFieldError('password')}}</div>
+        <div class="password-wrap">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="Create a password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        <div class="strength-row">
+          <div class="strength-track">
+            <div class="strength-fill" [style.width.%]="passwordStrengthScore"></div>
+          </div>
+          <small>{{ passwordStrengthLabel }}</small>
+        </div>
+        <div class="error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</div>
       </div>
 
       <div class="form-group">
         <label for="phone">Phone Number</label>
-        <input 
-          type="tel" 
-          id="phone" 
-          formControlName="phone" 
-          [placeholder]="selectedRole === 'company' ? 'Enter contact number' : 'Enter your phone number'">
-        <div class="error" *ngIf="getFieldError('phone')">{{getFieldError('phone')}}</div>
+        <input
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          [placeholder]="selectedRole === 'company' ? 'Enter contact number' : 'Enter your phone number'"
+        />
+        <div class="error" *ngIf="getFieldError('phone')">{{ getFieldError('phone') }}</div>
       </div>
 
-      <!-- Student Specific Fields -->
       <div *ngIf="selectedRole === 'student'" class="student-fields">
-        <!-- Parent Email Field (NEW) -->
         <div class="form-group">
-          <label for="parentEmail">Parent's Email Address <span class="required-star">*</span></label>
-          <input 
-            type="email" 
-            id="parentEmail" 
-            formControlName="parentEmail" 
-            placeholder="Enter parent's email address">
-          <div class="email-requirement">
-            ⓘ Parent will receive placement updates and notifications
-          </div>
-          <div class="error" *ngIf="getFieldError('parentEmail')">{{getFieldError('parentEmail')}}</div>
+          <label for="parentEmail">Parent's Email Address</label>
+          <input
+            type="email"
+            id="parentEmail"
+            formControlName="parentEmail"
+            placeholder="Enter parent's email address"
+          />
+          <div class="helper">Parent will receive placement updates and notifications.</div>
+          <div class="error" *ngIf="getFieldError('parentEmail')">{{ getFieldError('parentEmail') }}</div>
         </div>
 
         <div class="form-group">
           <label for="department">Department</label>
-          <input 
-            type="text" 
-            id="department" 
-            formControlName="department" 
-            placeholder="Enter your department (e.g., Computer Science)">
-          <div class="error" *ngIf="getFieldError('department')">{{getFieldError('department')}}</div>
+          <input type="text" id="department" formControlName="department" placeholder="Computer Science" />
+          <div class="error" *ngIf="getFieldError('department')">{{ getFieldError('department') }}</div>
         </div>
 
         <div class="form-group">
           <label for="course">Course</label>
-          <input 
-            type="text" 
-            id="course" 
-            formControlName="course" 
-            placeholder="Enter your course (e.g., B.Tech, MCA)">
-          <div class="error" *ngIf="getFieldError('course')">{{getFieldError('course')}}</div>
+          <input type="text" id="course" formControlName="course" placeholder="B.Tech / MCA / MBA" />
+          <div class="error" *ngIf="getFieldError('course')">{{ getFieldError('course') }}</div>
         </div>
 
         <div class="form-row">
@@ -118,34 +163,22 @@
               <option value="3">3rd Year</option>
               <option value="4">4th Year</option>
             </select>
-            <div class="error" *ngIf="getFieldError('year')">{{getFieldError('year')}}</div>
+            <div class="error" *ngIf="getFieldError('year')">{{ getFieldError('year') }}</div>
           </div>
 
           <div class="form-group">
             <label for="cgpa">CGPA</label>
-            <input 
-              type="number" 
-              id="cgpa" 
-              formControlName="cgpa" 
-              placeholder="CGPA" 
-              step="0.01" 
-              min="0" 
-              max="10">
-            <div class="error" *ngIf="getFieldError('cgpa')">{{getFieldError('cgpa')}}</div>
+            <input type="number" id="cgpa" formControlName="cgpa" placeholder="8.2" step="0.01" min="0" max="10" />
+            <div class="error" *ngIf="getFieldError('cgpa')">{{ getFieldError('cgpa') }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Company Specific Fields -->
       <div *ngIf="selectedRole === 'company'" class="company-fields">
         <div class="form-group">
           <label for="companyName">Company Name</label>
-          <input 
-            type="text" 
-            id="companyName" 
-            formControlName="companyName" 
-            placeholder="Enter your company name">
-          <div class="error" *ngIf="getFieldError('companyName')">{{getFieldError('companyName')}}</div>
+          <input type="text" id="companyName" formControlName="companyName" placeholder="Enter company name" />
+          <div class="error" *ngIf="getFieldError('companyName')">{{ getFieldError('companyName') }}</div>
         </div>
 
         <div class="form-group">
@@ -160,17 +193,13 @@
             <option value="retail">Retail</option>
             <option value="other">Other</option>
           </select>
-          <div class="error" *ngIf="getFieldError('industry')">{{getFieldError('industry')}}</div>
+          <div class="error" *ngIf="getFieldError('industry')">{{ getFieldError('industry') }}</div>
         </div>
 
         <div class="form-group">
           <label for="website">Company Website (Optional)</label>
-          <input 
-            type="url" 
-            id="website" 
-            formControlName="website" 
-            placeholder="https://www.example.com">
-          <div class="error" *ngIf="getFieldError('website')">{{getFieldError('website')}}</div>
+          <input type="url" id="website" formControlName="website" placeholder="https://www.example.com" />
+          <div class="error" *ngIf="getFieldError('website')">{{ getFieldError('website') }}</div>
         </div>
 
         <div class="form-group">
@@ -184,43 +213,40 @@
             <option value="501-1000">501-1000 employees</option>
             <option value="1000+">1000+ employees</option>
           </select>
-          <div class="error" *ngIf="getFieldError('companySize')">{{getFieldError('companySize')}}</div>
+          <div class="error" *ngIf="getFieldError('companySize')">{{ getFieldError('companySize') }}</div>
         </div>
 
         <div class="form-group">
           <label for="address">Company Address</label>
-          <textarea 
-            id="address" 
-            formControlName="address" 
+          <textarea
+            id="address"
+            formControlName="address"
             placeholder="Enter complete company address"
-            rows="3"></textarea>
-          <div class="error" *ngIf="getFieldError('address')">{{getFieldError('address')}}</div>
+            rows="3"
+          ></textarea>
+          <div class="error" *ngIf="getFieldError('address')">{{ getFieldError('address') }}</div>
         </div>
 
         <div class="form-group">
           <label for="description">Company Description (Optional)</label>
-          <textarea 
-            id="description" 
-            formControlName="description" 
-            placeholder="Brief description about your company"
-            rows="3"></textarea>
+          <textarea id="description" formControlName="description" placeholder="Brief company profile" rows="3"></textarea>
         </div>
       </div>
 
-      <button 
-        type="submit" 
-        class="register-btn" 
-        [disabled]="registerForm.invalid || isLoading">
-        {{isLoading ? 'Creating Account...' : 'Create Account'}}
+      <div class="error global" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="success global" *ngIf="successMessage">{{ successMessage }}</div>
+
+      <button type="submit" class="register-btn" [disabled]="registerForm.invalid || isLoading">
+        {{ isLoading ? 'Creating Account...' : 'Create Account' }}
       </button>
 
-      <div class="login-link">
+      <p class="login-link">
         Already have an account? <a (click)="goToLogin()">Sign In</a>
-      </div>
+      </p>
     </form>
 
-    <div class="no-role-selected" *ngIf="!selectedRole">
-      <p>Please select your role to continue registration</p>
+    <div class="empty-role" *ngIf="!selectedRole">
+      Choose your role to unlock the registration form.
     </div>
-  </div>
+  </section>
 </div>
