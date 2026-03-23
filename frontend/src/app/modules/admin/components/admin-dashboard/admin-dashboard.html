@@ -5,11 +5,19 @@
       <h1>Admin Dashboard</h1>
       <p class="subtitle">Track platform activity, approvals, and placement outcomes in one place.</p>
     </div>
-    <button type="button" class="hero-action">Generate Report</button>
+    <button type="button" class="hero-action" (click)="openReports()">
+      <span>Generate Report</span>
+    </button>
   </header>
 
   <section class="overview-grid">
     <article class="overview-card" *ngFor="let card of overviewCards">
+      <span class="card-icon" [ngSwitch]="card.icon" aria-hidden="true">
+        <span *ngSwitchCase="'students'">ST</span>
+        <span *ngSwitchCase="'companies'">CO</span>
+        <span *ngSwitchCase="'drives'">DR</span>
+        <span *ngSwitchCase="'reports'">RP</span>
+      </span>
       <p class="card-label">{{ card.label }}</p>
       <h2>{{ card.value }}</h2>
       <span class="trend">{{ card.trend }} this week</span>
@@ -32,7 +40,7 @@
             <h4>{{ task.title }}</h4>
             <p>Priority: <strong [class]="'priority-' + task.priority">{{ task.priority }}</strong></p>
           </div>
-          <button type="button" class="ghost-btn">Review</button>
+          <button type="button" class="ghost-btn" (click)="reviewTask(task.route)">Review</button>
         </li>
       </ul>
     </article>

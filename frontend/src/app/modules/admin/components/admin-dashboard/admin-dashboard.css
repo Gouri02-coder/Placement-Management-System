@@ -60,6 +60,44 @@
   gap: 1rem;
 }
 
+.overview-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+  border: 1px solid #e6ebf2;
+}
+
+.card-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: #124a7c;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.card-label {
+  margin: 0;
+  color: #4a5570;
+  font-size: 0.9rem;
+}
+
+.overview-card h2 {
+  margin: 0.45rem 0;
+  font-size: 2rem;
+}
+
+.trend {
+  color: #07824a;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
 .quick-links {
   margin-top: 1rem;
   display: flex;
@@ -80,31 +118,6 @@
 
 .quick-links a:hover {
   background: #ebf5ff;
-}
-
-.overview-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.2rem;
-  box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
-  border: 1px solid #e6ebf2;
-}
-
-.card-label {
-  margin: 0;
-  color: #4a5570;
-  font-size: 0.9rem;
-}
-
-.overview-card h2 {
-  margin: 0.45rem 0;
-  font-size: 2rem;
-}
-
-.trend {
-  color: #07824a;
-  font-weight: 600;
-  font-size: 0.88rem;
 }
 
 .dashboard-grid {
