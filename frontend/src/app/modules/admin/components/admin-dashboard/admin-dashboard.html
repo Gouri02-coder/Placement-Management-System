@@ -5,20 +5,11 @@
       <h1>Admin Dashboard</h1>
       <p class="subtitle">Track platform activity, approvals, and placement outcomes in one place.</p>
     </div>
-    <button type="button" class="hero-action" (click)="openReports()">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5Zm9 1.5V8h3.5ZM8 12h8v2H8Zm0 4h8v2H8Zm0-8h4v2H8Z"/></svg>
-      <span>Generate Report</span>
-    </button>
+    <button type="button" class="hero-action">Generate Report</button>
   </header>
 
   <section class="overview-grid">
     <article class="overview-card" *ngFor="let card of overviewCards">
-      <span class="card-icon" [ngSwitch]="card.icon" aria-hidden="true">
-        <svg *ngSwitchCase="'students'" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0Zm14-8a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-1.5 2.2A5.7 5.7 0 0 1 21 20h-3a7.8 7.8 0 0 0-1.5-5.8Z"/></svg>
-        <svg *ngSwitchCase="'companies'" viewBox="0 0 24 24"><path d="M3 21V7l9-4 9 4v14h-6v-6H9v6Zm4-4h2v-2H7Zm0-4h2v-2H7Zm0-4h2V7H7Zm4 8h2v-2h-2Zm0-4h2v-2h-2Zm0-4h2V7h-2Zm4 8h2v-2h-2Zm0-4h2v-2h-2Zm0-4h2V7h-2Z"/></svg>
-        <svg *ngSwitchCase="'roles'" viewBox="0 0 24 24"><path d="M4 6h16v3H4Zm0 5h10v3H4Zm0 5h16v3H4Z"/></svg>
-        <svg *ngSwitchCase="'placements'" viewBox="0 0 24 24"><path d="M6 20V10h3v10Zm5 0V4h3v16Zm5 0v-7h3v7Z"/></svg>
-      </span>
       <p class="card-label">{{ card.label }}</p>
       <h2>{{ card.value }}</h2>
       <span class="trend">{{ card.trend }} this week</span>
@@ -26,16 +17,7 @@
   </section>
 
   <section class="quick-links">
-    <a *ngFor="let item of quickLinks" [routerLink]="item.route">
-      <span class="link-icon" [ngSwitch]="item.icon" aria-hidden="true">
-        <svg *ngSwitchCase="'students'" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0Z"/></svg>
-        <svg *ngSwitchCase="'companies'" viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15h-5v-6H9v6Z"/></svg>
-        <svg *ngSwitchCase="'approval'" viewBox="0 0 24 24"><path d="M12 2 3 6v6c0 5 3.8 9.7 9 10 5.2-.3 9-5 9-10V6Zm-1 14-4-4 1.4-1.4 2.6 2.6 5.6-5.6L18 9Z"/></svg>
-        <svg *ngSwitchCase="'drives'" viewBox="0 0 24 24"><path d="M4 4h16v4H4Zm2 6h12v10H6Z"/></svg>
-        <svg *ngSwitchCase="'reports'" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5Zm9 1.5V8h3.5ZM8 12h8v2H8Zm0 4h8v2H8Z"/></svg>
-      </span>
-      <span>{{ item.label }}</span>
-    </a>
+    <a *ngFor="let item of quickLinks" [routerLink]="item.route">{{ item.label }}</a>
   </section>
 
   <section class="dashboard-grid">
@@ -46,18 +28,11 @@
       </div>
       <ul class="task-list">
         <li *ngFor="let task of pendingTasks">
-          <div class="task-copy">
-            <span class="task-icon" [ngSwitch]="task.icon" aria-hidden="true">
-              <svg *ngSwitchCase="'approval'" viewBox="0 0 24 24"><path d="M12 2 3 6v6c0 5 3.8 9.7 9 10 5.2-.3 9-5 9-10V6Zm-1 14-4-4 1.4-1.4 2.6 2.6 5.6-5.6L18 9Z"/></svg>
-              <svg *ngSwitchCase="'schedule'" viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4Zm11 6H6v12h12Zm-8 3h2v2h-2Zm4 0h2v2h-2Z"/></svg>
-              <svg *ngSwitchCase="'review'" viewBox="0 0 24 24"><path d="M4 5h16v2H4Zm0 6h10v2H4Zm0 6h16v2H4Z"/></svg>
-            </span>
-            <div>
-              <h4>{{ task.title }}</h4>
-              <p>Priority: <strong [class]="'priority-' + task.priority">{{ task.priority }}</strong></p>
-            </div>
+          <div>
+            <h4>{{ task.title }}</h4>
+            <p>Priority: <strong [class]="'priority-' + task.priority">{{ task.priority }}</strong></p>
           </div>
-          <button type="button" class="ghost-btn" (click)="reviewTask(task.route)">Review</button>
+          <button type="button" class="ghost-btn">Review</button>
         </li>
       </ul>
     </article>
@@ -69,11 +44,7 @@
       </div>
       <ul class="event-list">
         <li *ngFor="let item of recentEvents">
-          <span class="event-icon" [ngSwitch]="item.icon" aria-hidden="true">
-            <svg *ngSwitchCase="'schedule'" viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h3v18H4V4Zm11 6H6v12h12Z"/></svg>
-            <svg *ngSwitchCase="'companies'" viewBox="0 0 24 24"><path d="M4 21V6l8-3 8 3v15h-5v-6H9v6Z"/></svg>
-            <svg *ngSwitchCase="'reports'" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5Zm3 9h8v2H8Zm0 4h8v2H8Z"/></svg>
-          </span>
+          <span class="dot"></span>
           <div>
             <p>{{ item.event }}</p>
             <small>{{ item.time }}</small>
