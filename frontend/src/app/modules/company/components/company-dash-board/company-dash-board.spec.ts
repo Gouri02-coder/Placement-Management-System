@@ -3,7 +3,15 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { CompanyDashboardComponent } from './company-dash-board';
 import { CompanyService } from '../../services/company.service';
-import { Company, CompanyStats } from '../../models/company.model';
+import { Company, CompanyStatistics } from '../../models/company.model';
+
+interface MockCompanyStats extends CompanyStatistics {
+  activeJobs: number;
+  localHires: number;
+  pendingReviews: number;
+  upcomingDrives: number;
+  unreadNotifications: number;
+}
 
 describe('CompanyDashboardComponent', () => {
   let component: CompanyDashboardComponent;
@@ -18,18 +26,25 @@ describe('CompanyDashboardComponent', () => {
     website: 'https://test.com',
     address: 'Test Address',
     description: 'Test Description',
-    hrContact: {
-      name: 'Test HR',
-      email: 'hr@test.com',
-      phone: '1234567890',
-      position: 'HR Manager'
-    },
+    hrContacts: [
+      {
+        name: 'Test HR',
+        email: 'hr@test.com',
+        phone: '1234567890',
+        position: 'HR Manager'
+      }
+    ],
+    socialLinks: {},
+    verificationDocuments: [],
     status: 'approved',
     createdAt: new Date(),
     updatedAt: new Date()
   };
 
-  const mockStats: CompanyStats = {
+  const mockStats: MockCompanyStats = {
+    activeJobPostings: 5,
+    interviewsScheduled: 8,
+    profileCompletion: 85,
     activeJobs: 5,
     totalApplications: 100,
     localHires: 10,
@@ -96,7 +111,7 @@ describe('CompanyDashboardComponent', () => {
 
   it('should navigate to post job', () => {
     component.postJob();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/jobs/post']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/jobs/create']);
   });
 
   it('should navigate to manage jobs', () => {
