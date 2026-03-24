@@ -1,0 +1,38 @@
+<section class="schedule-card">
+  <header>
+    <h2>Drive Schedule</h2>
+    <p>Create new placement drives and manage publication state.</p>
+  </header>
+
+  <form class="drive-form" (ngSubmit)="addDrive()">
+    <input type="text" [(ngModel)]="form.company" name="company" placeholder="Company" required />
+    <input type="text" [(ngModel)]="form.role" name="role" placeholder="Role" required />
+    <input type="date" [(ngModel)]="form.date" name="date" required />
+    <input type="text" [(ngModel)]="form.venue" name="venue" placeholder="Venue" required />
+    <input type="number" [(ngModel)]="form.slots" name="slots" min="1" placeholder="Slots" required />
+    <button type="submit">Schedule Drive</button>
+  </form>
+
+  <div class="drive-list">
+    <article class="drive-item" *ngFor="let drive of scheduledDrives">
+      <div class="title-row">
+        <div>
+          <h3>{{ drive.company }}</h3>
+          <p>{{ drive.id }} • {{ drive.role }}</p>
+        </div>
+        <span class="status" [class]="drive.status">{{ drive.status }}</span>
+      </div>
+
+      <div class="meta-grid">
+        <p><strong>Date:</strong> {{ drive.date }}</p>
+        <p><strong>Venue:</strong> {{ drive.venue }}</p>
+        <p><strong>Slots:</strong> {{ drive.slots }}</p>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="publish(drive)">Publish</button>
+        <button type="button" class="danger" (click)="cancel(drive)">Cancel</button>
+      </div>
+    </article>
+  </div>
+</section>

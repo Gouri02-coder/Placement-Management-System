@@ -1,0 +1,258 @@
+<div class="reports-container">
+  <!-- Header -->
+  <div class="reports-header">
+    <div class="header-content">
+      <h1>Reports & Analytics</h1>
+      <p>Track and analyze your placement performance metrics</p>
+    </div>
+  </div>
+
+  <!-- Date Range Selector -->
+  <div class="date-range-section">
+    <div class="date-picker-group">
+      <label for="startDate">
+        <i class="material-icons" aria-hidden="true">event</i>
+        Start Date
+      </label>
+      <input type="date" id="startDate" [(ngModel)]="startDate">
+    </div>
+    <div class="date-picker-group">
+      <label for="endDate">
+        <i class="material-icons" aria-hidden="true">event</i>
+        End Date
+      </label>
+      <input type="date" id="endDate" [(ngModel)]="endDate">
+    </div>
+    <button class="btn-primary" (click)="generateReport()">
+      <i class="material-icons" aria-hidden="true">refresh</i> Generate Report
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'overview'" (click)="changeTab('overview')">
+      <i class="material-icons" aria-hidden="true">dashboard</i> Overview
+    </button>
+    <button class="tab" [class.active]="activeTab === 'applications'" (click)="changeTab('applications')">
+      <i class="material-icons" aria-hidden="true">description</i> Applications
+    </button>
+    <button class="tab" [class.active]="activeTab === 'departments'" (click)="changeTab('departments')">
+      <i class="material-icons" aria-hidden="true">school</i> Departments
+    </button>
+    <button class="tab" [class.active]="activeTab === 'activities'" (click)="changeTab('activities')">
+      <i class="material-icons" aria-hidden="true">history</i> Activities
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading report data...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading">
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="tab-content">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon applications">
+            <i class="material-icons" aria-hidden="true">description</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{formatNumber(stats.totalApplications)}}</h3>
+            <p>Total Applications</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon shortlisted">
+            <i class="material-icons" aria-hidden="true">star</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{formatNumber(stats.totalShortlisted)}}</h3>
+            <p>Shortlisted</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon hired">
+            <i class="material-icons" aria-hidden="true">check_circle</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{formatNumber(stats.totalHired)}}</h3>
+            <p>Hired</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon rejected">
+            <i class="material-icons" aria-hidden="true">cancel</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{formatNumber(stats.totalRejected)}}</h3>
+            <p>Rejected</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon jobs">
+            <i class="material-icons" aria-hidden="true">work</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.activeJobs}}</h3>
+            <p>Active Jobs</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon companies">
+            <i class="material-icons" aria-hidden="true">business</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.totalCompanies}}</h3>
+            <p>Companies</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon cgpa">
+            <i class="material-icons" aria-hidden="true">trending_up</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.averageCGPA}}</h3>
+            <p>Avg CGPA</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon placement">
+            <i class="material-icons" aria-hidden="true">emoji_events</i>
+          </div>
+          <div class="stat-info">
+            <h3 class="{{getPlacementRateClass()}}">{{stats.placementRate}}%</h3>
+            <p>Placement Rate</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Applications Trend</h3>
+          <div class="chart-container">
+            <canvas id="applicationChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Status Distribution</h3>
+          <div class="chart-container small">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card full-width">
+          <h3>Department-wise Performance</h3>
+          <div class="chart-container">
+            <canvas id="departmentChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Applications Tab -->
+    <div *ngIf="activeTab === 'applications'" class="tab-content">
+      <div class="export-section">
+        <button class="btn-outline" (click)="exportReport('excel')">
+          <i class="material-icons" aria-hidden="true">download</i> Export Excel
+        </button>
+        <button class="btn-outline" (click)="exportReport('pdf')">
+          <i class="material-icons" aria-hidden="true">picture_as_pdf</i> Export PDF
+        </button>
+      </div>
+
+      <div class="data-table">
+        <div class="table-header">
+          <h3>Monthly Application Summary</h3>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Applications</th>
+                <th>Shortlisted</th>
+                <th>Hired</th>
+                <th>Conversion Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of monthlyData">
+                <td>{{data.month}}</td>
+                <td>{{data.applications}}</td>
+                <td>{{data.shortlisted}}</td>
+                <td>{{data.hired}}</td>
+                <td>
+                  <span class="rate-badge" [ngClass]="{
+                    'high': data.hired > 0 && (data.hired / data.applications) * 100 >= 20,
+                    'medium': data.hired > 0 && (data.hired / data.applications) * 100 >= 10,
+                    'low': data.hired > 0 && (data.hired / data.applications) * 100 < 10
+                  }">
+                    {{data.applications > 0 ? ((data.hired / data.applications) * 100).toFixed(1) : 0}}%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departments Tab -->
+    <div *ngIf="activeTab === 'departments'" class="tab-content">
+      <div class="data-table">
+        <div class="table-header">
+          <h3>Department Performance</h3>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Applications</th>
+                <th>Shortlisted</th>
+                <th>Hired</th>
+                <th>Success Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dept of topDepartments">
+                <td><strong>{{dept.name}}</strong></td>
+                <td>{{dept.applications}}</td>
+                <td>{{dept.shortlisted}}</td>
+                <td>{{dept.hired}}</td>
+                <td>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="dept.rate"></div>
+                    <span class="progress-label">{{dept.rate}}%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activities Tab -->
+    <div *ngIf="activeTab === 'activities'" class="tab-content">
+      <div class="activities-list">
+        <div class="activity-item" *ngFor="let activity of recentActivities">
+          <div class="activity-icon" [style.background]="activity.color">
+            <i class="material-icons" aria-hidden="true">{{activity.icon}}</i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-header">
+              <strong>{{activity.title}}</strong>
+              <span class="activity-time">{{activity.time}}</span>
+            </div>
+            <p class="activity-description">{{activity.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

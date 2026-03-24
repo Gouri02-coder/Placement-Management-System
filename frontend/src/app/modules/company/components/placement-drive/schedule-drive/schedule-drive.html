@@ -1,0 +1,403 @@
+<div class="schedule-drive-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h1>Schedule Placement Drive</h1>
+      <p>Organize and manage campus recruitment drives efficiently</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'schedule'" (click)="activeTab = 'schedule'">
+      <i class="material-icons" aria-hidden="true">event</i> Schedule New Drive
+    </button>
+    <button class="tab" [class.active]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'">
+      <i class="material-icons" aria-hidden="true">today</i> Upcoming Drives
+    </button>
+    <button class="tab" [class.active]="activeTab === 'past'" (click)="activeTab = 'past'">
+      <i class="material-icons" aria-hidden="true">history</i> Past Drives
+    </button>
+  </div>
+
+  <!-- Schedule Form Section -->
+  <div class="form-section" *ngIf="activeTab === 'schedule'">
+    <div class="form-card">
+      <h2>Schedule New Placement Drive</h2>
+      <form [formGroup]="driveForm" (ngSubmit)="onSubmit()">
+        <!-- Basic Information -->
+        <div class="form-group">
+          <label for="driveName">Drive Name *</label>
+          <input type="text" id="driveName" formControlName="driveName" 
+                 placeholder="e.g., Tech Mahindra Campus Drive 2024"
+                 [class.error]="driveName?.invalid && driveName?.touched">
+          <div class="error-message" *ngIf="driveName?.invalid && driveName?.touched">
+            <span *ngIf="driveName?.errors?.['required']">Drive name is required</span>
+            <span *ngIf="driveName?.errors?.['minlength']">Drive name must be at least 5 characters</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="driveType">Drive Type *</label>
+            <select id="driveType" formControlName="driveType">
+              <option *ngFor="let type of driveTypes" [value]="type.value">{{type.label}}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="companyName">Company Name *</label>
+            <input type="text" id="companyName" formControlName="companyName" 
+                   placeholder="Enter company name"
+                   [class.error]="companyName?.invalid && companyName?.touched">
+            <div class="error-message" *ngIf="companyName?.invalid && companyName?.touched">
+              <span>Company name is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="companyWebsite">Company Website</label>
+            <input type="url" id="companyWebsite" formControlName="companyWebsite" 
+                   placeholder="https://www.company.com">
+          </div>
+        </div>
+
+        <!-- Date & Venue -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="driveDate">Drive Date *</label>
+            <input type="date" id="driveDate" formControlName="driveDate" 
+                   [min]="minDate"
+                   [class.error]="driveDate?.invalid && driveDate?.touched">
+            <div class="error-message" *ngIf="driveDate?.invalid && driveDate?.touched">
+              <span>Drive date is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="driveTime">Drive Time *</label>
+            <input type="time" id="driveTime" formControlName="driveTime"
+                   [class.error]="driveTime?.invalid && driveTime?.touched">
+            <div class="error-message" *ngIf="driveTime?.invalid && driveTime?.touched">
+              <span>Drive time is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="venue">Venue *</label>
+            <select id="venue" formControlName="venue">
+              <option *ngFor="let v of venues" [value]="v">{{v}}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Eligibility Criteria -->
+        <div class="form-group">
+          <label>Eligible Branches *</label>
+          <div class="checkbox-grid">
+            <label class="checkbox-option" *ngFor="let branch of branches">
+              <input type="checkbox" [checked]="selectedBranches.includes(branch)" 
+                     (change)="toggleBranch(branch)">
+              <span class="checkbox-checkmark"></span>
+              {{ branch }}
+            </label>
+          </div>
+          <div class="error-message" *ngIf="eligibleBranches?.invalid && eligibleBranches?.touched">
+            <span>At least one branch must be selected</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="minCGPA">Minimum CGPA</label>
+            <input type="number" id="minCGPA" formControlName="minCGPA" 
+                   step="0.1" min="0" max="10" placeholder="e.g., 7.0">
+            <div class="error-message" *ngIf="minCGPA?.invalid && minCGPA?.touched">
+              <span>CGPA must be between 0 and 10</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Passing Years *</label>
+            <div class="checkbox-grid horizontal">
+              <label class="checkbox-option" *ngFor="let year of [2023, 2024, 2025, 2026]">
+                <input type="checkbox" [checked]="selectedYears.includes(year)" 
+                       (change)="toggleYear(year)">
+                <span class="checkbox-checkmark"></span>
+                {{ year }}
+              </label>
+            </div>
+            <div class="error-message" *ngIf="passingYears?.invalid && passingYears?.touched">
+              <span>At least one year must be selected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Positions & Vacancies -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="positions">Positions/Job Roles *</label>
+            <input type="text" id="positions" formControlName="positions" 
+                   placeholder="e.g., Software Developer, QA Engineer"
+                   [class.error]="positions?.invalid && positions?.touched">
+            <div class="error-message" *ngIf="positions?.invalid && positions?.touched">
+              <span>Positions are required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="vacancies">Number of Vacancies *</label>
+            <input type="number" id="vacancies" formControlName="vacancies" 
+                   min="1" placeholder="e.g., 25"
+                   [class.error]="vacancies?.invalid && vacancies?.touched">
+            <div class="error-message" *ngIf="vacancies?.invalid && vacancies?.touched">
+              <span>Valid number of vacancies is required</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description & Requirements -->
+        <div class="form-group">
+          <label for="description">Drive Description *</label>
+          <textarea id="description" formControlName="description" rows="4"
+                    placeholder="Describe the drive, company profile, selection process, etc."
+                    [class.error]="description?.invalid && description?.touched"></textarea>
+          <div class="error-message" *ngIf="description?.invalid && description?.touched">
+            <span>Description is required (minimum 50 characters)</span>
+          </div>
+          <div class="char-count" [class.warning]="description?.value?.length < 50">
+            {{ description?.value?.length || 0 }}/50 characters minimum
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="requirements">Eligibility Requirements *</label>
+          <textarea id="requirements" formControlName="requirements" rows="3"
+                    placeholder="List any specific requirements (e.g., skills, certifications, etc.)"
+                    [class.error]="requirements?.invalid && requirements?.touched"></textarea>
+          <div class="error-message" *ngIf="requirements?.invalid && requirements?.touched">
+            <span>Requirements are required (minimum 30 characters)</span>
+          </div>
+        </div>
+
+        <!-- Registration Details -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="registrationDeadline">Registration Deadline *</label>
+            <input type="date" id="registrationDeadline" formControlName="registrationDeadline"
+                   [min]="registrationMinDate"
+                   [class.error]="registrationDeadline?.invalid && registrationDeadline?.touched">
+            <div class="error-message" *ngIf="registrationDeadline?.invalid && registrationDeadline?.touched">
+              <span>Registration deadline is required</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactPerson">Contact Person *</label>
+            <input type="text" id="contactPerson" formControlName="contactPerson"
+                   placeholder="Name of contact person"
+                   [class.error]="contactPerson?.invalid && contactPerson?.touched">
+            <div class="error-message" *ngIf="contactPerson?.invalid && contactPerson?.touched">
+              <span>Contact person name is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactEmail">Contact Email *</label>
+            <input type="email" id="contactEmail" formControlName="contactEmail"
+                   placeholder="email@company.com"
+                   [class.error]="contactEmail?.invalid && contactEmail?.touched">
+            <div class="error-message" *ngIf="contactEmail?.invalid && contactEmail?.touched">
+              <span *ngIf="contactEmail?.errors?.['required']">Email is required</span>
+              <span *ngIf="contactEmail?.errors?.['email']">Valid email is required</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactPhone">Contact Phone *</label>
+            <input type="tel" id="contactPhone" formControlName="contactPhone"
+                   placeholder="10-digit mobile number"
+                   [class.error]="contactPhone?.invalid && contactPhone?.touched">
+            <div class="error-message" *ngIf="contactPhone?.invalid && contactPhone?.touched">
+              <span>Valid 10-digit phone number is required</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="additionalNotes">Additional Notes</label>
+          <textarea id="additionalNotes" formControlName="additionalNotes" rows="2"
+                    placeholder="Any additional information for students..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+            <i class="material-icons" *ngIf="isSubmitting" class="spin">refresh</i>
+            {{ isSubmitting ? 'Scheduling...' : 'Schedule Drive' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Drives List Section -->
+  <div class="drives-section" *ngIf="activeTab !== 'schedule'">
+    <!-- Search and Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <i class="material-icons" aria-hidden="true">search</i>
+        <input type="text" placeholder="Search drives..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      
+<div class="filter-group">
+        <label for="statusFilter" class="visually-hidden">Filter by Status</label>
+        <select 
+          id="statusFilter"
+          [(ngModel)]="selectedStatus" 
+          (change)="applyFilters()"
+          aria-label="Filter drives by status">
+          <option value="all">All Status</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+<div class="filter-group">
+        <label for="typeFilter" class="visually-hidden">Filter by Drive Type</label>
+        <select 
+          id="typeFilter"
+          [(ngModel)]="selectedType" 
+          (change)="applyFilters()"
+          aria-label="Filter drives by type">
+          <option value="all">All Types</option>
+          <option value="onCampus">On-Campus</option>
+          <option value="offCampus">Off-Campus</option>
+          <option value="virtual">Virtual</option>
+          <option value="hybrid">Hybrid</option>
+        </select>
+      </div>
+
+      <button class="btn-clear" (click)="clearFilters()">
+        <i class="material-icons" aria-hidden="true">clear</i> Clear
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading drives...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredDrives.length === 0">
+      <i class="material-icons" aria-hidden="true">event_busy</i>
+      <h3>No drives found</h3>
+      <p>Try adjusting your filters or schedule a new drive</p>
+      <button class="btn-primary" (click)="activeTab = 'schedule'">Schedule New Drive</button>
+    </div>
+
+    <!-- Drives Grid -->
+    <div class="drives-grid" *ngIf="!isLoading && filteredDrives.length > 0">
+      <div class="drive-card" *ngFor="let drive of paginatedDrives">
+        <div class="card-header">
+          <div class="company-info">
+            <div class="company-logo">
+              <img [src]="drive.companyLogo" [alt]="drive.companyName + ' logo'" [title]="drive.companyName">
+            </div>
+            <div class="company-details">
+              <h3>{{drive.driveName}}</h3>
+              <p class="company-name">{{drive.companyName}}</p>
+            </div>
+          </div>
+          <div class="drive-status" [class]="getStatusClass(drive.status)">
+            {{drive.status | uppercase}}
+          </div>
+        </div>
+
+        <div class="drive-details">
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">{{getDriveTypeIcon(drive.driveType)}}</i>
+            <span>{{drive.driveType | uppercase}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">event</i>
+            <span>{{formatDate(drive.driveDate)}} at {{drive.driveTime}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">location_on</i>
+            <span>{{drive.venue}}</span>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">people</i>
+            <span>{{drive.registeredCount}} Registered</span>
+          </div>
+          <div class="detail-item">
+            <i class="material-icons" aria-hidden="true">work</i>
+            <span>{{drive.vacancies}} Vacancies</span>
+          </div>
+          <div class="detail-item" [class.urgent]="getDaysRemaining(drive.registrationDeadline) <= 3">
+            <i class="material-icons" aria-hidden="true">schedule</i>
+            <span>Registration: {{formatDate(drive.registrationDeadline)}}</span>
+          </div>
+        </div>
+
+        <div class="drive-description">
+          <p>{{drive.description | slice:0:120}}{{drive.description.length > 120 ? '...' : ''}}</p>
+        </div>
+
+        <div class="drive-branches">
+          <strong>Eligible Branches:</strong>
+          <div class="tags">
+            <span class="tag" *ngFor="let branch of drive.eligibleBranches.slice(0, 3)">{{branch}}</span>
+            <span class="tag more" *ngIf="drive.eligibleBranches.length > 3">+{{drive.eligibleBranches.length - 3}}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-outline" (click)="viewDetails(drive)">
+            <i class="material-icons" aria-hidden="true">visibility</i> View Details
+          </button>
+          <button class="btn-outline" (click)="editDrive(drive)" *ngIf="drive.status === 'scheduled'">
+            <i class="material-icons" aria-hidden="true">edit</i> Edit
+          </button>
+          <button class="btn-outline btn-warning" (click)="cancelDrive(drive)" *ngIf="drive.status === 'scheduled'">
+            <i class="material-icons" aria-hidden="true">cancel</i> Cancel
+          </button>
+        </div>
+
+        <div class="card-footer">
+          <span class="days-remaining" [class.urgent]="getDaysRemaining(drive.driveDate) <= 7">
+            <i class="material-icons" aria-hidden="true">event_available</i>
+            {{getDaysRemaining(drive.driveDate)}} days until drive
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="!isLoading && filteredDrives.length > 0 && totalPages > 1">
+      <button class="page-btn" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+        <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+      </button>
+      
+      <div class="page-numbers">
+        <button *ngFor="let page of getPages()" 
+                class="page-number" 
+                [class.active]="page === currentPage"
+                (click)="changePage(page)">
+          {{page}}
+        </button>
+      </div>
+      
+      <button class="page-btn" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+      </button>
+    </div>
+  </div>
+</div>

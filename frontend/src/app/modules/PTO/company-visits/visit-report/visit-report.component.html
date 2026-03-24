@@ -1,0 +1,22 @@
+<section class="pto-component-shell">
+  <header class="hero-card">
+    <p class="eyebrow">PTO Component</p>
+    <h2>{{ title }}</h2>
+    <p class="subtitle">{{ subtitle }}</p>
+  </header>
+
+  <div class="metric-grid">
+    <article class="metric-card" *ngFor="let metric of metrics">
+      <span>{{ metric.label }}</span>
+      <strong>{{ metric.value }}</strong>
+      <p>{{ metric.note }}</p>
+    </article>
+  </div>
+
+  <article class="content-card">
+    <h3>Ready For Extension</h3>
+    <ul>
+      <li *ngFor="let item of highlights">{{ item }}</li>
+    </ul>
+  </article>
+</section>

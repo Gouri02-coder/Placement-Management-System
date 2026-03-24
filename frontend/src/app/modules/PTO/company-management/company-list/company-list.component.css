@@ -1,0 +1,157 @@
+.company-list {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  color: #1f2937;
+}
+
+.hero,
+.filters,
+.table-card,
+.state-card {
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.subtext,
+.hero-stats span,
+.state-card,
+.empty-cell,
+.table-card td span {
+  color: #64748b;
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.hero-stats article {
+  min-width: 120px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #eff6ff, #f8fafc);
+  border-radius: 16px;
+}
+
+.hero-stats strong {
+  display: block;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px 140px;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.filters input,
+.filters select,
+.refresh-btn {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  font: inherit;
+}
+
+.refresh-btn {
+  border: 0;
+  background: #0f766e;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.state-card {
+  padding: 1rem 1.2rem;
+}
+
+.state-card.error {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
+.table-card {
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.status {
+  display: inline-flex;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 600;
+}
+
+.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status.review {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.table-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.empty-cell {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero,
+  .filters {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+}

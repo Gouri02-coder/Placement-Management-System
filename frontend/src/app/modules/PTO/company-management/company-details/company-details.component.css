@@ -1,0 +1,115 @@
+.company-details {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  color: #1e293b;
+}
+
+.back-link {
+  width: fit-content;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.hero,
+.summary-card,
+.state-card {
+  background: #ffffff;
+  border: 1px solid #dbe4f0;
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.hero,
+.summary-card,
+.state-card {
+  padding: 1.5rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+  gap: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: #0f766e;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+.meta,
+.description,
+.contact-card span,
+.contact-card small,
+.detail-grid span,
+ul {
+  color: #64748b;
+}
+
+.contact-card {
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f0fdfa, #eff6ff);
+}
+
+.contact-card strong {
+  display: inline-flex;
+  margin-top: 0.8rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+li + li {
+  margin-top: 0.65rem;
+}
+
+.state-card.error {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
+@media (max-width: 768px) {
+  .hero,
+  .content-grid,
+  .detail-grid div {
+    grid-template-columns: 1fr;
+  }
+}

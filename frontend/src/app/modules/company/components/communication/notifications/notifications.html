@@ -1,0 +1,185 @@
+<div class="notifications-container">
+  <!-- Header -->
+  <div class="notifications-header">
+    <div class="header-content">
+      <h1>Notifications</h1>
+      <p>Stay updated with your placement activities and important announcements</p>
+    </div>
+  </div>
+
+  <div class="notifications-layout">
+    <!-- Sidebar Filters -->
+    <div class="filters-sidebar">
+      <div class="stats-card">
+        <div class="stat-item">
+          <div class="stat-icon total">
+            <i class="material-icons" aria-hidden="true">notifications</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.total}}</h3>
+            <p>Total</p>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon unread">
+            <i class="material-icons" aria-hidden="true">mark_email_unread</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.unread}}</h3>
+            <p>Unread</p>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon read">
+            <i class="material-icons" aria-hidden="true">mark_email_read</i>
+          </div>
+          <div class="stat-info">
+            <h3>{{stats.read}}</h3>
+            <p>Read</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <h3>Filters</h3>
+        <div class="filter-list">
+          <button 
+            *ngFor="let filter of filterOptions"
+            class="filter-btn"
+            [class.active]="selectedFilter === filter.value"
+            (click)="selectedFilter = filter.value; applyFilters()">
+            <i class="material-icons" aria-hidden="true">{{filter.icon}}</i>
+            <span>{{filter.label}}</span>
+            <span class="filter-count">{{getFilterCount(filter.value)}}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="actions-section">
+        <button class="action-btn mark-read" (click)="markAllAsRead()">
+          <i class="material-icons" aria-hidden="true">done_all</i>
+          Mark All as Read
+        </button>
+        <button class="action-btn clear-all" (click)="clearAllNotifications()">
+          <i class="material-icons" aria-hidden="true">delete_sweep</i>
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="notifications-content">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <i class="material-icons" aria-hidden="true">search</i>
+        <input 
+          type="text" 
+          placeholder="Search notifications..." 
+          [(ngModel)]="searchTerm" 
+          (input)="applyFilters()"
+          aria-label="Search notifications">
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading notifications...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && filteredNotifications.length === 0">
+        <i class="material-icons" aria-hidden="true">notifications_off</i>
+        <h3>No notifications</h3>
+        <p *ngIf="selectedFilter !== 'all'">No notifications found for the selected filter</p>
+        <p *ngIf="selectedFilter === 'all'">You're all caught up! New notifications will appear here.</p>
+        <button class="btn-primary" (click)="selectedFilter = 'all'; applyFilters()" *ngIf="selectedFilter !== 'all'">
+          View All Notifications
+        </button>
+      </div>
+
+      <!-- Notifications List -->
+      <div class="notifications-list" *ngIf="!isLoading && filteredNotifications.length > 0">
+        <div 
+          class="notification-item" 
+          *ngFor="let notification of paginatedNotifications"
+          [class.unread]="!notification.read"
+          [class.read]="notification.read"
+          (click)="navigateToAction(notification)">
+          
+         <div 
+  class="notification-icon" 
+  [style.background-color]="getCategoryConfig(notification.category).bgColor">
+  <i class="material-icons" [style.color]="getCategoryConfig(notification.category).color">
+    {{getCategoryConfig(notification.category).icon}}
+  </i>
+</div>
+          
+          <div class="notification-content">
+            <div class="notification-header">
+              <div class="title-section">
+                <h4>{{notification.title}}</h4>
+                <div class="priority-badge" [class]="getPriorityClass(notification.priority)">
+                  <i class="material-icons" aria-hidden="true">{{getPriorityIcon(notification.priority)}}</i>
+                  {{notification.priority | uppercase}}
+                </div>
+                <div class="unread-dot" *ngIf="!notification.read"></div>
+              </div>
+              <button 
+                class="delete-btn" 
+                (click)="deleteNotification(notification, $event)"
+                aria-label="Delete notification">
+                <i class="material-icons" aria-hidden="true">close</i>
+              </button>
+            </div>
+            
+            <p class="notification-message">{{notification.message}}</p>
+            
+            <div class="notification-footer">
+              <span class="timestamp">
+                <i class="material-icons" aria-hidden="true">schedule</i>
+                {{formatTime(notification.timestamp)}}
+              </span>
+              <button 
+                class="action-link" 
+                (click)="navigateToAction(notification); $event.stopPropagation()">
+                {{notification.actionLabel}}
+                <i class="material-icons" aria-hidden="true">arrow_forward</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="!isLoading && filteredNotifications.length > 0 && totalPages > 1">
+        <button 
+          class="page-btn" 
+          (click)="changePage(currentPage - 1)" 
+          [disabled]="currentPage === 1"
+          aria-label="Previous page">
+          <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+        </button>
+        
+        <div class="page-numbers">
+          <button 
+            *ngFor="let page of getPages()" 
+            class="page-number" 
+            [class.active]="page === currentPage"
+            (click)="changePage(page)"
+            [attr.aria-label]="'Go to page ' + page"
+            [attr.aria-current]="page === currentPage ? 'page' : null">
+            {{page}}
+          </button>
+        </div>
+        
+        <button 
+          class="page-btn" 
+          (click)="changePage(currentPage + 1)" 
+          [disabled]="currentPage === totalPages"
+          aria-label="Next page">
+          Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

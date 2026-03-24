@@ -1,12 +1,13 @@
 package com.placement.repository;
 
-import com.placement.model.Placement;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.placement.model.Placement;
 
 @Repository
 public interface PlacementRepository extends JpaRepository<Placement, Long> {
@@ -21,4 +22,7 @@ public interface PlacementRepository extends JpaRepository<Placement, Long> {
     
     @Query("SELECT COUNT(p) FROM Placement p WHERE p.status = 'SELECTED'")
     Long countSelectedPlacements();
+
+    @Query("SELECT p FROM Placement p WHERE p.job.company.id = :companyId")
+    List<Placement> findByJobCompanyId(Long companyId);
 }

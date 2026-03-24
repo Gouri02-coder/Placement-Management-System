@@ -1,0 +1,14 @@
+com\placement\model\PTO.class
+com\placement\repository\CompanyRepository.class
+com\placement\model\Student.class
+com\placement\model\Placement.class
+com\placement\model\Job.class
+com\placement\dto\PlacementDTO.class
+com\placement\repository\JobRepository.class
+com\placement\model\Company.class
+com\placement\repository\PlacementRepository.class
+com\placement\service\PlacementService$PlacementStats.class
+com\placement\repository\PTORepository.class
+com\placement\service\PlacementService.class
+com\placement\repository\StudentRepository.class
+com\placement\service\impl\PlacementServiceImpl.class

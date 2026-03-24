@@ -1,0 +1,485 @@
+<div class="profile-container">
+  <!-- Confirmation Dialog -->
+  <div class="modal-overlay" *ngIf="showConfirmDialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Discard Changes?</h3>
+      </div>
+      <div class="modal-body">
+        <p>You have unsaved changes. Are you sure you want to leave?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelDiscardChanges()">Stay</button>
+        <button class="btn btn-danger" (click)="confirmDiscardChanges()">Discard Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-save indicator -->
+  <div class="auto-save-indicator" *ngIf="isSavingDraft">
+    <i class="material-icons spin">refresh</i> Saving draft...
+  </div>
+
+  <div class="profile-header">
+    <div class="header-left">
+      <button class="btn btn-back" (click)="goBack()">
+        <span class="material-icons">arrow_back</span> Back to Dashboard
+      </button>
+      <h1>Company Profile</h1>
+    </div>
+    <div class="header-actions">
+      <button *ngIf="!isEditing" class="btn btn-primary" (click)="toggleEdit()">
+        <span class="material-icons">edit</span> Edit Profile
+      </button>
+      <button class="btn btn-info" (click)="getVerificationStatus()">
+        <span class="material-icons">verified</span> Check Status
+      </button>
+      <button *ngIf="!isEditing" class="btn btn-outline" (click)="togglePreviewMode()">
+        <span class="material-icons">visibility</span> Preview
+      </button>
+      <button *ngIf="!isEditing" class="btn btn-outline" (click)="exportProfile()">
+        <span class="material-icons">download</span> Export
+      </button>
+      <button *ngIf="!isEditing && changeHistory.length > 0" class="btn btn-outline" (click)="showChangeHistory = !showChangeHistory">
+        <span class="material-icons">history</span> History
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="profile-content">
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="!isEditing">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <h3>{{companyStats.totalApplications}}</h3>
+          <p>Total Applications</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💼</div>
+        <div class="stat-content">
+          <h3>{{companyStats.activeJobPostings}}</h3>
+          <p>Active Jobs</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-content">
+          <h3>{{companyStats.interviewsScheduled}}</h3>
+          <p>Interviews</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-content">
+          <h3>{{companyStats.profileCompletion}}%</h3>
+          <p>Profile Complete</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="status-banner" [class]="getStatusClass()">
+      <div class="status-content">
+        <span class="status-icon">{{getStatusIcon()}}</span>
+        <div class="status-text">
+          <h3>Verification Status: {{companyProfile.status | uppercase}}</h3>
+          <p *ngIf="companyProfile.verificationNotes">{{companyProfile.verificationNotes}}</p>
+          <p *ngIf="!companyProfile.verificationNotes">
+            {{ companyProfile.status === 'approved' ? 'Your company profile has been verified and approved.' :
+               companyProfile.status === 'rejected' ? 'Your company profile requires additional verification.' :
+               'Your company profile is under review by our admin team.' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-section">
+      <div class="logo-preview">
+        <img [src]="logoPreview || companyProfile.logo || 'assets/default-company-logo.png'" 
+             alt="Company Logo" 
+             class="company-logo">
+        <div class="logo-actions" *ngIf="isEditing">
+          <input type="file" #logoInput accept="image/*" (change)="onLogoSelected($event)" hidden>
+          <button class="btn btn-outline" (click)="logoInput.click()" [disabled]="isUploadingLogo">
+            <span class="material-icons">photo_camera</span> Change Logo
+          </button>
+          <button *ngIf="logoPreview || companyProfile.logo" class="btn btn-outline btn-danger" 
+                  (click)="removeLogo()" [disabled]="isUploadingLogo">
+            <span class="material-icons">delete</span> Remove
+          </button>
+          <button *ngIf="logoFile" class="btn btn-primary" (click)="uploadLogo()" [disabled]="isUploadingLogo">
+            <span class="material-icons" *ngIf="isUploadingLogo" class="spin">refresh</span>
+            <span class="material-icons" *ngIf="!isUploadingLogo">cloud_upload</span>
+            {{ isUploadingLogo ? 'Uploading...' : 'Upload' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Completion Bar (when editing) -->
+    <div class="completion-bar-container" *ngIf="isEditing">
+      <label>Profile Completion</label>
+      <div class="completion-bar">
+        <div class="completion-fill" [style.width.%]="calculateProfileCompletion()"></div>
+      </div>
+      <span class="completion-text">{{calculateProfileCompletion()}}% Complete</span>
+    </div>
+
+    <!-- Preview Mode -->
+    <div *ngIf="showPreviewMode" class="preview-mode">
+      <div class="preview-header">
+        <h3>Profile Preview</h3>
+        <button class="btn btn-close" (click)="togglePreviewMode()">✕</button>
+      </div>
+      <div class="preview-content">
+        <!-- Simplified preview of profile -->
+        <div class="preview-card">
+          <img [src]="companyProfile.logo || 'assets/default-company-logo.png'" class="preview-logo" alt="{{companyProfile.name}} Logo" title="Company Logo">
+          <h2>{{companyProfile.name}}</h2>
+          <p><span class="material-icons">language</span> <a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a></p>
+          <p><span class="material-icons">location_on</span> {{companyProfile.address}}</p>
+          <p class="preview-description">{{companyProfile.description}}</p>
+          <div class="preview-hr" *ngIf="primaryHRContact">
+            <h4>Contact:</h4>
+            <p><strong>{{primaryHRContact.name}}</strong> ({{primaryHRContact.position}})</p>
+            <p><span class="material-icons">email</span> {{primaryHRContact.email}}</p>
+            <p><span class="material-icons">phone</span> {{primaryHRContact.phone}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Form (Edit Mode) -->
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form" *ngIf="isEditing">
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        
+        <div class="form-group">
+          <label for="companyName">Company Name *</label>
+          <input type="text" id="companyName" formControlName="name" 
+                 [class.error]="name?.invalid && name?.touched">
+          <div class="error-message" *ngIf="name?.invalid && name?.touched">
+            <span *ngIf="name?.errors?.['required']">Company name is required</span>
+            <span *ngIf="name?.errors?.['minlength']">Company name must be at least 2 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="website">Website *</label>
+          <input type="url" id="website" formControlName="website" 
+                 [class.error]="website?.invalid && website?.touched"
+                 placeholder="https://example.com">
+          <div class="error-message" *ngIf="website?.invalid && website?.touched">
+            <span *ngIf="website?.errors?.['required']">Website is required</span>
+            <span *ngIf="website?.errors?.['pattern']">Please enter a valid URL starting with http:// or https://</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Company Address *</label>
+          <textarea id="address" formControlName="address" rows="3"
+                    [class.error]="address?.invalid && address?.touched"
+                    placeholder="Full company address"></textarea>
+          <div class="error-message" *ngIf="address?.invalid && address?.touched">
+            <span *ngIf="address?.errors?.['required']">Address is required</span>
+            <span *ngIf="address?.errors?.['minlength']">Address must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Company Description *</label>
+          <textarea id="description" formControlName="description" rows="5"
+                    [class.error]="description?.invalid && description?.touched"
+                    placeholder="Describe your company, services, culture, etc."></textarea>
+          <div class="error-message" *ngIf="description?.invalid && description?.touched">
+            <span *ngIf="description?.errors?.['required']">Description is required</span>
+            <span *ngIf="description?.errors?.['minlength']">Description must be at least 50 characters</span>
+          </div>
+          <div class="char-count" [class.warning]="(description?.value?.length || 0) < 50">
+            {{ description?.value?.length || 0 }}/50 characters
+          </div>
+        </div>
+      </div>
+
+      <!-- HR Contacts Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3>HR Contacts</h3>
+          <button type="button" class="btn btn-small btn-outline" (click)="addHRContact()">
+            <span class="material-icons">add</span> Add HR Contact
+          </button>
+        </div>
+
+        <div formArrayName="hrContacts">
+          <div *ngFor="let contact of hrContacts.controls; let i = index" 
+               [formGroupName]="i" class="hr-contact-card">
+            <div class="contact-header">
+              <h4>Contact #{{i + 1}} <span *ngIf="contact.get('isPrimary')?.value" class="primary-badge">PRIMARY</span></h4>
+              <div class="contact-actions">
+                <button *ngIf="!contact.get('isPrimary')?.value" 
+                        type="button" class="btn-icon" (click)="setPrimaryContact(i)" 
+                        title="Set as Primary">
+                  <span class="material-icons">star_border</span>
+                </button>
+                <button *ngIf="hrContacts.length > 1" 
+                        type="button" class="btn-icon btn-danger" (click)="removeHRContact(i)"
+                        title="Remove Contact">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Name *</label>
+                <input type="text" formControlName="name" placeholder="Enter contact name"
+                       [class.error]="contact.get('name')?.invalid && contact.get('name')?.touched">
+                <div class="error-message" *ngIf="contact.get('name')?.invalid && contact.get('name')?.touched">
+                  Name is required
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Position *</label>
+                <input type="text" formControlName="position" placeholder="Enter contact position"
+                       [class.error]="contact.get('position')?.invalid && contact.get('position')?.touched"
+                       title="Contact position in the company">
+                <div class="error-message" *ngIf="contact.get('position')?.invalid && contact.get('position')?.touched">
+                  Position is required
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Email *</label>
+                <input type="email" formControlName="email" placeholder="Enter contact email"
+                       [class.error]="contact.get('email')?.invalid && contact.get('email')?.touched">
+                <div class="error-message" *ngIf="contact.get('email')?.invalid && contact.get('email')?.touched">
+                  <span *ngIf="contact.get('email')?.errors?.['required']">Email is required</span>
+                  <span *ngIf="contact.get('email')?.errors?.['email']">Invalid email format</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Phone *</label>
+                <input type="tel" formControlName="phone" placeholder="10-digit number"
+                       [class.error]="contact.get('phone')?.invalid && contact.get('phone')?.touched">
+                <div class="error-message" *ngIf="contact.get('phone')?.invalid && contact.get('phone')?.touched">
+                  <span *ngIf="contact.get('phone')?.errors?.['required']">Phone is required</span>
+                  <span *ngIf="contact.get('phone')?.errors?.['pattern']">Invalid phone format</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Links Section -->
+      <div class="form-section" formGroupName="socialLinks">
+        <h3>Social Media Links</h3>
+        
+        <div class="form-group">
+          <label for="linkedin">LinkedIn</label>
+          <input type="url" id="linkedin" formControlName="linkedin" 
+                 [class.error]="linkedin?.invalid && linkedin?.touched"
+                 placeholder="https://linkedin.com/company/...">
+          <div class="error-message" *ngIf="linkedin?.invalid && linkedin?.touched">
+            Invalid LinkedIn URL
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="twitter">Twitter</label>
+          <input type="url" id="twitter" formControlName="twitter"
+                 [class.error]="twitter?.invalid && twitter?.touched"
+                 placeholder="https://twitter.com/...">
+          <div class="error-message" *ngIf="twitter?.invalid && twitter?.touched">
+            Invalid Twitter URL
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="github">GitHub</label>
+          <input type="url" id="github" formControlName="github"
+                 [class.error]="github?.invalid && github?.touched"
+                 placeholder="https://github.com/...">
+          <div class="error-message" *ngIf="github?.invalid && github?.touched">
+            Invalid GitHub URL
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="facebook">Facebook</label>
+          <input type="url" id="facebook" formControlName="facebook"
+                 [class.error]="facebook?.invalid && facebook?.touched"
+                 placeholder="https://facebook.com/...">
+          <div class="error-message" *ngIf="facebook?.invalid && facebook?.touched">
+            Invalid Facebook URL
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Documents Section -->
+      <div class="form-section" *ngIf="isEditing">
+        <h3>Verification Documents</h3>
+        
+        <div class="documents-list">
+          <div class="document-item" *ngFor="let doc of verificationDocuments; let i = index">
+            <span class="material-icons">description</span>
+            <div class="doc-info">
+              <span class="doc-name">{{doc.name}}</span>
+              <span class="doc-status" [class]="'status-' + doc.status">{{doc.status}}</span>
+            </div>
+            <a [href]="doc.url" target="_blank" class="btn-icon" title="View Document">
+              <span class="material-icons">visibility</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="upload-document">
+          <input type="file" #documentInput (change)="onDocumentSelected($event, 'verification')" hidden>
+          <button type="button" class="btn btn-outline" (click)="documentInput.click()" 
+                  [disabled]="isUploadingDocument">
+            <span class="material-icons" *ngIf="!isUploadingDocument">cloud_upload</span>
+            <span class="material-icons spin" *ngIf="isUploadingDocument">refresh</span>
+            {{ isUploadingDocument ? 'Uploading...' : 'Upload Document' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || !profileForm.valid">
+          <span class="material-icons spin" *ngIf="isSubmitting">refresh</span>
+          {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </form>
+
+    <!-- Read-only View -->
+    <div *ngIf="!isEditing && !showPreviewMode" class="profile-view">
+      <!-- Social Links Display -->
+      <div class="social-links" *ngIf="companyProfile.socialLinks && (companyProfile.socialLinks.linkedin || companyProfile.socialLinks.twitter || companyProfile.socialLinks.github || companyProfile.socialLinks.facebook)">
+        <h4>Connect With Us</h4>
+        <div class="social-icons">
+          <a *ngIf="companyProfile.socialLinks.linkedin" [href]="companyProfile.socialLinks.linkedin" target="_blank" class="social-icon linkedin">
+            <span class="material-icons">linkedin</span>
+          </a>
+          <a *ngIf="companyProfile.socialLinks.twitter" [href]="companyProfile.socialLinks.twitter" target="_blank" class="social-icon twitter">
+            <span class="material-icons">x</span>
+          </a>
+          <a *ngIf="companyProfile.socialLinks.github" [href]="companyProfile.socialLinks.github" target="_blank" class="social-icon github">
+            <span class="material-icons">code</span>
+          </a>
+          <a *ngIf="companyProfile.socialLinks.facebook" [href]="companyProfile.socialLinks.facebook" target="_blank" class="social-icon facebook">
+            <span class="material-icons">facebook</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Company Name</label>
+          <p>{{companyProfile.name}}</p>
+        </div>
+        <div class="info-item">
+          <label>Website</label>
+          <p><a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a></p>
+        </div>
+        <div class="info-item full-width">
+          <label>Address</label>
+          <p>{{companyProfile.address}}</p>
+        </div>
+        <div class="info-item full-width">
+          <label>Description</label>
+          <p class="description-text">{{companyProfile.description}}</p>
+        </div>
+      </div>
+
+      <div class="hr-section">
+        <h4>HR Contacts ({{companyProfile.hrContacts.length || 0}})</h4>
+        <div *ngFor="let contact of companyProfile.hrContacts; let i = index" class="hr-card">
+          <div class="hr-header" *ngIf="contact.isPrimary">
+            <span class="primary-badge">PRIMARY</span>
+          </div>
+          <div class="hr-grid">
+            <div class="hr-item">
+              <label>Name</label>
+              <p>{{contact.name}}</p>
+            </div>
+            <div class="hr-item">
+              <label>Position</label>
+              <p>{{contact.position}}</p>
+            </div>
+            <div class="hr-item">
+              <label>Email</label>
+              <p><a [href]="'mailto:' + contact.email">{{contact.email}}</a></p>
+            </div>
+            <div class="hr-item">
+              <label>Phone</label>
+              <p><a [href]="'tel:' + contact.phone">{{contact.phone}}</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Documents Display -->
+      <div class="documents-section" *ngIf="verificationDocuments.length > 0">
+        <h4>Verification Documents</h4>
+        <div class="documents-list">
+          <div class="document-item" *ngFor="let doc of verificationDocuments">
+            <span class="material-icons">verified</span>
+            <div class="doc-info">
+              <span class="doc-name">{{doc.name}}</span>
+              <span class="doc-status" [class]="'status-' + doc.status">{{doc.status}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change History Modal -->
+    <div class="modal-overlay" *ngIf="showChangeHistory">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3>Change History</h3>
+          <button class="btn-close" (click)="showChangeHistory = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="history-list">
+            <div class="history-item" *ngFor="let item of changeHistory">
+              <div class="history-icon">
+                <span class="material-icons">edit</span>
+              </div>
+              <div class="history-content">
+                <div class="history-field">Field: {{item.field}}</div>
+                <div class="history-values">
+                  <span class="old-value">{{item.oldValue}}</span>
+                  <span class="material-icons">arrow_forward</span>
+                  <span class="new-value">{{item.newValue}}</span>
+                </div>
+                <div class="history-meta">
+                  Changed on {{item.changedAt | date:'medium'}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

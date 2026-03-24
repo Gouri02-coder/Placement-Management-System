@@ -1,0 +1,226 @@
+<div class="analytics-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Analytics Dashboard</h1>
+      <p>Real-time insights into placement performance and trends</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="refreshData()" aria-label="Refresh data">
+        <i class="material-icons" aria-hidden="true">refresh</i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Date Range Selector -->
+  <div class="date-range-section">
+    <div class="range-buttons">
+      <button class="range-btn" [class.active]="dateRange === 'week'" (click)="changeDateRange('week')">Week</button>
+      <button class="range-btn" [class.active]="dateRange === 'month'" (click)="changeDateRange('month')">Month</button>
+      <button class="range-btn" [class.active]="dateRange === 'quarter'" (click)="changeDateRange('quarter')">Quarter</button>
+      <button class="range-btn" [class.active]="dateRange === 'year'" (click)="changeDateRange('year')">Year</button>
+    </div>
+    <div class="custom-range">
+      <input type="date" [(ngModel)]="customStartDate">
+      <span>to</span>
+      <input type="date" [(ngModel)]="customEndDate">
+      <button class="btn-primary" (click)="loadDashboardData()">Apply</button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading">
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon placements">
+          <i class="material-icons" aria-hidden="true">work</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{formatNumber(metrics.totalPlacements)}}</h3>
+          <p>Total Placements</p>
+          <span class="trend positive">
+            <i class="material-icons" aria-hidden="true">trending_up</i> +{{metrics.growthRate}}%
+          </span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon companies">
+          <i class="material-icons" aria-hidden="true">business</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{metrics.totalCompanies}}</h3>
+          <p>Companies</p>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon jobs">
+          <i class="material-icons" aria-hidden="true">work_outline</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{metrics.totalJobs}}</h3>
+          <p>Job Openings</p>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon applications">
+          <i class="material-icons" aria-hidden="true">description</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{formatNumber(metrics.totalApplications)}}</h3>
+          <p>Applications</p>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon rate">
+          <i class="material-icons" aria-hidden="true">trending_up</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{metrics.placementRate}}%</h3>
+          <p>Placement Rate</p>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon salary">
+          <i class="material-icons" aria-hidden="true">attach_money</i>
+        </div>
+        <div class="metric-info">
+          <h3>{{formatSalary(metrics.averageSalary)}}</h3>
+          <p>Average Salary</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Placement Trend Chart -->
+      <div class="chart-card">
+        <h3>Placement Trend</h3>
+        <div class="bar-chart-container">
+          <div class="bar-chart">
+            <div class="bar-item" *ngFor="let data of placementTrend">
+              <div class="bar-label">{{data.month}}</div>
+              <div class="bar-wrapper">
+                <div class="bar-fill placements-bar" [style.height.%]="getBarHeight(data.placements)">
+                  <span class="bar-value">{{data.placements}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-color placements-color"></span>
+          <span>Actual Placements</span>
+        </div>
+      </div>
+
+      <!-- Top Companies -->
+      <div class="chart-card">
+        <h3>Top Hiring Companies</h3>
+        <div class="companies-list">
+          <div class="company-item" *ngFor="let company of topCompanies.slice(0, 5)">
+            <div class="company-logo">{{company.logo}}</div>
+            <div class="company-info">
+              <div class="company-name">{{company.name}}</div>
+              <div class="company-stats">
+                <span>{{company.placements}} hires</span>
+                <span>{{formatSalary(company.avgSalary)}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Performance -->
+    <div class="branch-section">
+      <h3>Branch-wise Performance</h3>
+      <div class="branch-table">
+        <div class="branch-header">
+          <span>Branch</span>
+          <span>Students</span>
+          <span>Placements</span>
+          <span>Rate</span>
+          <span>Avg Salary</span>
+        </div>
+        <div class="branch-row" *ngFor="let branch of branchPerformance">
+          <span class="branch-name">{{branch.name}}</span>
+          <span>{{branch.students}}</span>
+          <span>{{branch.placements}}</span>
+          <span>
+            <span class="rate-badge" [class]="getBranchClass(branch.rate)">
+              {{branch.rate}}%
+            </span>
+          </span>
+          <span class="salary">{{formatSalary(branch.avgSalary)}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill Demand -->
+    <div class="skills-section">
+      <h3>In-Demand Skills</h3>
+      <div class="skills-grid">
+        <div class="skill-card" *ngFor="let skill of skillDemand">
+          <div class="skill-header">
+            <span class="skill-name">{{skill.name}}</span>
+            <span class="skill-growth" [class]="getGrowthClass(skill.growth)">
+              <i class="material-icons" aria-hidden="true">{{getGrowthIcon(skill.growth)}}</i>
+              {{skill.growth}}%
+            </span>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" [class]="getDemandClass(skill.demand)" [style.width.%]="skill.demand"></div>
+          </div>
+          <div class="skill-demand">{{skill.demand}}% demand</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="two-column">
+      <!-- Recent Placements -->
+      <div class="recent-section">
+        <h3>Recent Placements</h3>
+        <div class="placements-list">
+          <div class="placement-item" *ngFor="let placement of recentPlacements">
+            <div class="placement-avatar">
+              {{placement.name.charAt(0)}}
+            </div>
+            <div class="placement-info">
+              <div class="placement-name">{{placement.name}}</div>
+              <div class="placement-details">
+                <span class="company">{{placement.company}}</span>
+                <span class="package">{{placement.package}}</span>
+                <span class="branch">{{placement.branch}}</span>
+              </div>
+            </div>
+            <div class="placement-date">{{formatDate(placement.date)}}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="notifications-section">
+        <h3>Notifications</h3>
+        <div class="notifications-list">
+          <div class="notification-item" *ngFor="let notification of notifications" [class]="getNotificationClass(notification.type)">
+            <div class="notification-icon">
+              <i class="material-icons" aria-hidden="true">{{getNotificationIcon(notification.type)}}</i>
+            </div>
+            <div class="notification-content">
+              <p>{{notification.message}}</p>
+              <span class="notification-time">{{notification.time}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

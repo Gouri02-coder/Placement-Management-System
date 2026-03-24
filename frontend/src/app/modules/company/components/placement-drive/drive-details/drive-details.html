@@ -1,0 +1,547 @@
+<div class="drive-details-container">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading drive details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!isLoading && error">
+    <i class="material-icons" aria-hidden="true">error_outline</i>
+    <h2>Error</h2>
+    <p>{{error}}</p>
+    <button class="btn-primary" (click)="goBack()">
+      <i class="material-icons" aria-hidden="true">arrow_back</i> Back to Drives
+    </button>
+  </div>
+
+  <!-- Drive Content -->
+  <div *ngIf="!isLoading && drive">
+    <!-- Header Section -->
+    <div class="header-section">
+      <button class="btn-back" (click)="goBack()">
+        <i class="material-icons" aria-hidden="true">arrow_back</i> Back to Drives
+      </button>
+      <div class="header-content">
+        <div class="company-header">
+          <div class="company-logo">
+            <img [src]="drive.companyLogo" [alt]="drive.companyName + ' logo'">
+          </div>
+          <div class="company-info">
+            <h1>{{drive.driveName}}</h1>
+            <p class="company-name">{{drive.companyName}}</p>
+            <div class="drive-meta">
+              <span class="drive-type" [class]="drive.driveType">
+                <i class="material-icons" aria-hidden="true">{{getDriveTypeIcon(drive.driveType)}}</i>
+                {{drive.driveType | uppercase}}
+              </span>
+              <span class="drive-status" [class]="getStatusClass(drive.status)">
+                <i class="material-icons" aria-hidden="true">{{getStatusIcon(drive.status)}}</i>
+                {{drive.status | uppercase}}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-outline" (click)="shareDrive()">
+            <i class="material-icons" aria-hidden="true">share</i> Share
+          </button>
+          <button 
+            class="btn-primary" 
+            (click)="openApplicationForm()" 
+            [disabled]="!isRegistrationOpen()"
+            [attr.aria-label]="isRegistrationOpen() ? 'Apply for this drive' : 'Registration closed'">
+            <i class="material-icons" aria-hidden="true">how_to_reg</i>
+            {{isRegistrationOpen() ? 'Apply Now' : 'Registration Closed'}}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <i class="material-icons" aria-hidden="true">event</i>
+        <div class="stat-info">
+          <span class="stat-value">{{formatDate(drive.driveDate)}}</span>
+          <span class="stat-label">Drive Date</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <i class="material-icons" aria-hidden="true">schedule</i>
+        <div class="stat-info">
+          <span class="stat-value">{{drive.driveTime}}</span>
+          <span class="stat-label">Time</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <i class="material-icons" aria-hidden="true">location_on</i>
+        <div class="stat-info">
+          <span class="stat-value">{{drive.venue}}</span>
+          <span class="stat-label">Venue</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <i class="material-icons" aria-hidden="true">people</i>
+        <div class="stat-info">
+          <span class="stat-value">{{drive.registeredCount}} / {{drive.vacancies}}</span>
+          <span class="stat-label">Registered</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="content-left">
+        <!-- Company Overview -->
+        <div class="info-card">
+          <h2>About {{drive.companyName}}</h2>
+          <p class="company-description">{{drive.companyDescription}}</p>
+          <div class="company-details-grid">
+            <div class="company-detail">
+              <i class="material-icons" aria-hidden="true">business</i>
+              <div>
+                <strong>Industry</strong>
+                <span>{{drive.industry}}</span>
+              </div>
+            </div>
+            <div class="company-detail">
+              <i class="material-icons" aria-hidden="true">groups</i>
+              <div>
+                <strong>Company Size</strong>
+                <span>{{drive.companySize}}</span>
+              </div>
+            </div>
+            <div class="company-detail">
+              <i class="material-icons" aria-hidden="true">location_city</i>
+              <div>
+                <strong>Headquarters</strong>
+                <span>{{drive.headquarters}}</span>
+              </div>
+            </div>
+            <div class="company-detail">
+              <i class="material-icons" aria-hidden="true">calendar_today</i>
+              <div>
+                <strong>Founded</strong>
+                <span>{{drive.founded}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="social-links">
+            <a *ngFor="let link of socialLinks" [href]="link.url" class="social-link" target="_blank" [attr.aria-label]="link.label">
+              <i class="material-icons" aria-hidden="true">{{link.icon}}</i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Positions Available -->
+        <div class="info-card">
+          <h2>Positions Available</h2>
+          <div class="positions-grid">
+            <div class="position-card" *ngFor="let position of drive.positions">
+              <div class="position-header">
+                <h3>{{position.title}}</h3>
+                <span class="vacancies">{{position.vacancies}} positions</span>
+              </div>
+              <p class="position-salary">{{position.salary}}</p>
+              <p class="position-description">{{position.description}}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Requirements & Benefits -->
+        <div class="info-card">
+          <h2>Requirements & Benefits</h2>
+          <div class="requirements-benefits">
+            <div class="requirements">
+              <h3><i class="material-icons" aria-hidden="true">check_circle</i> Requirements</h3>
+              <ul>
+                <li *ngFor="let req of drive.requirements">{{req}}</li>
+              </ul>
+            </div>
+            <div class="benefits">
+              <h3><i class="material-icons" aria-hidden="true">star</i> Benefits</h3>
+              <ul>
+                <li *ngFor="let benefit of drive.benefits">{{benefit}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="info-card">
+          <h2>Drive Timeline</h2>
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let event of timelineEvents; let i = index">
+              <div class="timeline-marker" [class.completed]="event.completed"></div>
+              <div class="timeline-content">
+                <div class="timeline-date">{{formatDate(event.date)}}</div>
+                <div class="timeline-title">{{event.title}}</div>
+                <div class="timeline-description">{{event.description}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="info-card">
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-list">
+            <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+              <div class="faq-question" (click)="toggleFAQ(i)">
+                <span>{{faq.question}}</span>
+                <i class="material-icons" aria-hidden="true">{{faq.open ? 'remove' : 'add'}}</i>
+              </div>
+              <div class="faq-answer" *ngIf="faq.open">
+                <p>{{faq.answer}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-right">
+        <!-- Eligibility Card -->
+        <div class="info-card">
+          <h2>Eligibility Criteria</h2>
+          <div class="eligibility-list">
+            <div class="eligibility-item">
+              <i class="material-icons" aria-hidden="true">school</i>
+              <div>
+                <strong>Eligible Branches</strong>
+                <div class="tags">
+                  <span class="tag" *ngFor="let branch of drive.eligibleBranches">{{branch}}</span>
+                </div>
+              </div>
+            </div>
+            <div class="eligibility-item">
+              <i class="material-icons" aria-hidden="true">trending_up</i>
+              <div>
+                <strong>Minimum CGPA</strong>
+                <span>{{drive.minCGPA || 'No minimum'}}</span>
+              </div>
+            </div>
+            <div class="eligibility-item">
+              <i class="material-icons" aria-hidden="true">date_range</i>
+              <div>
+                <strong>Passing Years</strong>
+                <div class="tags">
+                  <span class="tag" *ngFor="let year of drive.passingYears">{{year}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Info -->
+        <div class="info-card highlight">
+          <h2>Registration Information</h2>
+          <div class="registration-info">
+            <div class="reg-date" [class.urgent]="getDaysRemaining(drive.registrationDeadline) <= 7 && isRegistrationOpen()">
+              <i class="material-icons" aria-hidden="true">event</i>
+              <div>
+                <strong>Registration Deadline</strong>
+                <span>{{formatDate(drive.registrationDeadline)}}</span>
+                <span *ngIf="isRegistrationOpen()" class="days-left">
+                  {{getDaysRemaining(drive.registrationDeadline)}} days left
+                </span>
+              </div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-label">Registration Progress</div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="registrationStats.applicationRate"></div>
+              </div>
+              <div class="progress-stats">
+                <span>{{drive.registeredCount}} registered</span>
+                <span>{{drive.vacancies}} vacancies</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="info-card">
+          <h2>Contact Information</h2>
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="material-icons" aria-hidden="true">person</i>
+              <div>
+                <strong>Contact Person</strong>
+                <span>{{drive.contactPerson}}</span>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="material-icons" aria-hidden="true">email</i>
+              <div>
+                <strong>Email</strong>
+                <a [href]="'mailto:' + drive.contactEmail">{{drive.contactEmail}}</a>
+              </div>
+            </div>
+            <div class="contact-item">
+              <i class="material-icons" aria-hidden="true">phone</i>
+              <div>
+                <strong>Phone</strong>
+                <a [href]="'tel:' + drive.contactPhone">{{drive.contactPhone}}</a>
+              </div>
+            </div>
+            <div class="contact-item" *ngIf="drive.website">
+              <i class="material-icons" aria-hidden="true">language</i>
+              <div>
+                <strong>Website</strong>
+                <a [href]="drive.website" target="_blank">{{drive.website}}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="info-card" *ngIf="drive.additionalNotes">
+          <h2>Additional Notes</h2>
+          <div class="additional-notes">
+            <i class="material-icons" aria-hidden="true">info</i>
+            <p>{{drive.additionalNotes}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Form Modal with Full Validation -->
+<div class="modal" *ngIf="showApplicationForm" (click)="closeApplicationForm()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 id="modal-title">Apply for {{drive?.driveName}}</h2>
+      <button 
+        type="button" 
+        class="close-btn" 
+        (click)="closeApplicationForm()"
+        aria-label="Close application form"
+        title="Close">
+        <i class="material-icons" aria-hidden="true">close</i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form #appForm="ngForm" (ngSubmit)="submitApplication()" aria-labelledby="modal-title">
+        <!-- Row 1: Full Name and Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fullName">Full Name *</label>
+            <input 
+              type="text" 
+              id="fullName" 
+              [(ngModel)]="applicationForm.fullName" 
+              name="fullName" 
+              #fullName="ngModel"
+              required 
+              minlength="3"
+              maxlength="100"
+              aria-required="true"
+              aria-describedby="fullNameError">
+            <div id="fullNameError" class="error-message" *ngIf="fullName.invalid && fullName.touched">
+              <span *ngIf="fullName.errors?.['required']">Full name is required</span>
+              <span *ngIf="fullName.errors?.['minlength']">Name must be at least 3 characters</span>
+              <span *ngIf="fullName.errors?.['maxlength']">Name cannot exceed 100 characters</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input 
+              type="email" 
+              id="email" 
+              [(ngModel)]="applicationForm.email" 
+              name="email" 
+              #email="ngModel"
+              required 
+              email
+              aria-required="true"
+              aria-describedby="emailError">
+            <div id="emailError" class="error-message" *ngIf="email.invalid && email.touched">
+              <span *ngIf="email.errors?.['required']">Email is required</span>
+              <span *ngIf="email.errors?.['email']">Please enter a valid email address</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Phone Number and Roll Number -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone Number *</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              [(ngModel)]="applicationForm.phone" 
+              name="phone" 
+              #phone="ngModel"
+              required 
+              pattern="^[0-9]{10}$"
+              aria-required="true"
+              aria-describedby="phoneError">
+            <div id="phoneError" class="error-message" *ngIf="phone.invalid && phone.touched">
+              <span *ngIf="phone.errors?.['required']">Phone number is required</span>
+              <span *ngIf="phone.errors?.['pattern']">Please enter a valid 10-digit phone number</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rollNumber">Roll Number *</label>
+            <input 
+              type="text" 
+              id="rollNumber" 
+              [(ngModel)]="applicationForm.rollNumber" 
+              name="rollNumber" 
+              #rollNumber="ngModel"
+              required 
+              pattern="^[A-Za-z0-9]{5,20}$"
+              aria-required="true"
+              aria-describedby="rollNumberError">
+            <div id="rollNumberError" class="error-message" *ngIf="rollNumber.invalid && rollNumber.touched">
+              <span *ngIf="rollNumber.errors?.['required']">Roll number is required</span>
+              <span *ngIf="rollNumber.errors?.['pattern']">Roll number should be 5-20 alphanumeric characters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Branch and Passing Year -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="branch">Branch *</label>
+            <select 
+              id="branch" 
+              [(ngModel)]="applicationForm.branch" 
+              name="branch" 
+              #branch="ngModel"
+              required
+              aria-required="true"
+              aria-describedby="branchError">
+              <option value="">Select Branch</option>
+              <option *ngFor="let branch of branchOptions" [value]="branch">{{branch}}</option>
+            </select>
+            <div id="branchError" class="error-message" *ngIf="branch.invalid && branch.touched">
+              Please select your branch
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="passingYear">Passing Year *</label>
+            <select 
+              id="passingYear" 
+              [(ngModel)]="applicationForm.passingYear" 
+              name="passingYear" 
+              #passingYear="ngModel"
+              required
+              aria-required="true"
+              aria-describedby="passingYearError">
+              <option value="">Select Year</option>
+              <option *ngFor="let year of passingYearsOptions" [value]="year">{{year}}</option>
+            </select>
+            <div id="passingYearError" class="error-message" *ngIf="passingYear.invalid && passingYear.touched">
+              Please select your passing year
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: CGPA and Resume Link -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cgpa">CGPA (Optional)</label>
+            <input 
+              type="number" 
+              id="cgpa" 
+              [(ngModel)]="applicationForm.cgpa" 
+              name="cgpa" 
+              #cgpa="ngModel"
+              step="0.01" 
+              min="0" 
+              max="10"
+              aria-describedby="cgpaError cgpaHelp">
+            <div id="cgpaError" class="error-message" *ngIf="cgpa.invalid && cgpa.touched">
+              <span *ngIf="cgpa.errors?.['min']">CGPA cannot be less than 0</span>
+              <span *ngIf="cgpa.errors?.['max']">CGPA cannot exceed 10</span>
+            </div>
+            <div id="cgpaHelp" class="help-text">CGPA should be between 0 and 10</div>
+          </div>
+          <div class="form-group">
+            <label for="resumeLink">Resume Link (Optional)</label>
+            <input 
+              type="url" 
+              id="resumeLink" 
+              [(ngModel)]="applicationForm.resumeLink" 
+              name="resumeLink" 
+              #resumeLink="ngModel"
+              pattern="https?://.+"
+              aria-describedby="resumeLinkError resumeLinkHelp">
+            <div id="resumeLinkError" class="error-message" *ngIf="resumeLink.invalid && resumeLink.touched">
+              <span *ngIf="resumeLink.errors?.['pattern']">Please enter a valid URL (e.g., https://drive.google.com/...)</span>
+            </div>
+            <div id="resumeLinkHelp" class="help-text">Google Drive or OneDrive link to your resume</div>
+          </div>
+        </div>
+
+        <!-- Row 5: Cover Letter (Full Width) -->
+        <div class="form-group">
+          <label for="coverLetter">Cover Letter (Optional)</label>
+          <textarea 
+            id="coverLetter" 
+            [(ngModel)]="applicationForm.coverLetter" 
+            name="coverLetter" 
+            #coverLetter="ngModel"
+            rows="4" 
+            minlength="50"
+            maxlength="1000"
+            placeholder="Tell us why you're interested in this opportunity..."
+            aria-describedby="coverLetterError coverLetterCount"></textarea>
+          <div id="coverLetterError" class="error-message" *ngIf="coverLetter.invalid && coverLetter.touched">
+            <span *ngIf="coverLetter.errors?.['minlength']">Cover letter should be at least 50 characters</span>
+            <span *ngIf="coverLetter.errors?.['maxlength']">Cover letter cannot exceed 1000 characters</span>
+          </div>
+          <div id="coverLetterCount" class="char-count" *ngIf="applicationForm.coverLetter">
+            {{applicationForm.coverLetter.length}} / 1000 characters
+          </div>
+        </div>
+
+        <!-- Row 6: Additional Information (Full Width) -->
+        <div class="form-group">
+          <label for="additionalInfo">Additional Information (Optional)</label>
+          <textarea 
+            id="additionalInfo" 
+            [(ngModel)]="applicationForm.additionalInfo" 
+            name="additionalInfo" 
+            #additionalInfo="ngModel"
+            rows="3" 
+            maxlength="500"
+            placeholder="Any other information you'd like to share..."
+            aria-describedby="additionalInfoError additionalInfoCount"></textarea>
+          <div id="additionalInfoError" class="error-message" *ngIf="additionalInfo.invalid && additionalInfo.touched">
+            <span *ngIf="additionalInfo.errors?.['maxlength']">Additional information cannot exceed 500 characters</span>
+          </div>
+          <div id="additionalInfoCount" class="char-count" *ngIf="applicationForm.additionalInfo">
+            {{applicationForm.additionalInfo.length}} / 500 characters
+          </div>
+        </div>
+
+        <!-- Form Validation Summary -->
+        <div class="form-summary" *ngIf="appForm.invalid && appForm.touched" role="alert">
+          <i class="material-icons" aria-hidden="true">warning</i>
+          <span>Please fill in all required fields correctly before submitting.</span>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn-secondary" 
+            (click)="closeApplicationForm()"
+            aria-label="Cancel and close form">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || appForm.invalid"
+            aria-label="Submit application">
+            <i class="material-icons" *ngIf="isSubmitting" class="spin">refresh</i>
+            {{isSubmitting ? 'Submitting...' : 'Submit Application'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

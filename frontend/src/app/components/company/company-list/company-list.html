@@ -1,0 +1,37 @@
+<section class="page-card">
+  <header>
+    <h2>View Companies</h2>
+    <p>Track company status, openings, and package trends.</p>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" [(ngModel)]="search" placeholder="Search by ID, company, or sector" />
+    <select [(ngModel)]="statusFilter">
+      <option value="All">All Status</option>
+      <option value="Approved">Approved</option>
+      <option value="Pending">Pending</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+    <span class="count">{{ filteredCompanies.length }} companies</span>
+  </div>
+
+  <div class="grid">
+    <article class="company-card" *ngFor="let company of filteredCompanies">
+      <div class="title-row">
+        <div>
+          <h3>{{ company.name }}</h3>
+          <small>{{ company.id }}</small>
+        </div>
+        <span class="chip" [class]="'chip ' + company.status">{{ company.status }}</span>
+      </div>
+      <p><strong>Sector:</strong> {{ company.sector }}</p>
+      <p><strong>Openings:</strong> {{ company.openings }}</p>
+      <p><strong>CTC:</strong> {{ company.packageLpa }} LPA</p>
+
+      <div class="actions">
+        <button type="button" (click)="toggleApproval(company)">Toggle Approval</button>
+        <a [routerLink]="['/admin/companies/details', company.id]">Details</a>
+      </div>
+    </article>
+  </div>
+</section>

@@ -1,0 +1,45 @@
+<section class="company-details">
+  <a class="back-link" [routerLink]="'/placement/companies/list'">Back to company list</a>
+
+  <section class="state-card" *ngIf="isLoading">Loading company details...</section>
+  <section class="state-card error" *ngIf="!isLoading && errorMessage">{{ errorMessage }}</section>
+
+  <ng-container *ngIf="!isLoading && company">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Company Profile</p>
+        <h2>{{ company.name }}</h2>
+        <p class="meta">{{ company.industry }} • {{ company.location }}</p>
+        <p class="description">{{ company.description || 'No company description available yet.' }}</p>
+      </div>
+      <aside class="contact-card">
+        <h3>PTO View</h3>
+        <p>{{ company.contactName }}</p>
+        <span>{{ company.contactRole }}</span>
+        <small>{{ company.contactEmail || 'Email not available' }}</small>
+        <strong>{{ company.status }}</strong>
+      </aside>
+    </header>
+
+    <div class="content-grid">
+      <article class="summary-card">
+        <h3>Company Snapshot</h3>
+        <div class="detail-grid">
+          <div><span>Company ID</span><strong>{{ company.id }}</strong></div>
+          <div><span>Industry</span><strong>{{ company.industry }}</strong></div>
+          <div><span>Location</span><strong>{{ company.location }}</strong></div>
+          <div><span>Approval State</span><strong>{{ company.status }}</strong></div>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <h3>PTO Notes</h3>
+        <ul>
+          <li>Registration data shown here is coming from the company database record.</li>
+          <li>PTO approval or rejection updates the same company row used across the app.</li>
+          <li>Company dashboard can consume the same verification state for visibility.</li>
+        </ul>
+      </article>
+    </div>
+  </ng-container>
+</section>

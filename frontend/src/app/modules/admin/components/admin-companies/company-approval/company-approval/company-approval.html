@@ -1,0 +1,45 @@
+<section class="approval-card">
+  <header>
+    <h2>Company Approval Queue</h2>
+    <p>Review submitted companies, verify details, and approve/reject onboarding requests.</p>
+  </header>
+
+  <div class="toolbar">
+    <input [(ngModel)]="query" type="text" placeholder="Search by id, company, sector" />
+    <label>
+      <input type="checkbox" [(ngModel)]="showOnlyPending" />
+      Show only pending
+    </label>
+    <span>{{ filteredApprovals.length }} items</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Company</th>
+          <th>Sector</th>
+          <th>Contact</th>
+          <th>Submitted</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredApprovals">
+          <td>{{ item.id }}</td>
+          <td><a [routerLink]="['/admin/companies/details', item.id]">{{ item.name }}</a></td>
+          <td>{{ item.sector }}</td>
+          <td>{{ item.contact }}</td>
+          <td>{{ item.submittedOn }}</td>
+          <td><span class="status" [class]="item.status">{{ item.status }}</span></td>
+          <td class="actions">
+            <button type="button" (click)="approve(item)">Approve</button>
+            <button type="button" class="danger" (click)="reject(item)">Reject</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
