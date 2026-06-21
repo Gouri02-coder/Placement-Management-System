@@ -2,30 +2,26 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
+import {
+  AdminApprovalStoreService,
+  ApprovalItem
+} from '../../admin-approval-store.service';
+
 interface OverviewCard {
   label: string;
   value: string;
   trend: string;
-  icon: 'students' | 'companies' | 'roles' | 'placements';
+  icon: 'students' | 'companies' | 'drives' | 'reports';
 }
 
 interface QuickLink {
   label: string;
   route: string;
-  icon: 'students' | 'companies' | 'approval' | 'drives' | 'reports';
-}
-
-interface PendingTask {
-  title: string;
-  priority: 'high' | 'medium' | 'low';
-  route: string;
-  icon: 'approval' | 'schedule' | 'review';
 }
 
 interface RecentEvent {
   event: string;
   time: string;
-  icon: 'schedule' | 'companies' | 'reports';
 }
 
 @Component({
@@ -39,37 +35,42 @@ export class AdminDashboard {
   overviewCards: OverviewCard[] = [
     { label: 'Registered Students', value: '1,284', trend: '+12%', icon: 'students' },
     { label: 'Active Companies', value: '86', trend: '+8%', icon: 'companies' },
-    { label: 'Open Roles', value: '214', trend: '+5%', icon: 'roles' },
-    { label: 'Placements This Month', value: '73', trend: '+18%', icon: 'placements' }
+    { label: 'Active Drives', value: '24', trend: '+5%', icon: 'drives' },
+    { label: 'Reports Generated', value: '73', trend: '+18%', icon: 'reports' }
   ];
 
   quickLinks: QuickLink[] = [
-    { label: 'View All Students', route: '/admin/students/list', icon: 'students' },
-    { label: 'View Companies', route: '/admin/companies', icon: 'companies' },
-    { label: 'Approve Companies', route: '/admin/companies/approval', icon: 'approval' },
-    { label: 'Manage Drives', route: '/admin/drives/management', icon: 'drives' },
-    { label: 'View Reports', route: '/admin/reports', icon: 'reports' }
-  ];
-
-  pendingTasks: PendingTask[] = [
-    { title: 'Verify 12 company profiles', priority: 'high', route: '/admin/companies/approval', icon: 'approval' },
-    { title: 'Review 7 new drive requests', priority: 'medium', route: '/admin/drives/schedule', icon: 'schedule' },
-    { title: 'Approve 19 student documents', priority: 'low', route: '/admin/students/list', icon: 'review' }
+    { label: 'View All Students', route: '/admin/students/list' },
+    { label: 'View Companies', route: '/admin/companies' },
+    { label: 'Approve Companies', route: '/admin/companies/approval' },
+    { label: 'Manage Drives', route: '/admin/drives/management' },
+    { label: 'View Reports', route: '/admin/reports' }
   ];
 
   recentEvents: RecentEvent[] = [
-    { event: 'Placement drive scheduled by Nexora Labs', time: '15 mins ago', icon: 'schedule' },
-    { event: 'New company ByteCraft completed verification', time: '1 hour ago', icon: 'companies' },
-    { event: 'Admin exported monthly placement report', time: '3 hours ago', icon: 'reports' }
+    { event: 'Placement drive scheduled by Nexora Labs', time: '15 mins ago' },
+    { event: 'New company ByteCraft completed verification', time: '1 hour ago' },
+    { event: 'Admin exported monthly placement report', time: '3 hours ago' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private approvalStore: AdminApprovalStoreService
+  ) {}
+
+  get pendingApprovals(): ApprovalItem[] {
+    return this.approvalStore.pendingApprovals;
+  }
 
   openReports(): void {
     this.router.navigate(['/admin/reports']);
   }
 
-  reviewTask(route: string): void {
-    this.router.navigate([route]);
+  openApprovalQueue(): void {
+    this.router.navigate(['/admin/companies/approval']);
+  }
+
+  reviewApproval(item: ApprovalItem): void {
+    this.router.navigate(['/admin/companies/details', item.id]);
   }
 }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CompanyDriveRecord, getCompanyDrives, getCompanyPortalContext } from '../../../data/company-drive.data';
 
 @Component({
   selector: 'app-drive-list',
@@ -10,46 +11,44 @@ import { RouterModule } from '@angular/router';
   styleUrl: './drive-list.css',
 })
 export class DriveList implements OnInit {
-  drives: any[] = [];
-  filteredDrives: any[] = [];
+  companyName = '';
+  companyBadge = '';
+  drives: CompanyDriveRecord[] = [];
+  filteredDrives: CompanyDriveRecord[] = [];
   isLoading = true;
-  
-  // Filter properties
+
   searchTerm = '';
   selectedStatus = 'all';
   selectedType = 'all';
   selectedBranch = 'all';
-  
-  // Pagination
+
   currentPage = 1;
-  itemsPerPage = 8;
+  itemsPerPage = 6;
   totalPages = 1;
-  
-  // Statistics
+
   stats = {
     total: 0,
     upcoming: 0,
     ongoing: 0,
-    completed: 0
+    completed: 0,
   };
-  
-  // Filter options
+
   driveTypes = [
     { value: 'all', label: 'All Types' },
     { value: 'onCampus', label: 'On-Campus' },
     { value: 'offCampus', label: 'Off-Campus' },
     { value: 'virtual', label: 'Virtual' },
-    { value: 'hybrid', label: 'Hybrid' }
+    { value: 'hybrid', label: 'Hybrid' },
   ];
-  
+
   driveStatuses = [
     { value: 'all', label: 'All Status' },
     { value: 'scheduled', label: 'Scheduled' },
     { value: 'ongoing', label: 'Ongoing' },
     { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' }
+    { value: 'cancelled', label: 'Cancelled' },
   ];
-  
+
   branches = [
     'Computer Science',
     'Information Technology',
@@ -60,189 +59,63 @@ export class DriveList implements OnInit {
     'Chemical Engineering',
     'Biotechnology',
     'Data Science',
-    'Artificial Intelligence'
+    'Artificial Intelligence',
   ];
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadDrives();
   }
 
   private loadDrives(): void {
-    // Simulate API call - replace with actual service
+    const context = getCompanyPortalContext();
+
+    this.companyName = context.companyName;
+    this.companyBadge = context.companyBadge;
+
     setTimeout(() => {
-      this.drives = [
-        {
-          id: 1,
-          driveName: 'Tech Mahindra Campus Drive',
-          driveType: 'onCampus',
-          companyName: 'Tech Mahindra',
-          companyLogo: 'https://via.placeholder.com/60x60?text=TM',
-          driveDate: '2024-04-15',
-          driveTime: '10:00 AM',
-          venue: 'Main Auditorium',
-          eligibleBranches: ['Computer Science', 'Information Technology'],
-          minCGPA: 7.0,
-          passingYears: [2024, 2025],
-          positions: ['Software Developer', 'QA Engineer'],
-          vacancies: 25,
-          registeredCount: 156,
-          status: 'scheduled',
-          description: 'Tech Mahindra is conducting a campus drive for final year students. They are looking for talented individuals with strong programming skills.',
-          registrationDeadline: '2024-04-10',
-          contactPerson: 'HR Manager',
-          contactEmail: 'hr@techmahindra.com',
-          contactPhone: '+91 1234567890'
-        },
-        {
-          id: 2,
-          driveName: 'Infosys Virtual Drive',
-          driveType: 'virtual',
-          companyName: 'Infosys',
-          companyLogo: 'https://via.placeholder.com/60x60?text=INF',
-          driveDate: '2024-04-20',
-          driveTime: '11:00 AM',
-          venue: 'Online - Microsoft Teams',
-          eligibleBranches: ['Computer Science', 'Information Technology', 'Electronics & Communication'],
-          minCGPA: 6.5,
-          passingYears: [2024],
-          positions: ['System Engineer', 'Digital Specialist'],
-          vacancies: 50,
-          registeredCount: 342,
-          status: 'scheduled',
-          description: 'Infosys is hiring fresh graduates for multiple roles. Candidates with good communication skills and technical knowledge are preferred.',
-          registrationDeadline: '2024-04-15',
-          contactPerson: 'Recruitment Team',
-          contactEmail: 'careers@infosys.com',
-          contactPhone: '+91 9876543210'
-        },
-        {
-          id: 3,
-          driveName: 'Amazon Off-Campus Drive',
-          driveType: 'offCampus',
-          companyName: 'Amazon',
-          companyLogo: 'https://via.placeholder.com/60x60?text=AMZ',
-          driveDate: '2024-04-05',
-          driveTime: '09:30 AM',
-          venue: 'Conference Room - Block B',
-          eligibleBranches: ['Computer Science', 'Information Technology', 'Data Science'],
-          minCGPA: 7.5,
-          passingYears: [2023, 2024],
-          positions: ['Software Development Engineer'],
-          vacancies: 15,
-          registeredCount: 89,
-          status: 'ongoing',
-          description: 'Amazon is looking for talented software engineers who are passionate about building scalable solutions.',
-          registrationDeadline: '2024-04-01',
-          contactPerson: 'Technical Recruiter',
-          contactEmail: 'tech-recruit@amazon.com',
-          contactPhone: '+91 1122334455'
-        },
-        {
-          id: 4,
-          driveName: 'TCS NQT Drive',
-          driveType: 'hybrid',
-          companyName: 'TCS',
-          companyLogo: 'https://via.placeholder.com/60x60?text=TCS',
-          driveDate: '2024-03-25',
-          driveTime: '02:00 PM',
-          venue: 'Hybrid Mode',
-          eligibleBranches: ['Computer Science', 'Information Technology', 'Electronics & Communication', 'Mechanical'],
-          minCGPA: 6.0,
-          passingYears: [2024],
-          positions: ['Assistant System Engineer', 'IT Analyst'],
-          vacancies: 100,
-          registeredCount: 567,
-          status: 'completed',
-          description: 'TCS National Qualifier Test recruitment drive for fresh graduates across various disciplines.',
-          registrationDeadline: '2024-03-20',
-          contactPerson: 'HR Department',
-          contactEmail: 'hr@tcs.com',
-          contactPhone: '+91 9988776655'
-        },
-        {
-          id: 5,
-          driveName: 'Microsoft Campus Drive',
-          driveType: 'onCampus',
-          companyName: 'Microsoft',
-          companyLogo: 'https://via.placeholder.com/60x60?text=MS',
-          driveDate: '2024-05-10',
-          driveTime: '10:30 AM',
-          venue: 'Seminar Hall - Block A',
-          eligibleBranches: ['Computer Science', 'Information Technology'],
-          minCGPA: 8.0,
-          passingYears: [2024],
-          positions: ['Software Engineer', 'Program Manager'],
-          vacancies: 20,
-          registeredCount: 210,
-          status: 'scheduled',
-          description: 'Microsoft is coming for campus recruitment. Looking for exceptional coding skills and problem-solving abilities.',
-          registrationDeadline: '2024-05-05',
-          contactPerson: 'Campus Recruitment Team',
-          contactEmail: 'campus@microsoft.com',
-          contactPhone: '+91 5566778899'
-        },
-        {
-          id: 6,
-          driveName: 'Google Virtual Drive',
-          driveType: 'virtual',
-          companyName: 'Google',
-          companyLogo: 'https://via.placeholder.com/60x60?text=GOOG',
-          driveDate: '2024-05-15',
-          driveTime: '11:00 AM',
-          venue: 'Online - Google Meet',
-          eligibleBranches: ['Computer Science', 'Information Technology', 'Data Science'],
-          minCGPA: 8.5,
-          passingYears: [2024],
-          positions: ['Software Developer', 'Data Analyst'],
-          vacancies: 10,
-          registeredCount: 450,
-          status: 'scheduled',
-          description: 'Google is conducting a virtual drive for top performers. Exceptional coding and analytical skills required.',
-          registrationDeadline: '2024-05-10',
-          contactPerson: 'Talent Acquisition',
-          contactEmail: 'talent@google.com',
-          contactPhone: '+91 4455667788'
-        }
-      ];
-      
+      this.drives = getCompanyDrives();
       this.filteredDrives = [...this.drives];
       this.updateStats();
       this.calculateTotalPages();
       this.isLoading = false;
-    }, 1000);
+    }, 350);
   }
 
   private updateStats(): void {
     this.stats.total = this.drives.length;
-    this.stats.upcoming = this.drives.filter(d => d.status === 'scheduled').length;
-    this.stats.ongoing = this.drives.filter(d => d.status === 'ongoing').length;
-    this.stats.completed = this.drives.filter(d => d.status === 'completed').length;
+    this.stats.upcoming = this.drives.filter((drive) => drive.status === 'scheduled').length;
+    this.stats.ongoing = this.drives.filter((drive) => drive.status === 'ongoing').length;
+    this.stats.completed = this.drives.filter((drive) => drive.status === 'completed').length;
   }
 
   applyFilters(): void {
-    this.filteredDrives = this.drives.filter(drive => {
-      const matchesSearch = drive.driveName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                           drive.companyName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                           drive.description.toLowerCase().includes(this.searchTerm.toLowerCase());
+    this.filteredDrives = this.drives.filter((drive) => {
+      const matchesSearch =
+        drive.driveName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        drive.driveCode.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        drive.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        drive.roles.some((role) => role.title.toLowerCase().includes(this.searchTerm.toLowerCase()));
       const matchesStatus = this.selectedStatus === 'all' || drive.status === this.selectedStatus;
       const matchesType = this.selectedType === 'all' || drive.driveType === this.selectedType;
       const matchesBranch = this.selectedBranch === 'all' || drive.eligibleBranches.includes(this.selectedBranch);
-      
+
       return matchesSearch && matchesStatus && matchesType && matchesBranch;
     });
-    
+
     this.currentPage = 1;
     this.calculateTotalPages();
   }
 
   private calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredDrives.length / this.itemsPerPage);
-    if (this.totalPages === 0) this.totalPages = 1;
+    if (this.totalPages === 0) {
+      this.totalPages = 1;
+    }
   }
 
-  get paginatedDrives(): any[] {
+  get paginatedDrives(): CompanyDriveRecord[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredDrives.slice(startIndex, startIndex + this.itemsPerPage);
   }
@@ -259,15 +132,15 @@ export class DriveList implements OnInit {
     const maxVisiblePages = 5;
     let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+
+    for (let page = startPage; page <= endPage; page += 1) {
+      pages.push(page);
     }
-    
+
     return pages;
   }
 
@@ -279,54 +152,16 @@ export class DriveList implements OnInit {
     this.applyFilters();
   }
 
-  viewDetails(drive: any): void {
-    console.log('View details for drive:', drive);
-    alert(`Viewing details for ${drive.driveName}`);
-    // Navigate to details page
-    // this.router.navigate(['/company/drives', drive.id]);
+  viewDetails(drive: CompanyDriveRecord): void {
+    this.router.navigate(['/company/drives/details', drive.id], {
+      queryParams: { tab: 'overview' },
+    });
   }
 
-  registerForDrive(drive: any): void {
-    if (drive.status === 'scheduled' && new Date(drive.registrationDeadline) > new Date()) {
-      console.log('Registering for drive:', drive);
-      alert(`You have successfully registered for ${drive.driveName}!`);
-    } else if (drive.status === 'ongoing') {
-      alert(`Registration is currently closed for ${drive.driveName}. The drive is already ongoing.`);
-    } else if (drive.status === 'completed') {
-      alert(`${drive.driveName} has already been completed.`);
-    } else if (new Date(drive.registrationDeadline) <= new Date()) {
-      alert(`Registration deadline for ${drive.driveName} has passed.`);
-    }
-  }
-
-  getStatusClass(status: string): string {
-    switch (status) {
-      case 'scheduled': return 'status-scheduled';
-      case 'ongoing': return 'status-ongoing';
-      case 'completed': return 'status-completed';
-      case 'cancelled': return 'status-cancelled';
-      default: return '';
-    }
-  }
-
-  getStatusIcon(status: string): string {
-    switch (status) {
-      case 'scheduled': return 'schedule';
-      case 'ongoing': return 'play_circle';
-      case 'completed': return 'check_circle';
-      case 'cancelled': return 'cancel';
-      default: return 'info';
-    }
-  }
-
-  getDriveTypeIcon(type: string): string {
-    switch (type) {
-      case 'onCampus': return 'business';
-      case 'offCampus': return 'location_city';
-      case 'virtual': return 'computer';
-      case 'hybrid': return 'sync';
-      default: return 'event';
-    }
+  manageDrive(drive: CompanyDriveRecord): void {
+    this.router.navigate(['/company/drives/details', drive.id], {
+      queryParams: { tab: 'roles' },
+    });
   }
 
   getDaysRemaining(date: string): number {
@@ -337,8 +172,34 @@ export class DriveList implements OnInit {
   }
 
   formatDate(date: string): string {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  getTotalRoles(drive: CompanyDriveRecord): number {
+    return drive.roles.length;
+  }
+
+  getFilledSeats(drive: CompanyDriveRecord): number {
+    return drive.roles.reduce((count, role) => count + role.offers, 0);
+  }
+
+  getDriveTypeLabel(type: CompanyDriveRecord['driveType']): string {
+    switch (type) {
+      case 'onCampus':
+        return 'On-Campus';
+      case 'offCampus':
+        return 'Off-Campus';
+      case 'virtual':
+        return 'Virtual';
+      case 'hybrid':
+        return 'Hybrid';
+      default:
+        return type;
+    }
   }
 
   isRegistrationOpen(deadline: string, status: string): boolean {

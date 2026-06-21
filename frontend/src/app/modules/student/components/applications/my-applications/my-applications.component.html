@@ -1,167 +1,125 @@
-<div class="applications-container">
-  <div class="applications-header">
-    <h1>My Applications</h1>
-    <p>Track your job applications and their status</p>
-  </div>
+<div class="applications-shell">
+  <section class="applications-hero">
+    <div>
+      <p class="eyebrow">Student Applications</p>
+      <h1>Application Studio</h1>
+      <p>
+        Track your latest applications, review recruiter movement, and polish submissions before the next shortlist.
+      </p>
+    </div>
+    <a routerLink="/student/job-portals" class="hero-action">Explore Job Portals</a>
+  </section>
 
-  <!-- Status Filters -->
-  <div class="status-filters">
-    <div 
+  <section class="summary-grid">
+    <article class="summary-card total">
+      <span class="summary-kicker">Applications</span>
+      <strong>{{ totalApplications }}</strong>
+      <p>Live job submissions across active companies</p>
+    </article>
+    <article class="summary-card review">
+      <span class="summary-kicker">In Motion</span>
+      <strong>{{ activeReviews }}</strong>
+      <p>Applications currently moving through review</p>
+    </article>
+    <article class="summary-card interview">
+      <span class="summary-kicker">Interviews</span>
+      <strong>{{ upcomingInterviews }}</strong>
+      <p>Upcoming conversations already scheduled</p>
+    </article>
+    <article class="summary-card score">
+      <span class="summary-kicker">Avg Match</span>
+      <strong>{{ averageMatchScore }}%</strong>
+      <p>Fit score across your current application mix</p>
+    </article>
+  </section>
+
+  <section class="filters-grid">
+    <button
       *ngFor="let filter of statusFilters"
-      class="filter-item"
+      type="button"
+      class="filter-card"
       [class.active]="selectedStatus === filter.value"
       (click)="filterByStatus(filter.value)">
-      <div class="filter-icon">
-        <i [class]="getStatusIcon(filter.value)"></i>
-      </div>
-      <div class="filter-info">
-        <span class="filter-count">{{ filter.count }}</span>
-        <span class="filter-label">{{ filter.label }}</span>
-      </div>
-    </div>
-  </div>
+      <span class="filter-icon">{{ filter.icon }}</span>
+      <strong>{{ filter.count }}</strong>
+      <span>{{ filter.label }}</span>
+      <small>{{ filter.helper }}</small>
+    </button>
+  </section>
 
-  <!-- Applications List -->
-  <div class="applications-content">
-    <!-- Loading State -->
+  <section class="applications-content">
     <div *ngIf="isLoading" class="loading-state">
       <div class="spinner"></div>
       <p>Loading your applications...</p>
     </div>
 
-    <!-- Applications Grid -->
-    <div *ngIf="!isLoading" class="applications-grid">
-      <div 
-        *ngFor="let application of filteredApplications" 
+    <div *ngIf="!isLoading && filteredApplications.length > 0" class="application-grid">
+      <article
+        *ngFor="let application of filteredApplications"
         class="application-card"
         [class]="getStatusClass(application.status)">
-        
-        <!-- Application Header -->
-        <div class="app-header">
-          <div class="job-info">
-            <h3 class="job-title">{{ application.jobTitle }}</h3>
-            <p class="company-name">{{ application.companyName }}</p>
-            <span class="app-date">
-              Applied {{ getDaysSinceApplied(application.appliedDate) }}
-            </span>
+        <div class="card-head">
+          <div>
+            <p class="company-chip">{{ application.companyName }}</p>
+            <h3>{{ application.jobTitle }}</h3>
+            <p class="meta-line">
+              {{ application.roleTrack }} | {{ application.locationPreference }} | Applied {{ getDaysSinceApplied(application.appliedDate) }}
+            </p>
           </div>
-          <div class="status-section">
-            <div class="status-badge {{ application.status }}">
-              <i [class]="getStatusIcon(application.status)"></i>
-              {{ application.status | titlecase }}
-            </div>
+          <span class="status-pill" [class]="application.status">{{ getStatusLabel(application.status) }}</span>
+        </div>
+
+        <div class="card-stats">
+          <div>
+            <span>Match Score</span>
+            <strong>{{ application.matchScore }}%</strong>
+          </div>
+          <div>
+            <span>Application ID</span>
+            <strong>{{ application.id }}</strong>
+          </div>
+          <div>
+            <span>Interview</span>
+            <strong>{{ application.interviewDate ? (application.interviewDate | date:'mediumDate') : 'Awaiting update' }}</strong>
           </div>
         </div>
 
-        <!-- Application Details -->
-        <div class="app-details">
-          <div class="detail-item">
-            <label>Application ID:</label>
-            <span>{{ application.id }}</span>
+        <div class="card-body">
+          <div class="skills-row">
+            <span *ngFor="let skill of application.skillsSnapshot">{{ skill }}</span>
           </div>
-          <div class="detail-item">
-            <label>Applied On:</label>
-            <span>{{ application.appliedDate | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-item" *ngIf="application.interviewDate">
-            <label>Interview Date:</label>
-            <span>{{ application.interviewDate | date:'medium' }}</span>
+          <p class="recruiter-note">{{ application.recruiterNote }}</p>
+        </div>
+
+        <div class="timeline-preview">
+          <div *ngFor="let milestone of application.milestones.slice(0, 2)">
+            <strong>{{ milestone.label }}</strong>
+            <span>{{ milestone.date }}</span>
           </div>
         </div>
 
-        <!-- Application Actions -->
-        <div class="app-actions">
-          <button 
-            class="view-job-btn"
-            [routerLink]="['/student/job-details', application.jobId]">
-            <i class="fas fa-eye"></i>
-            View Job
-          </button>
-          
-          <button 
-            class="withdraw-btn"
+        <div class="card-actions">
+          <a class="secondary-btn link-btn" [routerLink]="['/student/applications/details', application.id]">View Details</a>
+          <a class="primary-btn link-btn" [routerLink]="['/student/applications/edit', application.id]">Edit Application</a>
+          <button
+            type="button"
+            class="ghost-btn"
             (click)="withdrawApplication(application.id)"
             *ngIf="application.status === 'applied' || application.status === 'under-review'">
-            <i class="fas fa-times"></i>
             Withdraw
           </button>
-
-          <button 
-            class="interview-btn"
-            *ngIf="application.status === 'shortlisted'"
-            [routerLink]="['/student/interviews']">
-            <i class="fas fa-calendar-alt"></i>
-            View Interview
-          </button>
         </div>
-
-        <!-- Status Progress -->
-        <div class="status-progress">
-          <div class="progress-steps">
-            <div 
-              class="step applied"
-              [class.active]="['applied', 'under-review', 'shortlisted', 'selected'].includes(application.status)">
-              <div class="step-icon">
-                <i class="fas fa-paper-plane"></i>
-              </div>
-              <span class="step-label">Applied</span>
-            </div>
-
-            <div 
-              class="step review"
-              [class.active]="['under-review', 'shortlisted', 'selected'].includes(application.status)">
-              <div class="step-icon">
-                <i class="fas fa-search"></i>
-              </div>
-              <span class="step-label">Under Review</span>
-            </div>
-
-            <div 
-              class="step shortlisted"
-              [class.active]="['shortlisted', 'selected'].includes(application.status)">
-              <div class="step-icon">
-                <i class="fas fa-list"></i>
-              </div>
-              <span class="step-label">Shortlisted</span>
-            </div>
-
-            <div 
-              class="step final"
-              [class.active]="application.status === 'selected'">
-              <div class="step-icon">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <span class="step-label">Selected</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </article>
     </div>
 
-    <!-- Empty State -->
     <div *ngIf="!isLoading && filteredApplications.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-file-alt"></i>
+      <h3>No applications in this view</h3>
+      <p *ngIf="selectedStatus === 'all'">Try exploring more opportunities and submit a few fresh applications.</p>
+      <p *ngIf="selectedStatus !== 'all'">Switch back to all applications or open job portals to apply for more roles.</p>
+      <div class="empty-actions">
+        <a routerLink="/student/job-portals" class="primary-link">Browse Job Portals</a>
+        <button *ngIf="selectedStatus !== 'all'" type="button" class="secondary-btn" (click)="filterByStatus('all')">View All Applications</button>
       </div>
-      <h3>No applications found</h3>
-      <p *ngIf="selectedStatus === 'all'">
-        You haven't applied to any jobs yet. Start exploring opportunities!
-      </p>
-      <p *ngIf="selectedStatus !== 'all'">
-        No applications with {{ selectedStatus | titlecase }} status.
-      </p>
-      <button 
-        *ngIf="selectedStatus === 'all'"
-        class="browse-jobs-btn"
-        routerLink="/student/job-search">
-        Browse Jobs
-      </button>
-      <button 
-        *ngIf="selectedStatus !== 'all'"
-        class="view-all-btn"
-        (click)="filterByStatus('all')">
-        View All Applications
-      </button>
     </div>
-  </div>
+  </section>
 </div>

@@ -1,45 +1,111 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { TokenService } from '../../../core/services/token.service';
 
-import { Drive, DriveFormDraft } from '../models';
+export interface Position {
+  title: string;
+  package: number;
+  openings: number;
+  location: string;
+}
+
+export interface Drive {
+  id: number;
+  title: string;
+  companyName: string;
+  companyId: number;
+  description: string;
+  driveType: 'ON_CAMPUS' | 'OFF_CAMPUS' | 'VIRTUAL';
+  mode: 'ONLINE' | 'OFFLINE' | 'HYBRID';
+  location: string;
+  startDate: string;
+  endDate: string;
+  registrationDeadline: string;
+  eligibilityCriteria: {
+    minCgpa: number;
+    allowedBranches: string[];
+    allowedYears: number[];
+    backlogsAllowed: boolean;
+  };
+  positions: Position[];
+  status: 'UPCOMING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  registeredStudents: number;
+  selectedStudents: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DriveResponse {
+  status: string;
+  drives: Drive[];
+  total: number;
+  active: number;
+  upcoming: number;
+  completed: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class DriveService {
-  getDrives(): Drive[] {
-    return [
-      {
-        id: 'DRV-201',
-        companyName: 'ApexNova Technologies',
-        role: 'Graduate Engineer Trainee',
-        packageLpa: '7.5',
-        eligibleDepartments: ['CSE', 'IT', 'ECE'],
-        scheduledDate: '2026-03-28',
-        stage: 'Interview',
-        applicants: 126
-      },
-      {
-        id: 'DRV-202',
-        companyName: 'BlueOrbit Analytics',
-        role: 'Data Analyst',
-        packageLpa: '6.8',
-        eligibleDepartments: ['CSE', 'IT', 'MBA'],
-        scheduledDate: '2026-04-04',
-        stage: 'Assessment',
-        applicants: 94
-      }
-    ];
+export class PTODriveService {
+  private apiUrl = 'http://localhost:8080/api/pto/drives';
+
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService
+  ) {}
+
+  private getHeaders(): HttpHeaders {
+    const token = this.tokenService.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  getDriveDraft(): DriveFormDraft {
-    return {
-      companyName: '',
-      role: '',
-      packageLpa: '',
-      scheduledDate: '',
-      eligibleDepartments: [],
-      minimumCgpa: 7
-    };
+  private handleError(error: any) {
+    console.error('API Error:', error);
+    return throwError(() => error);
+  }
+
+  getAllDrives(): Observable<DriveResponse> {
+    console.log('Fetching all drives...');
+    return this.http.get<DriveResponse>(this.apiUrl, { headers: this.getHeaders() })
+      .pipe(
+        tap(response => console.log('Drives fetched:', response)),
+        catchError(this.handleError)
+      );
+  }
+
+  getDriveById(id: number): Observable<Drive> {
+    return this.http.get<Drive>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  createDrive(drive: Partial<Drive>): Observable<any> {
+    return this.http.post(this.apiUrl, drive, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  updateDrive(id: number, drive: Partial<Drive>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, drive, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteDrive(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  getDriveStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/stats`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
+  }
+
+  getRegisteredStudents(driveId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${driveId}/students`, { headers: this.getHeaders() })
+      .pipe(catchError(this.handleError));
   }
 }
-

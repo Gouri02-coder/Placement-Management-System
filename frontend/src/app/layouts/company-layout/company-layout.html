@@ -1,0 +1,51 @@
+<div class="company-layout">
+  <aside class="sidebar">
+    <div class="brand-header">
+      <div class="brand-logo">C</div>
+      <span class="brand-name">Company Portal</span>
+    </div>
+
+    <nav>
+      <div class="nav-label">Management</div>
+
+      <a routerLink="/company/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">DB</span> Dashboard
+      </a>
+      <a routerLink="/company/profile" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">CP</span> Company Profile
+      </a>
+      <a routerLink="/company/applications" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">AP</span> Applications
+      </a>
+      <a routerLink="/company/drives" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">PD</span> Placement Drives
+      </a>
+      <a routerLink="/company/analytics" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">AN</span> Analytics
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar">{{ (companyProfile.name || 'C').charAt(0) }}</div>
+        <div class="user-meta">
+          <span class="name">{{ userName }}</span>
+          <span class="role">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <div class="status-chip" [ngClass]="getStatusClass()">
+        <span>Status</span>
+        <strong>{{ companyProfile.status | titlecase }}</strong>
+      </div>
+
+      <button class="logout-btn" (click)="logout()">
+        <span class="nav-icon">EX</span> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

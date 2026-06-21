@@ -98,10 +98,9 @@ export class DashboardService {
   // Get quick actions with dynamic counts
   getQuickActions(): Observable<any[]> {
     return forkJoin({
-      pendingCompanies: this.http.get<any>(`${this.apiUrl}/companies/pending/count`),
       pendingStudents: this.http.get<any>(`${this.apiUrl}/students/pending/count`)
     }).pipe(
-      map(({ pendingCompanies, pendingStudents }) => [
+      map(({ pendingStudents }) => [
         {
           id: 'view-students',
           title: 'VIEW ALL STUDENTS',
@@ -118,15 +117,6 @@ export class DashboardService {
           icon: 'building',
           color: 'green',
           badge: 'Verified'
-        },
-        {
-          id: 'approve-companies',
-          title: 'APPROVE COMPANIES',
-          route: '/pto/company-management/company-verification',
-          icon: 'check-circle',
-          color: 'yellow',
-          count: pendingCompanies.count || 0,
-          badge: 'Pending'
         },
         {
           id: 'manage-drives',
@@ -214,15 +204,6 @@ export class DashboardService {
         icon: 'building',
         color: 'green',
         badge: 'Verified'
-      },
-      {
-        id: 'approve-companies',
-        title: 'APPROVE COMPANIES',
-        route: '/pto/company-management/company-verification',
-        icon: 'check-circle',
-        color: 'yellow',
-        count: 0,
-        badge: 'Pending'
       },
       {
         id: 'manage-drives',

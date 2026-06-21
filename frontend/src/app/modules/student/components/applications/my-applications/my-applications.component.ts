@@ -1,31 +1,32 @@
 import { Component, OnInit } from '@angular/core';
-import { ApplicationService } from '../../../services/application.service';
-import { JobApplication } from '../../../models/job.model';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { DemoApplication } from '../demo-applications.data';
+import { JobPortalStoreService } from '../../../services/job-portal-store.service';
 
 @Component({
   selector: 'app-my-applications',
-  imports: [CommonModule,DatePipe,RouterLink],
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './my-applications.component.html',
   styleUrls: ['./my-applications.component.css']
 })
 export class MyApplicationsComponent implements OnInit {
-  applications: JobApplication[] = [];
-  filteredApplications: JobApplication[] = [];
+  applications: DemoApplication[] = [];
+  filteredApplications: DemoApplication[] = [];
   isLoading = false;
   selectedStatus = 'all';
 
-  statusFilters = [
-    { value: 'all', label: 'All Applications', count: 0 },
-    { value: 'applied', label: 'Applied', count: 0 },
-    { value: 'under-review', label: 'Under Review', count: 0 },
-    { value: 'shortlisted', label: 'Shortlisted', count: 0 },
-    { value: 'rejected', label: 'Rejected', count: 0 },
-    { value: 'selected', label: 'Selected', count: 0 }
+  readonly statusFilters = [
+    { value: 'all', label: 'All Applications', helper: 'Every active application', icon: 'ALL', count: 0 },
+    { value: 'applied', label: 'Applied', helper: 'Recently submitted', icon: 'AP', count: 0 },
+    { value: 'under-review', label: 'Under Review', helper: 'Recruiter is reviewing', icon: 'RV', count: 0 },
+    { value: 'shortlisted', label: 'Shortlisted', helper: 'Ready for next step', icon: 'SL', count: 0 },
+    { value: 'selected', label: 'Selected', helper: 'Offer confirmed', icon: 'OK', count: 0 },
+    { value: 'rejected', label: 'Rejected', helper: 'Closed applications', icon: 'RJ', count: 0 }
   ];
 
-  constructor(private applicationService: ApplicationService) {}
+  constructor(private jobPortalStore: JobPortalStoreService) {}
 
   ngOnInit(): void {
     this.loadApplications();
@@ -33,38 +34,46 @@ export class MyApplicationsComponent implements OnInit {
 
   loadApplications(): void {
     this.isLoading = true;
-    const studentId = '123'; // Get from auth service
-    this.applicationService.getStudentApplications(studentId).subscribe({
-      next: (applications) => {
-        this.applications = applications.filter(app => app.status !== 'draft') as JobApplication[];
-        this.filteredApplications = this.applications;
-        this.updateStatusCounts();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading applications:', error);
-        this.isLoading = false;
-      }
-    });
+    this.applications = this.jobPortalStore.getApplicationsSnapshot();
+    this.applyCurrentFilter();
+    this.isLoading = false;
+  }
+
+  get totalApplications(): number {
+    return this.applications.length;
+  }
+
+  get activeReviews(): number {
+    return this.applications.filter(application =>
+      application.status === 'applied' || application.status === 'under-review'
+    ).length;
+  }
+
+  get upcomingInterviews(): number {
+    return this.applications.filter(application => !!application.interviewDate).length;
+  }
+
+  get averageMatchScore(): number {
+    if (this.applications.length === 0) {
+      return 0;
+    }
+
+    return Math.round(
+      this.applications.reduce((sum, application) => sum + application.matchScore, 0) / this.applications.length
+    );
   }
 
   updateStatusCounts(): void {
     this.statusFilters.forEach(filter => {
-      if (filter.value === 'all') {
-        filter.count = this.applications.length;
-      } else {
-        filter.count = this.applications.filter(app => app.status === filter.value).length;
-      }
+      filter.count = filter.value === 'all'
+        ? this.applications.length
+        : this.applications.filter(application => application.status === filter.value).length;
     });
   }
 
   filterByStatus(status: string): void {
     this.selectedStatus = status;
-    if (status === 'all') {
-      this.filteredApplications = this.applications;
-    } else {
-      this.filteredApplications = this.applications.filter(app => app.status === status);
-    }
+    this.applyCurrentFilter();
   }
 
   getStatusClass(status: string): string {
@@ -74,34 +83,25 @@ export class MyApplicationsComponent implements OnInit {
       case 'shortlisted': return 'status-shortlisted';
       case 'selected': return 'status-selected';
       case 'rejected': return 'status-rejected';
-      default: return '';
+      default: return 'status-applied';
     }
   }
 
-  getStatusIcon(status: string): string {
+  getStatusLabel(status: DemoApplication['status']): string {
     switch (status) {
-      case 'applied': return 'fas fa-paper-plane';
-      case 'under-review': return 'fas fa-search';
-      case 'shortlisted': return 'fas fa-list';
-      case 'selected': return 'fas fa-check-circle';
-      case 'rejected': return 'fas fa-times-circle';
-      default: return 'fas fa-file-alt';
+      case 'under-review': return 'Under Review';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
   }
 
   withdrawApplication(applicationId: string): void {
-    if (confirm('Are you sure you want to withdraw this application?')) {
-      this.applicationService.withdrawApplication(applicationId).subscribe({
-        next: () => {
-          this.applications = this.applications.filter(app => app.id !== applicationId);
-          this.filteredApplications = this.filteredApplications.filter(app => app.id !== applicationId);
-          this.updateStatusCounts();
-        },
-        error: (error) => {
-          console.error('Error withdrawing application:', error);
-        }
-      });
+    if (!confirm('Are you sure you want to withdraw this application?')) {
+      return;
     }
+
+    this.jobPortalStore.updateApplication(applicationId, { status: 'rejected', recruiterNote: 'Application withdrawn from the current recruitment cycle.' });
+    this.applications = this.jobPortalStore.getApplicationsSnapshot();
+    this.applyCurrentFilter();
   }
 
   getDaysSinceApplied(date: Date): string {
@@ -109,11 +109,19 @@ export class MyApplicationsComponent implements OnInit {
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - appliedDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return '1 day ago';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     return `${Math.floor(diffDays / 30)} months ago`;
+  }
+
+  private applyCurrentFilter(): void {
+    this.filteredApplications = this.selectedStatus === 'all'
+      ? [...this.applications]
+      : this.applications.filter(application => application.status === this.selectedStatus);
+
+    this.updateStatusCounts();
   }
 }

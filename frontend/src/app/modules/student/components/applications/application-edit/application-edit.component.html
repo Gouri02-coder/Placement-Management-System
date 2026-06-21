@@ -1,0 +1,120 @@
+<section class="application-edit-shell" *ngIf="application; else missingState">
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <header class="edit-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Application Workspace</p>
+      <h1>{{ application.jobTitle }}</h1>
+      <p class="hero-subtitle">
+        {{ application.companyName }} • Refresh your application story before the next recruiter checkpoint.
+      </p>
+
+      <div class="hero-pills">
+        <span [class]="getStatusTone(application.status)">{{ getStatusLabel(application.status) }}</span>
+        <span>{{ application.roleTrack }}</span>
+        <span>{{ application.matchScore }}% match</span>
+      </div>
+    </div>
+
+    <div class="hero-links">
+      <a [routerLink]="['/student/applications/details', application.id]" class="ghost-link">View Details</a>
+      <a routerLink="/student/applications" class="ghost-link">Back to Applications</a>
+    </div>
+  </header>
+
+  <section class="edit-layout">
+    <article class="edit-panel form-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Refine Submission</p>
+          <h3>Make this application sharper</h3>
+        </div>
+        <div class="panel-badge">Editable Demo</div>
+      </div>
+
+      <div class="field-grid">
+        <label class="field">
+          <span>Preferred Location</span>
+          <small>Help recruiters understand your flexibility for this role.</small>
+          <input [(ngModel)]="form.locationPreference" placeholder="Enter preferred location" />
+        </label>
+
+        <label class="field">
+          <span>Resume URL</span>
+          <small>Paste the latest version you want recruiters to review.</small>
+          <input [(ngModel)]="form.resumeUrl" placeholder="Paste your latest resume link" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Cover Letter</span>
+        <small>Use this space to tailor your pitch to the role and company.</small>
+        <textarea [(ngModel)]="form.coverLetter" rows="8" placeholder="Refresh your cover letter for this role"></textarea>
+      </label>
+
+      <div class="editor-note">
+        <strong>Quick guidance</strong>
+        <p>Keep the message role-specific, mention relevant project impact, and align your preferred location with the job setup.</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="primary-btn" (click)="save()">Save Changes</button>
+        <button type="button" class="secondary-btn" (click)="goToDetails()">Review Details</button>
+      </div>
+    </article>
+
+    <article class="edit-panel side-panel">
+      <div class="panel-head snapshot-head">
+        <div>
+          <p class="panel-kicker">Live Snapshot</p>
+          <h3>Application overview</h3>
+        </div>
+      </div>
+
+      <div class="snapshot-grid">
+        <div class="snapshot-card">
+          <span>Status</span>
+          <strong>{{ getStatusLabel(application.status) }}</strong>
+        </div>
+        <div class="snapshot-card">
+          <span>Match Score</span>
+          <strong>{{ application.matchScore }}%</strong>
+        </div>
+        <div class="snapshot-card">
+          <span>Track</span>
+          <strong>{{ application.roleTrack }}</strong>
+        </div>
+        <div class="snapshot-card">
+          <span>Interview</span>
+          <strong>{{ application.interviewDate ? (application.interviewDate | date:'mediumDate') : 'Awaiting update' }}</strong>
+        </div>
+      </div>
+
+      <div class="snapshot-section">
+        <p class="section-title">Key Skills</p>
+        <div class="skills-row">
+          <span *ngFor="let skill of application.skillsSnapshot">{{ skill }}</span>
+        </div>
+      </div>
+
+      <div class="snapshot-section spotlight">
+        <p class="section-title">Recruiter Note</p>
+        <p>{{ application.recruiterNote }}</p>
+      </div>
+
+      <div class="save-note" *ngIf="isSaved">
+        <strong>Changes saved locally</strong>
+        <p>Your updated values are ready in this demo flow. Open the details page to review the refreshed version.</p>
+      </div>
+    </article>
+  </section>
+</section>
+
+<ng-template #missingState>
+  <section class="empty-shell">
+    <h2>Application not found</h2>
+    <p>The edit view could not find a matching demo application.</p>
+    <a routerLink="/student/applications" class="primary-btn link-btn">Return to Applications</a>
+  </section>
+</ng-template>

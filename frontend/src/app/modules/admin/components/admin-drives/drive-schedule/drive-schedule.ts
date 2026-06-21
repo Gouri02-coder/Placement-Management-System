@@ -52,6 +52,14 @@ export class DriveSchedule {
     }
   ];
 
+  get publishedCount(): number {
+    return this.scheduledDrives.filter((drive) => drive.status === 'Published').length;
+  }
+
+  get scheduledCount(): number {
+    return this.scheduledDrives.filter((drive) => drive.status === 'Scheduled').length;
+  }
+
   addDrive(): void {
     if (!this.form.company || !this.form.role || !this.form.date || !this.form.venue || this.form.slots <= 0) {
       return;

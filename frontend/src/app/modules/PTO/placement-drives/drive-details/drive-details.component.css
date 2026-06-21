@@ -19,6 +19,20 @@
   padding: 1.5rem;
 }
 
+.hero-top,
+.detail-row,
+.position-card,
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hero-top {
+  align-items: flex-start;
+}
+
 .eyebrow {
   margin: 0 0 0.45rem;
   color: #2563eb;
@@ -41,6 +55,46 @@
   color: #64748b;
 }
 
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.status-pill {
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.status-pill.active {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-pill.upcoming {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-pill.completed {
+  background: #dcfce7;
+  color: #059669;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -58,6 +112,58 @@
   color: #0f172a;
 }
 
+.detail-row {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-row:last-child {
+  border-bottom: 0;
+}
+
+.detail-row span {
+  color: #64748b;
+}
+
+.detail-row strong {
+  text-align: right;
+}
+
+.position-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.position-card {
+  padding: 1rem 1.1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.position-card p,
+.position-meta {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+}
+
+.position-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+
+.back-btn {
+  padding: 0.85rem 1.2rem;
+  border: 0;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
 .content-card ul {
   margin: 0;
   padding-left: 1.2rem;
@@ -68,7 +174,22 @@
 }
 
 @media (max-width: 768px) {
+  .hero-top,
+  .detail-row,
+  .position-card,
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .details-grid,
   .metric-grid {
     grid-template-columns: 1fr;
+  }
+
+  .detail-row strong,
+  .position-meta {
+    justify-items: start;
+    text-align: left;
   }
 }

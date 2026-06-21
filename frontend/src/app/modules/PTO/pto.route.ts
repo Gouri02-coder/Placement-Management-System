@@ -5,7 +5,6 @@ import { PtoLayoutComponent } from './pto-layout/pto-layout.component';
 import { PtoDashboardComponent } from './pto-dashboard/pto-dashboard.component';
 import { CompanyDetailsComponent } from './company-management/company-details/company-details.component';
 import { CompanyListComponent } from './company-management/company-list/company-list.component';
-import { CompanyVerificationComponent } from './company-management/company-verification/company-verification.component';
 import { VisitListComponent } from './company-visits/visit-list/visit-list.component';
 import { VisitReportComponent } from './company-visits/visit-report/visit-report.component';
 import { VisitScheduleComponent } from './company-visits/visit-schedule/visit-schedule.component';
@@ -62,10 +61,6 @@ export const PTO_ROUTES: Routes = [
           {
             path: 'company-details/:id',
             component: CompanyDetailsComponent
-          },
-          {
-            path: 'company-verification',
-            component: CompanyVerificationComponent
           }
         ]
       },

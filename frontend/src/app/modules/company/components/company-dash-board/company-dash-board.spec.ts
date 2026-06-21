@@ -111,12 +111,12 @@ describe('CompanyDashboardComponent', () => {
 
   it('should navigate to post job', () => {
     component.postJob();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/jobs/create']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/drives/schedule']);
   });
 
   it('should navigate to manage jobs', () => {
     component.manageJobs();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/jobs']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/company/drives']);
   });
 
   it('should get correct status class', () => {

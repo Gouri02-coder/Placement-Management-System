@@ -3,24 +3,34 @@
     <div class="brand-logo">P</div>
     <span class="brand-name">PTO Portal</span>
   </div>
-  
+
   <nav>
     <div class="nav-label">Management</div>
-    
+
     <a routerLink="/pto/dashboard" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📊</span> PTO Dashboard
+      <span class="nav-item-text">PTO Dashboard</span>
     </a>
     <a routerLink="/pto/student-management/student-list" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">👥</span> View All Students
+      <span class="nav-item-text">View All Students</span>
     </a>
     <a routerLink="/pto/company-management/company-list" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">🏢</span> View Companies
-    </a>
-    <a routerLink="/pto/company-management/company-verification" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">✓</span> Approve Companies
+      <span class="nav-item-text">View Companies</span>
     </a>
     <a routerLink="/pto/placement-drives/drive-list" routerLinkActive="active" class="nav-item">
-      <span class="nav-icon">📅</span> Manage Drives
+      <span class="nav-item-text">Manage Drives</span>
     </a>
   </nav>
+
+  <div class="sidebar-footer" *ngIf="currentUser as user">
+    <div class="profile-card">
+      <div class="profile-avatar">{{ (user.name || user.email || 'P')[0] | uppercase }}</div>
+      <div class="profile-details">
+        <div class="profile-name">{{ user.name || 'PTO User' }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+        <div class="profile-role">Role: {{ (user.role || 'pto') | uppercase }}</div>
+      </div>
+    </div>
+
+    <button type="button" class="logout-btn" (click)="logout()">Logout</button>
+  </div>
 </aside>

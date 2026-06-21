@@ -1,0 +1,120 @@
+<section class="application-detail-shell" *ngIf="application; else missingState">
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <header class="detail-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Application Dossier</p>
+      <h1>{{ application.jobTitle }}</h1>
+      <p class="hero-subtitle">
+        {{ application.companyName }} • {{ application.roleTrack }} • {{ application.locationPreference }}
+      </p>
+
+      <div class="hero-pills">
+        <span [class]="getStatusTone(application.status)">{{ getStatusLabel(application.status) }}</span>
+        <span>{{ application.matchScore }}% match score</span>
+        <span *ngIf="application.interviewDate">Interview scheduled</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a [routerLink]="['/student/applications/edit', application.id]" class="primary-link">Edit Application</a>
+      <a routerLink="/student/applications" class="ghost-link">Back to Applications</a>
+    </div>
+  </header>
+
+  <section class="detail-grid">
+    <article class="panel overview-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Snapshot</p>
+          <h3>Submission overview</h3>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <span>Application ID</span>
+          <strong>{{ application.id }}</strong>
+        </div>
+        <div class="info-card">
+          <span>Applied On</span>
+          <strong>{{ application.appliedDate | date:'mediumDate' }}</strong>
+        </div>
+        <div class="info-card">
+          <span>Match Score</span>
+          <strong>{{ application.matchScore }}%</strong>
+        </div>
+        <div class="info-card">
+          <span>Interview</span>
+          <strong>{{ application.interviewDate ? (application.interviewDate | date:'medium') : 'Awaiting update' }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel recruiter-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Recruiter Readout</p>
+          <h3>How this application is landing</h3>
+        </div>
+      </div>
+
+      <p class="note">{{ application.recruiterNote }}</p>
+
+      <div class="skills-row">
+        <span *ngFor="let skill of application.skillsSnapshot">{{ skill }}</span>
+      </div>
+
+      <div class="mini-metrics">
+        <div>
+          <span>Track</span>
+          <strong>{{ application.roleTrack }}</strong>
+        </div>
+        <div>
+          <span>Location Preference</span>
+          <strong>{{ application.locationPreference }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <article class="panel timeline-panel">
+    <div class="panel-head timeline-head">
+      <div>
+        <p class="panel-kicker">Progress Story</p>
+        <h3>Application timeline</h3>
+      </div>
+      <a routerLink="/student/applications" class="ghost-link compact">Back to Applications</a>
+    </div>
+
+    <div class="timeline-list">
+      <div class="timeline-item" *ngFor="let milestone of application.milestones; let index = index">
+        <div class="timeline-marker">{{ index + 1 }}</div>
+        <div class="timeline-content">
+          <strong>{{ milestone.label }}</strong>
+          <span>{{ milestone.date }}</span>
+          <p>{{ milestone.note }}</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel cover-panel">
+    <div class="panel-head">
+      <div>
+        <p class="panel-kicker">Submitted Narrative</p>
+        <h3>Cover letter snapshot</h3>
+      </div>
+    </div>
+    <p class="cover-copy">{{ application.coverLetter || 'No cover letter attached for this application.' }}</p>
+  </article>
+</section>
+
+<ng-template #missingState>
+  <section class="empty-shell">
+    <h2>Application not found</h2>
+    <p>The application you are trying to view is not available in the demo dataset.</p>
+    <a routerLink="/student/applications" class="primary-link">Return to Applications</a>
+  </section>
+</ng-template>

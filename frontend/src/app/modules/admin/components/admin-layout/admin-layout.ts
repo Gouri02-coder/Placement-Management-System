@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../../../core/services/auth.service';
 
 interface AdminNavItem {
   label: string;
@@ -31,7 +32,10 @@ export class AdminLayout {
   currentPath = '/admin/dashboard';
   sidebarCollapsed = false;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.currentPath = this.router.url;
 
     this.router.events
@@ -47,5 +51,13 @@ export class AdminLayout {
 
   trackNav(_: number, item: AdminNavItem): string {
     return item.route;
+  }
+
+  get currentUser() {
+    return this.authService.getUser();
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

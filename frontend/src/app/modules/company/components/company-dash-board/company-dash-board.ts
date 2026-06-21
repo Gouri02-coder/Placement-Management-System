@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 import { CompanyService } from '../../services/company.service';
 import { Company } from '../../models/company.model';
 import { CommonModule } from '@angular/common';
@@ -13,10 +13,19 @@ interface CompanyStats {
   unreadNotifications: number;
 }
 
+const DEFAULT_DASHBOARD_STATS: CompanyStats = {
+  activeJobs: 12,
+  totalApplications: 148,
+  localHires: 26,
+  pendingReviews: 18,
+  upcomingDrives: 4,
+  unreadNotifications: 7
+};
+
 @Component({
   selector: 'app-company-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule],
   templateUrl: './company-dash-board.html',
   styleUrls: ['./company-dash-board.css']
 })
@@ -41,12 +50,7 @@ export class CompanyDashboardComponent implements OnInit {
   };
 
   dashboardStats: CompanyStats = {
-    activeJobs: 0,
-    totalApplications: 0,
-    localHires: 0,
-    pendingReviews: 0,
-    upcomingDrives: 0,
-    unreadNotifications: 0
+    ...DEFAULT_DASHBOARD_STATS
   };
 
   recentActivities = [
@@ -106,10 +110,19 @@ export class CompanyDashboardComponent implements OnInit {
     const companyId = this.getCompanyId();
     this.companyService.getCompanyStats(companyId).subscribe({
       next: (stats) => {
-        this.dashboardStats = stats as unknown as CompanyStats;
+        const incomingStats = (stats || {}) as Partial<CompanyStats> & {
+          activeJobPostings?: number;
+        };
+
+        this.dashboardStats = {
+          ...DEFAULT_DASHBOARD_STATS,
+          ...incomingStats,
+          activeJobs: incomingStats.activeJobs ?? incomingStats.activeJobPostings ?? DEFAULT_DASHBOARD_STATS.activeJobs
+        };
       },
       error: (error) => {
         console.error('Error loading company stats:', error);
+        this.dashboardStats = { ...DEFAULT_DASHBOARD_STATS };
       }
     });
   }
@@ -124,10 +137,10 @@ export class CompanyDashboardComponent implements OnInit {
     const routes = {
       dashboard: '/company/dashboard',
       profile: '/company/profile',
-      jobs: '/company/jobs',
+      jobs: '/company/drives',
       applications: '/company/applications',
-      drives: '/company/dashboard',
-      analytics: '/company/dashboard',
+      drives: '/company/drives',
+      analytics: '/company/analytics',
       communication: '/company/dashboard'
     };
     
@@ -137,11 +150,11 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   postJob(): void {
-    this.router.navigate(['/company/jobs/create']);
+    this.router.navigate(['/company/drives/schedule']);
   }
 
   manageJobs(): void {
-    this.router.navigate(['/company/jobs']);
+    this.router.navigate(['/company/drives']);
   }
 
   viewApplications(): void {
@@ -149,11 +162,11 @@ export class CompanyDashboardComponent implements OnInit {
   }
 
   scheduleDrive(): void {
-    this.router.navigate(['/company/dashboard']);
+    this.router.navigate(['/company/drives/schedule']);
   }
 
   viewAnalytics(): void {
-    this.router.navigate(['/company/dashboard']);
+    this.router.navigate(['/company/analytics']);
   }
 
   editProfile(): void {

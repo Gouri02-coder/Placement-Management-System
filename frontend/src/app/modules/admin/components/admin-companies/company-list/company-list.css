@@ -1,0 +1,199 @@
+:host {
+  display: block;
+}
+
+.page-shell {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.page-hero,
+.toolbar-card,
+.table-card {
+  border: 1px solid #dce8f4;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.page-hero {
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(135deg, #f8fcff, #eef6ff);
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f7093;
+}
+
+.page-hero h2,
+.section-head h3 {
+  margin: 0;
+  color: #132238;
+}
+
+.page-hero p,
+.section-head p,
+.helper-copy {
+  margin-bottom: 0;
+  color: #5b6c84;
+  line-height: 1.6;
+}
+
+.hero-stat {
+  min-width: 150px;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f172a, #1d4ed8);
+  color: #fff;
+}
+
+.hero-stat strong {
+  display: block;
+  font-size: 1.7rem;
+}
+
+.hero-stat span {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.toolbar-card {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: minmax(260px, 1.3fr) minmax(180px, 0.6fr) minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.toolbar-card input,
+.toolbar-card select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #cbd9ea;
+  border-radius: 14px;
+  padding: 0.8rem 0.95rem;
+  background: #fff;
+  color: #172033;
+}
+
+.table-card {
+  padding: 1.1rem;
+}
+
+.section-head {
+  margin-bottom: 0.9rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e3edf7;
+  border-radius: 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.95rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ebf1f7;
+}
+
+th {
+  background: #f8fbfe;
+  color: #4f617c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background: rgba(239, 246, 255, 0.72);
+}
+
+.company-cell strong {
+  color: #15263f;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.36rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.status-pill.Approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pill.Pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pill.Rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.action-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ghost-btn,
+.text-link {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.ghost-btn {
+  border: 1px solid #cdd9e8;
+  background: #fff;
+  color: #1d4ed8;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+}
+
+.text-link {
+  color: #124a7c;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .page-hero,
+  .toolbar-card {
+    grid-template-columns: 1fr;
+  }
+
+  .page-hero {
+    flex-direction: column;
+  }
+
+  .action-cell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

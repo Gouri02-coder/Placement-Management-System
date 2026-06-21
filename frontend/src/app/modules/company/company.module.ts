@@ -9,12 +9,6 @@ import { CompanyRoutingModule } from './company.route';
 import { CompanyDashboardComponent } from './components/company-dash-board/company-dash-board';
 import { CompanyProfileComponent } from './components/company-profile/company-profile';
 
-// Job Management Components
-import { JobPostingsComponent } from './components/company-jobs/job-postings/job-postings';
-import { JobListComponent } from './components/company-jobs/job-list/job-list';
-import { JobCreateComponent } from './components/company-jobs/job-create/job-create';
-import { JobEditComponent } from './components/company-jobs/job-edit/job-edit';
-
 // Application Management Components
 import { ApplicationListComponent } from './components/application-management/application-list/application-list';
 import { CandidateProfileComponent } from './components/application-management/candidate-profile/candidate-profile';
@@ -39,13 +33,7 @@ import { AnalyticsService } from './services/analytics.service';
 
     CompanyDashboardComponent,
     CompanyProfileComponent,
-    
-    // Job Management
-    JobPostingsComponent,
-    JobListComponent,
-    JobCreateComponent,
-    JobEditComponent,
-    
+
     // Application Management
     ApplicationListComponent,
     CandidateProfileComponent,

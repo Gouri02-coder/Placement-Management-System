@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Student, Education, Project } from '../../models/student.model';
+import { StudentService } from '../../services/student.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-resume-builder',
@@ -42,6 +44,11 @@ export class ResumeBuilderComponent implements OnInit {
   educations: Education[] = [this.createEmptyEducation()];
   projects: Project[] = [this.createEmptyProject()];
   newSkill: string = '';
+
+  constructor(
+    private studentService: StudentService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadStudentData();
@@ -100,19 +107,35 @@ export class ResumeBuilderComponent implements OnInit {
   }
 
   loadStudentData(): void {
-    const savedData = localStorage.getItem('studentResume');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      this.student = { ...this.student, ...data.student };
-      this.educations = data.educations || this.educations;
-      this.projects = data.projects || this.projects;
-      
-      // Parse date strings back to Date objects
-      this.educations.forEach(edu => {
-        edu.startDate = new Date(edu.startDate);
-        edu.endDate = new Date(edu.endDate);
-      });
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser?.id) {
+      return;
     }
+
+    this.studentService.getStudentProfile(currentUser.id.toString()).subscribe({
+      next: (student) => {
+        this.student = {
+          ...student,
+          personalInfo: {
+            ...student.personalInfo,
+            dateOfBirth: new Date(student.personalInfo?.dateOfBirth || new Date())
+          },
+          createdAt: new Date(student.createdAt),
+          updatedAt: new Date(student.updatedAt)
+        };
+        this.educations = student.education?.length
+          ? student.education.map(edu => ({
+              ...edu,
+              startDate: new Date(edu.startDate),
+              endDate: new Date(edu.endDate)
+            }))
+          : [this.createEmptyEducation()];
+        this.projects = student.projects?.length ? student.projects : [this.createEmptyProject()];
+      },
+      error: (error) => {
+        console.error('Error loading student resume data:', error);
+      }
+    });
   }
 
   saveResume(): void {

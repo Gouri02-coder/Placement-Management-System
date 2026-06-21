@@ -45,6 +45,7 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
   
   // Social links
   socialLinks: SocialLinks = {};
+  tagInput = '';
   
   // Verification documents
   verificationDocuments: VerificationDocument[] = [];
@@ -136,6 +137,17 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
         Validators.minLength(50),
         Validators.maxLength(2000)
       ]],
+      industry: ['', [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(80)
+      ]],
+      foundedYear: [null, [
+        Validators.min(1900),
+        Validators.max(new Date().getFullYear())
+      ]],
+      employeeCount: ['', Validators.maxLength(40)],
+      tags: [[]],
       
       // HR Contacts
       hrContacts: this.fb.array([]),
@@ -158,6 +170,10 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
       website: '',
       address: '',
       description: '',
+      industry: '',
+      foundedYear: undefined,
+      employeeCount: '',
+      tags: [],
       hrContacts: [],
       socialLinks: {},
       verificationDocuments: [],
@@ -351,8 +367,14 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
       website: profile.website,
       address: profile.address,
       description: profile.description,
+      industry: profile.industry || '',
+      foundedYear: profile.foundedYear || null,
+      employeeCount: profile.employeeCount || '',
+      tags: profile.tags || [],
       socialLinks: profile.socialLinks || {}
     });
+
+    this.tagInput = '';
   }
 
   private getCompanyId(): string {
@@ -540,6 +562,9 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
     // Ensure hrContacts are properly structured
     const submitData = {
       ...formData,
+      tags: Array.isArray(formData.tags)
+        ? formData.tags.map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0)
+        : [],
       hrContacts: formData.hrContacts.map((contact: any, index: number) => ({
         ...contact,
         isPrimary: index === 0 || contact.isPrimary // Ensure at least one is primary
@@ -709,6 +734,10 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
         website: draft.formData.website,
         address: draft.formData.address,
         description: draft.formData.description,
+        industry: draft.formData.industry || '',
+        foundedYear: draft.formData.foundedYear || null,
+        employeeCount: draft.formData.employeeCount || '',
+        tags: draft.formData.tags || [],
         socialLinks: draft.formData.socialLinks || {}
       });
     }
@@ -744,6 +773,9 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
     if (formValue.website) completion += 10;
     if (formValue.address) completion += 10;
     if (formValue.description && formValue.description.length >= 50) completion += 15;
+    if (formValue.industry) completion += 10;
+    if (formValue.employeeCount) completion += 5;
+    if (formValue.foundedYear) completion += 5;
     if (this.companyProfile.logo) completion += 10;
     if (this.hrContacts.length > 0 && this.hrContacts.at(0).get('name')?.value) completion += 20;
     if (Object.keys(formValue.socialLinks || {}).some(key => formValue.socialLinks[key])) completion += 10;
@@ -815,6 +847,64 @@ export class CompanyProfileComponent implements OnInit, OnDestroy {
       case 'rejected': return '✗';
       default: return '⏱';
     }
+  }
+
+  getStatusBadgeText(): string {
+    switch (this.companyProfile.status) {
+      case 'approved': return 'OK';
+      case 'rejected': return 'NO';
+      case 'in_review': return 'RV';
+      default: return 'PD';
+    }
+  }
+
+  get industry() { return this.profileForm.get('industry'); }
+  get foundedYear() { return this.profileForm.get('foundedYear'); }
+  get employeeCount() { return this.profileForm.get('employeeCount'); }
+
+  get companyTags(): string[] {
+    const tags = this.profileForm.get('tags')?.value;
+    return Array.isArray(tags) ? tags : [];
+  }
+
+  addTag(): void {
+    const value = this.tagInput.trim();
+    if (!value) return;
+
+    const exists = this.companyTags.some((tag) => tag.toLowerCase() === value.toLowerCase());
+    if (!exists) {
+      this.profileForm.get('tags')?.setValue([...this.companyTags, value]);
+      this.profileForm.get('tags')?.markAsDirty();
+      this.hasUnsavedChanges = true;
+      this.saveDraft();
+    }
+
+    this.tagInput = '';
+  }
+
+  removeTag(tagToRemove: string): void {
+    this.profileForm.get('tags')?.setValue(this.companyTags.filter((tag) => tag !== tagToRemove));
+    this.profileForm.get('tags')?.markAsDirty();
+    this.hasUnsavedChanges = true;
+    this.saveDraft();
+  }
+
+  handleTagInput(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ',') {
+      keyboardEvent.preventDefault();
+      this.addTag();
+    }
+  }
+
+  get populatedSocialLinks(): Array<{ label: string; url: string; badge: string; cssClass: string }> {
+    const links = this.companyProfile.socialLinks || {};
+    return [
+      { label: 'LinkedIn', url: links.linkedin || '', badge: 'in', cssClass: 'linkedin' },
+      { label: 'Twitter', url: links.twitter || '', badge: 'X', cssClass: 'twitter' },
+      { label: 'GitHub', url: links.github || '', badge: 'GH', cssClass: 'github' },
+      { label: 'Facebook', url: links.facebook || '', badge: 'f', cssClass: 'facebook' }
+    ].filter((item) => item.url);
   }
 
   // Error handling

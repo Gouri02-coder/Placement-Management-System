@@ -1,0 +1,574 @@
+:host {
+  display: block;
+  --panel: rgba(17, 26, 51, 0.78);
+  --panel-strong: rgba(7, 17, 38, 0.94);
+  --panel-soft: rgba(255, 255, 255, 0.04);
+  --border: rgba(96, 165, 250, 0.16);
+  --border-strong: rgba(96, 165, 250, 0.28);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --purple: #8b5cf6;
+  --red: #ef4444;
+  --shadow: 0 18px 42px rgba(2, 6, 23, 0.26);
+}
+
+.company-drive-view {
+  padding: 8px 0 24px;
+  color: var(--text-main);
+}
+
+.company-drive-view-loading,
+.company-drive-view-error,
+.company-drive-view-hero,
+.company-drive-view-stat-card,
+.company-drive-view-card,
+.company-drive-view-modal-card {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.company-drive-view-loading,
+.company-drive-view-error {
+  padding: 56px 24px;
+  text-align: center;
+  background: var(--panel);
+}
+
+.company-drive-view-spinner {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 14px;
+  border: 4px solid rgba(148, 163, 184, 0.18);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: company-drive-view-spin 1s linear infinite;
+}
+
+@keyframes company-drive-view-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.company-drive-view-error-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.company-drive-view-hero {
+  margin-bottom: 24px;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.22), transparent 28%),
+    linear-gradient(135deg, rgba(7, 17, 38, 0.96), rgba(17, 26, 51, 0.84));
+}
+
+.company-drive-view-back-btn,
+.company-drive-view-primary-btn,
+.company-drive-view-secondary-btn,
+.company-drive-view-faq-question,
+.company-drive-view-modal-close {
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.company-drive-view-back-btn,
+.company-drive-view-secondary-btn,
+.company-drive-view-faq-question,
+.company-drive-view-modal-close {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+.company-drive-view-primary-btn {
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+}
+
+.company-drive-view-back-btn:hover,
+.company-drive-view-secondary-btn:hover,
+.company-drive-view-faq-question:hover,
+.company-drive-view-modal-close:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.company-drive-view-primary-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.company-drive-view-primary-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.company-drive-view-hero-content {
+  margin-top: 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.company-drive-view-company {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.company-drive-view-logo img {
+  width: 88px;
+  height: 88px;
+  border-radius: 20px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.company-drive-view-eyebrow,
+.company-drive-view-section {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #93c5fd;
+}
+
+.company-drive-view-copy h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--text-main);
+}
+
+.company-drive-view-company-name,
+.company-drive-view-text,
+.company-drive-view-timeline-content span,
+.company-drive-view-timeline-content p,
+.company-drive-view-progress-meta,
+.company-drive-view-form-help {
+  color: var(--text-muted);
+}
+
+.company-drive-view-company-name {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.company-drive-view-meta,
+.company-drive-view-actions,
+.company-drive-view-tags,
+.company-drive-view-page-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.company-drive-view-pill,
+.company-drive-view-tag,
+.company-drive-view-position-top span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.company-drive-view-pill {
+  padding: 7px 12px;
+}
+
+.company-drive-view-type {
+  background: rgba(59, 130, 246, 0.12);
+  color: #bfdbfe;
+}
+
+.status-scheduled {
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+}
+
+.status-ongoing {
+  background: rgba(16, 185, 129, 0.16);
+  color: #86efac;
+}
+
+.status-completed {
+  background: rgba(139, 92, 246, 0.16);
+  color: #ddd6fe;
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+}
+
+.company-drive-view-stats,
+.company-drive-view-company-grid,
+.company-drive-view-position-grid,
+.company-drive-view-columns,
+.company-drive-view-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.company-drive-view-stats {
+  margin-bottom: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.company-drive-view-stat-card,
+.company-drive-view-card {
+  padding: 24px;
+  background: var(--panel);
+}
+
+.company-drive-view-stat-label,
+.company-drive-view-info-box span,
+.company-drive-view-side-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.company-drive-view-stat-card strong,
+.company-drive-view-card-head h2,
+.company-drive-view-info-box strong,
+.company-drive-view-side-item strong,
+.company-drive-view-position-top h3,
+.company-drive-view-list-box h3,
+.company-drive-view-timeline-content strong,
+.company-drive-view-modal-head h2 {
+  color: var(--text-main);
+}
+
+.company-drive-view-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.9fr);
+  gap: 24px;
+}
+
+.company-drive-view-primary,
+.company-drive-view-sidebar,
+.company-drive-view-timeline,
+.company-drive-view-side-list,
+.company-drive-view-registration,
+.company-drive-view-faq-list {
+  display: grid;
+  gap: 24px;
+}
+
+.company-drive-view-card-head {
+  margin-bottom: 18px;
+}
+
+.company-drive-view-card-head h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.company-drive-view-text {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.company-drive-view-company-grid,
+.company-drive-view-position-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.company-drive-view-info-box,
+.company-drive-view-position-card,
+.company-drive-view-list-box,
+.company-drive-view-side-item,
+.company-drive-view-faq-item {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.company-drive-view-position-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.company-drive-view-position-top span {
+  padding: 6px 10px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #bfdbfe;
+}
+
+.company-drive-view-position-salary {
+  margin: 0 0 8px;
+  color: #86efac;
+  font-weight: 800;
+}
+
+.company-drive-view-list-box ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+}
+
+.company-drive-view-list-box li {
+  margin-bottom: 8px;
+}
+
+.company-drive-view-timeline-item {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 14px;
+}
+
+.company-drive-view-timeline-dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.04);
+}
+
+.company-drive-view-timeline-dot-done {
+  background: var(--green);
+}
+
+.company-drive-view-timeline-content strong {
+  display: block;
+  margin: 4px 0 6px;
+}
+
+.company-drive-view-faq-item {
+  overflow: hidden;
+  padding: 0;
+}
+
+.company-drive-view-faq-question {
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.company-drive-view-faq-answer {
+  padding: 0 18px 18px;
+}
+
+.company-drive-view-faq-answer p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.company-drive-view-tag {
+  padding: 6px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.16);
+  color: #dbeafe;
+}
+
+.company-drive-view-card-highlight {
+  background:
+    radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 28%),
+    var(--panel);
+}
+
+.company-drive-view-side-item small {
+  display: block;
+  margin-top: 6px;
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.company-drive-view-progress-head,
+.company-drive-view-progress-meta,
+.company-drive-view-modal-head,
+.company-drive-view-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.company-drive-view-progress-head {
+  margin-bottom: 10px;
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.company-drive-view-progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.company-drive-view-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--blue));
+}
+
+.company-drive-view-side-item a {
+  color: #93c5fd;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.company-drive-view-modal {
+  position: fixed;
+  inset: 0;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+}
+
+.company-drive-view-modal-card {
+  width: min(920px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(10, 18, 38, 0.96);
+}
+
+.company-drive-view-modal-head,
+.company-drive-view-modal-body,
+.company-drive-view-modal-actions {
+  padding: 22px 24px;
+}
+
+.company-drive-view-modal-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.company-drive-view-modal-close {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.company-drive-view-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.company-drive-view-form-group {
+  margin-bottom: 16px;
+}
+
+.company-drive-view-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.company-drive-view-form-group input,
+.company-drive-view-form-group select,
+.company-drive-view-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid rgba(96, 165, 250, 0.16);
+  border-radius: 14px;
+  background: rgba(8, 14, 30, 0.9);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.company-drive-view-form-group textarea {
+  resize: vertical;
+}
+
+.company-drive-view-form-group input:focus,
+.company-drive-view-form-group select:focus,
+.company-drive-view-form-group textarea:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.company-drive-view-form-error {
+  margin-top: 6px;
+  color: #fecaca;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.company-drive-view-form-summary {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.company-drive-view-modal-actions {
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 1200px) {
+  .company-drive-view-stats,
+  .company-drive-view-company-grid,
+  .company-drive-view-position-grid,
+  .company-drive-view-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .company-drive-view-main,
+  .company-drive-view-stats,
+  .company-drive-view-company-grid,
+  .company-drive-view-position-grid,
+  .company-drive-view-columns,
+  .company-drive-view-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .company-drive-view-hero-content,
+  .company-drive-view-company,
+  .company-drive-view-actions,
+  .company-drive-view-position-top,
+  .company-drive-view-modal-head,
+  .company-drive-view-modal-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

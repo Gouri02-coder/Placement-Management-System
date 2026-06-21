@@ -1,203 +1,180 @@
-<div class="job-postings-container">
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <div class="hero-content">
-      <h1>Find Your Dream Job</h1>
-      <p>Discover exciting opportunities from top companies and take the next step in your career</p>
+<div class="company-job-page">
+  <section class="company-job-hero">
+    <div class="company-job-hero-copy">
+      <p class="company-job-eyebrow">Company Hiring</p>
+      <h1>Job Postings</h1>
+      <p>Manage, review, and promote your company’s open roles through one polished hiring workspace.</p>
     </div>
-  </div>
+  </section>
 
-  <!-- Search and Filters Section -->
-  <div class="filters-section">
-    <div class="search-box">
-      <i class="material-icons" aria-hidden="true">search</i>
-      <input 
-        type="text" 
-        placeholder="Search by job title, company, or keywords..." 
-        [(ngModel)]="searchTerm" 
+  <section class="company-job-filters">
+    <div class="company-job-search">
+      <span class="company-job-search-icon">🔎</span>
+      <input
+        type="text"
+        placeholder="Search by job title, company, or keywords..."
+        [(ngModel)]="searchTerm"
         (input)="applyFilters()"
         aria-label="Search jobs">
     </div>
-    
-    <div class="filters-grid">
-      <div class="filter-group">
-        <label for="jobType">Job Type</label>
-        <select id="jobType" [(ngModel)]="selectedType" (change)="applyFilters()">
+
+    <div class="company-job-filter-grid">
+      <label class="company-job-filter">
+        <span>Job Type</span>
+        <select [(ngModel)]="selectedType" (change)="applyFilters()">
           <option *ngFor="let type of jobTypes" [value]="type.value">{{type.label}}</option>
         </select>
-      </div>
+      </label>
 
-      <div class="filter-group">
-        <label for="location">Location</label>
-        <select id="location" [(ngModel)]="selectedLocation" (change)="applyFilters()">
+      <label class="company-job-filter">
+        <span>Location</span>
+        <select [(ngModel)]="selectedLocation" (change)="applyFilters()">
           <option *ngFor="let location of locations" [value]="location.value">{{location.label}}</option>
         </select>
-      </div>
+      </label>
 
-      <div class="filter-group">
-        <label for="experience">Experience Level</label>
-        <select id="experience" [(ngModel)]="selectedExperience" (change)="applyFilters()">
+      <label class="company-job-filter">
+        <span>Experience Level</span>
+        <select [(ngModel)]="selectedExperience" (change)="applyFilters()">
           <option *ngFor="let exp of experienceLevels" [value]="exp.value">{{exp.label}}</option>
         </select>
-      </div>
+      </label>
 
-      <button class="btn-clear" (click)="clearFilters()" aria-label="Clear all filters">
-        <i class="material-icons" aria-hidden="true">clear</i> Clear All
+      <button class="company-job-clear-btn" (click)="clearFilters()" aria-label="Clear all filters">
+        Clear All
       </button>
     </div>
 
-    <div class="results-info">
-      <span class="results-count">
-        <i class="material-icons" aria-hidden="true">work</i>
-        {{filteredJobs.length}} job{{filteredJobs.length !== 1 ? 's' : ''}} found
-      </span>
+    <div class="company-job-results">
+      {{filteredJobs.length}} job{{filteredJobs.length !== 1 ? 's' : ''}} found
     </div>
-  </div>
+  </section>
 
-  <!-- Loading State -->
-  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
-    <div class="spinner" aria-hidden="true"></div>
-    <p>Loading amazing opportunities...</p>
-  </div>
+  <section class="company-job-loading" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="company-job-spinner" aria-hidden="true"></div>
+    <p>Loading job postings...</p>
+  </section>
 
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!isLoading && filteredJobs.length === 0">
-    <i class="material-icons" aria-hidden="true">work_off</i>
+  <section class="company-job-empty" *ngIf="!isLoading && filteredJobs.length === 0">
+    <div class="company-job-empty-icon">📭</div>
     <h3>No jobs found</h3>
-    <p>Try adjusting your search filters or check back later for new opportunities</p>
-    <button class="btn-primary" (click)="clearFilters()" aria-label="Clear all filters">
-      <i class="material-icons" aria-hidden="true">refresh</i> Clear Filters
-    </button>
-  </div>
+    <p>Try adjusting your filters or check back later for new openings.</p>
+    <button class="company-job-primary-btn" (click)="clearFilters()">Clear Filters</button>
+  </section>
 
-  <!-- Jobs Grid -->
-  <div class="jobs-grid" *ngIf="!isLoading && filteredJobs.length > 0">
-    <div class="job-card" *ngFor="let job of paginatedJobs" [class.featured]="job.featured">
-      <div class="card-badge" *ngIf="job.featured" aria-label="Featured job">
-        <i class="material-icons" aria-hidden="true">stars</i> Featured
+  <section class="company-job-grid" *ngIf="!isLoading && filteredJobs.length > 0">
+    <article class="company-job-card" *ngFor="let job of paginatedJobs" [class.company-job-card-featured]="job.featured">
+      <div class="company-job-badges">
+        <span class="company-job-badge company-job-badge-featured" *ngIf="job.featured">Featured</span>
+        <span class="company-job-badge company-job-badge-urgent" *ngIf="isUrgent(job.deadline)">Urgent</span>
+        <span class="company-job-badge company-job-badge-expired" *ngIf="isExpired(job.deadline)">Expired</span>
       </div>
-      <div class="card-badge urgent" *ngIf="isUrgent(job.deadline)" aria-label="Urgent hiring">
-        <i class="material-icons" aria-hidden="true">schedule</i> Urgent
-      </div>
-      <div class="card-badge expired" *ngIf="isExpired(job.deadline)" aria-label="Job expired">
-        <i class="material-icons" aria-hidden="true">event_busy</i> Expired
-      </div>
-      
-      <div class="card-header">
-        <div class="company-logo">
-          <!-- ✅ Fixed: Added alt attribute with meaningful description -->
-          <img 
-            [src]="job.companyLogo" 
-            [alt]="job.company + ' logo'"
-            [title]="job.company">
+
+      <div class="company-job-head">
+        <div class="company-job-logo">
+          <img [src]="job.companyLogo" [alt]="job.company + ' logo'" [title]="job.company">
         </div>
-        <div class="job-info">
+        <div class="company-job-title-block">
           <h3>{{job.title}}</h3>
-          <div class="company-name">
-            <i class="material-icons" aria-hidden="true">business</i>
-            {{job.company}}
-          </div>
+          <p>{{job.company}}</p>
         </div>
       </div>
 
-      <div class="job-details">
-        <div class="detail-item">
-          <i class="material-icons" aria-hidden="true">{{getLocationIcon(job.location)}}</i>
-          <span>{{job.location | uppercase}}</span>
+      <div class="company-job-meta-grid">
+        <div class="company-job-meta-box">
+          <span>Location</span>
+          <strong>{{job.location | uppercase}}</strong>
         </div>
-        <div class="detail-item">
-          <i class="material-icons" aria-hidden="true">work</i>
-          <span class="job-type" [class]="getTypeClass(job.type)">{{job.type | uppercase}}</span>
+        <div class="company-job-meta-box">
+          <span>Job Type</span>
+          <strong class="company-job-type" [class]="getTypeClass(job.type)">{{job.type | uppercase}}</strong>
         </div>
-        <div class="detail-item">
-          <i class="material-icons" aria-hidden="true">trending_up</i>
-          <span>{{getExperienceLabel(job.experience)}}</span>
+        <div class="company-job-meta-box">
+          <span>Experience</span>
+          <strong>{{getExperienceLabel(job.experience)}}</strong>
         </div>
-        <div class="detail-item">
-          <i class="material-icons" aria-hidden="true">attach_money</i>
-          <span>{{job.salary}}</span>
+        <div class="company-job-meta-box">
+          <span>Salary</span>
+          <strong>{{job.salary}}</strong>
         </div>
       </div>
 
-      <div class="job-description">
+      <div class="company-job-description">
         <p>{{job.description}}</p>
       </div>
 
-      <div class="job-requirements">
-        <div class="requirements-header">
-          <i class="material-icons" aria-hidden="true">check_circle</i>
-          <strong>Key Requirements:</strong>
-        </div>
-        <div class="tags">
-          <span class="tag" *ngFor="let req of job.requirements.slice(0, 4)">{{req}}</span>
-          <span class="tag more" *ngIf="job.requirements.length > 4">+{{job.requirements.length - 4}} more</span>
+      <div class="company-job-section">
+        <span class="company-job-section-label">Key Requirements</span>
+        <div class="company-job-tags">
+          <span class="company-job-tag" *ngFor="let req of job.requirements.slice(0, 4)">{{req}}</span>
+          <span class="company-job-tag company-job-tag-more" *ngIf="job.requirements.length > 4">+{{job.requirements.length - 4}} more</span>
         </div>
       </div>
 
-      <div class="job-footer">
-        <div class="footer-info">
-          <div class="info-item">
-            <i class="material-icons" aria-hidden="true">schedule</i>
-            <span>Posted {{formatDate(job.postedDate)}}</span>
+      <div class="company-job-footer">
+        <div class="company-job-footer-list">
+          <div class="company-job-footer-item">
+            <span>Posted</span>
+            <strong>{{formatDate(job.postedDate)}}</strong>
           </div>
-          <div class="info-item">
-            <i class="material-icons" aria-hidden="true">people</i>
-            <span>{{job.applicants}} applicants</span>
+          <div class="company-job-footer-item">
+            <span>Applicants</span>
+            <strong>{{job.applicants}}</strong>
           </div>
-          <div class="info-item" [class.urgent]="isUrgent(job.deadline)" [class.expired]="isExpired(job.deadline)">
-            <i class="material-icons" aria-hidden="true">event</i>
-            <span *ngIf="!isExpired(job.deadline)">{{getDaysRemaining(job.deadline)}} days left</span>
-            <span *ngIf="isExpired(job.deadline)">Expired</span>
+          <div class="company-job-footer-item" [class.company-job-footer-item-urgent]="isUrgent(job.deadline)" [class.company-job-footer-item-expired]="isExpired(job.deadline)">
+            <span>Deadline</span>
+            <strong *ngIf="!isExpired(job.deadline)">{{getDaysRemaining(job.deadline)}} days left</strong>
+            <strong *ngIf="isExpired(job.deadline)">Expired</strong>
           </div>
         </div>
-        <div class="tags-small">
-          <span class="tag-small" *ngFor="let tag of job.tags">{{tag}}</span>
+
+        <div class="company-job-tags-small">
+          <span class="company-job-tag-small" *ngFor="let tag of job.tags">{{tag}}</span>
         </div>
       </div>
 
-      <div class="card-actions">
-        <button class="btn-outline" (click)="viewDetails(job.id)" aria-label="View details for {{job.title}}">
-          <i class="material-icons" aria-hidden="true">visibility</i> View Details
+      <div class="company-job-actions">
+        <button class="company-job-secondary-btn" (click)="viewDetails(job.id)" aria-label="View details for {{job.title}}">
+          View Details
         </button>
-        <button 
-          class="btn-primary" 
-          (click)="applyNow(job.id)" 
+        <button
+          class="company-job-primary-btn"
+          (click)="applyNow(job.id)"
           [disabled]="isExpired(job.deadline)"
           [attr.aria-label]="isExpired(job.deadline) ? 'This job has expired' : 'Apply for ' + job.title">
-          <i class="material-icons" aria-hidden="true">send</i> Apply Now
+          Apply Now
         </button>
       </div>
-    </div>
-  </div>
+    </article>
+  </section>
 
-  <!-- Pagination -->
-  <div class="pagination" *ngIf="!isLoading && filteredJobs.length > 0 && totalPages > 1" role="navigation" aria-label="Pagination">
-    <button 
-      class="page-btn" 
-      (click)="changePage(currentPage - 1)" 
+  <section class="company-job-pagination" *ngIf="!isLoading && filteredJobs.length > 0 && totalPages > 1" role="navigation" aria-label="Pagination">
+    <button
+      class="company-job-page-btn"
+      (click)="changePage(currentPage - 1)"
       [disabled]="currentPage === 1"
       aria-label="Previous page">
-      <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+      Previous
     </button>
-    
-    <div class="page-numbers">
-      <button 
-        *ngFor="let page of getPages()" 
-        class="page-number" 
-        [class.active]="page === currentPage"
+
+    <div class="company-job-page-numbers">
+      <button
+        *ngFor="let page of getPages()"
+        class="company-job-page-number"
+        [class.company-job-page-number-active]="page === currentPage"
         (click)="changePage(page)"
         [attr.aria-label]="'Go to page ' + page"
         [attr.aria-current]="page === currentPage ? 'page' : null">
         {{page}}
       </button>
     </div>
-    
-    <button 
-      class="page-btn" 
-      (click)="changePage(currentPage + 1)" 
+
+    <button
+      class="company-job-page-btn"
+      (click)="changePage(currentPage + 1)"
       [disabled]="currentPage === totalPages"
       aria-label="Next page">
-      Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+      Next
     </button>
-  </div>
+  </section>
 </div>

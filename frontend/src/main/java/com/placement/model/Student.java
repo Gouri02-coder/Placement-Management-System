@@ -42,9 +42,20 @@ public class Student {
     @Column(name = "created_date")
     private LocalDate createdDate;
 
+    @Column(name = "verified_by_admin", nullable = false)
+    private Boolean verifiedByAdmin;
+
+    @Column(name = "rejected_by_admin", nullable = false)
+    private Boolean rejectedByAdmin;
+
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
+
     // Constructors
     public Student() {
         this.createdDate = LocalDate.now();
+        this.verifiedByAdmin = false;
+        this.rejectedByAdmin = false;
     }
 
     public Student(String name, String email, String phone, String department, String course, Integer year, Double cgpa) {
@@ -85,4 +96,17 @@ public class Student {
 
     public LocalDate getCreatedDate() { return createdDate; }
     public void setCreatedDate(LocalDate createdDate) { this.createdDate = createdDate; }
+
+    public Boolean getVerifiedByAdmin() { return verifiedByAdmin; }
+    public void setVerifiedByAdmin(Boolean verifiedByAdmin) { this.verifiedByAdmin = verifiedByAdmin; }
+
+    public boolean isVerifiedByAdmin() { return verifiedByAdmin != null && verifiedByAdmin; }
+
+    public Boolean getRejectedByAdmin() { return rejectedByAdmin; }
+    public void setRejectedByAdmin(Boolean rejectedByAdmin) { this.rejectedByAdmin = rejectedByAdmin; }
+
+    public boolean isRejectedByAdmin() { return rejectedByAdmin != null && rejectedByAdmin; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 }

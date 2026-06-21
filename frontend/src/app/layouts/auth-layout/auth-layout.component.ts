@@ -63,7 +63,10 @@ export class AuthLayoutComponent implements OnInit {
             this.router.navigate(['/company/dashboard']);
             break;
           case 'placement-officer':
-            this.router.navigate(['/placement/dashboard']);
+            this.router.navigate(['/pto/dashboard']);
+            break;
+          case 'pto':
+            this.router.navigate(['/pto/dashboard']);
             break;
           case 'admin':
             this.router.navigate(['/admin/dashboard']);

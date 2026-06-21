@@ -18,7 +18,6 @@ interface StatCard {
 })
 export class LandingPageComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
-  activeFeature = 'students';
 
   statCards: StatCard[] = [
     { label: 'Partner Companies', target: 500, suffix: '+', value: 0 },
@@ -41,10 +40,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
-  }
-
-  selectFeature(feature: 'students' | 'companies' | 'admin'): void {
-    this.activeFeature = feature;
   }
 
   scrollTo(sectionId: string): void {

@@ -78,14 +78,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/login`, credentials, { headers }).pipe(
       tap((response: any) => {
         console.log('=== LOGIN RESPONSE ===');
-        console.log('Response status:', response?.status);
+        console.log('Response:', response);
+        console.log('Status:', response?.status);
         console.log('Has token:', !!response?.token);
         console.log('Has user:', !!response?.user);
         
         if (response?.token) {
           console.log('Token preview:', response.token.substring(0, 50) + '...');
           console.log('Token length:', response.token.length);
-          console.log('Token parts count:', response.token.split('.').length);
           console.log('Token valid JWT:', this.tokenService.isValidJwtToken(response.token));
         }
         
@@ -94,17 +94,18 @@ export class AuthService {
           console.log('User email:', response.user.email);
         }
         
-        this.persistAuthSession(response);
+        if (this.isSuccessfulAuthResponse(response)) {
+          this.persistAuthSession(response);
+        } else {
+          console.error('Login response does not contain a usable auth payload:', response);
+        }
       }),
       catchError((error) => {
         console.error('=== LOGIN ERROR ===');
         console.error('Status:', error.status);
         console.error('Status Text:', error.statusText);
         console.error('Message:', error.message);
-        console.error('Error:', error);
-        if (error.error) {
-          console.error('Error body:', error.error);
-        }
+        console.error('Error details:', error.error);
         return throwError(() => error);
       })
     );
@@ -234,23 +235,27 @@ export class AuthService {
     
     switch (role) {
       case 'admin':
+      case 'role_admin':
         console.log('Redirecting to admin dashboard');
         this.router.navigate(['/admin/dashboard']);
         break;
       case 'pto':
+      case 'role_pto':
         console.log('Redirecting to PTO dashboard');
         this.router.navigate(['/pto/dashboard']);
         break;
       case 'company':
+      case 'role_company':
         console.log('Redirecting to company dashboard');
         this.router.navigate(['/company/dashboard']);
         break;
       case 'student':
+      case 'role_student':
         console.log('Redirecting to student dashboard');
         this.router.navigate(['/student/dashboard']);
         break;
       default:
-        console.log('Unknown role, redirecting to home');
+        console.log('Unknown role:', role, 'redirecting to home');
         this.router.navigate(['/']);
     }
   }
@@ -261,19 +266,19 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    return this.hasRole('admin');
+    return this.hasRole('admin') || this.hasRole('role_admin');
   }
 
   isStudent(): boolean {
-    return this.hasRole('student');
+    return this.hasRole('student') || this.hasRole('role_student');
   }
 
   isCompany(): boolean {
-    return this.hasRole('company');
+    return this.hasRole('company') || this.hasRole('role_company');
   }
 
   isPTO(): boolean {
-    return this.hasRole('pto');
+    return this.hasRole('pto') || this.hasRole('role_pto');
   }
 
   private persistAuthSession(response: any): void {
@@ -284,8 +289,8 @@ export class AuthService {
       return;
     }
 
-    if (!response.status || response.status !== 'success') {
-      console.error('Invalid response status:', response.status);
+    if (!this.isSuccessfulAuthResponse(response)) {
+      console.error('Response does not contain a valid auth payload');
       return;
     }
 
@@ -303,9 +308,6 @@ export class AuthService {
     // Validate token format
     if (!this.tokenService.isValidJwtToken(response.token)) {
       console.error('Invalid JWT token format received from server');
-      console.error('Token:', response.token);
-      console.error('Token parts:', response.token?.split('.').length);
-      console.error('Expected: 3 parts, Found:', response.token?.split('.').length);
       return;
     }
 
@@ -322,6 +324,10 @@ export class AuthService {
     // Process user data
     let userRole = response.user.role || '';
     userRole = userRole.toLowerCase();
+    // Remove ROLE_ prefix if present for display
+    if (userRole.startsWith('role_')) {
+      userRole = userRole.substring(5);
+    }
     console.log('User role normalized:', userRole);
 
     const user: User = {
@@ -348,5 +354,20 @@ export class AuthService {
     }
 
     console.log('=== AUTH SESSION PERSISTED SUCCESSFULLY ===');
+  }
+
+  private isSuccessfulAuthResponse(response: any): boolean {
+    if (!response) {
+      return false;
+    }
+
+    // Accept both:
+    // 1. { status: 'success', token, user }
+    // 2. { token, user }
+    const hasToken = typeof response.token === 'string' && response.token.trim().length > 0;
+    const hasUser = !!response.user;
+    const statusIsSuccess = !response.status || response.status === 'success';
+
+    return hasToken && hasUser && statusIsSuccess;
   }
 }

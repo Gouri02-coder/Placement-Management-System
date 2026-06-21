@@ -15,5 +15,9 @@ public interface StudentService {
     List<Student> getStudentsByCourse(String course);
     List<Student> getStudentsByYear(Integer year);
     List<Student> getStudentsByCgpaGreaterThanEqual(Double cgpa);
+    List<Student> getVerifiedStudents();
+    List<Student> getRejectedStudents();
+    void verifyStudent(@NonNull Long id);
+    void rejectStudent(@NonNull Long id, String reason);
     boolean existsByEmail(String email);
 }

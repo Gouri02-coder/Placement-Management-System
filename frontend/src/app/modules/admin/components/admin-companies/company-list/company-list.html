@@ -1,1 +1,67 @@
-<p>company-list works!</p>
+<section class="page-shell">
+  <header class="page-hero">
+    <div>
+      <p class="eyebrow">Company Directory</p>
+      <h2>Registered Companies</h2>
+      <p>Review recruiter profiles, track onboarding status, and move pending partners through approval.</p>
+    </div>
+    <div class="hero-stat">
+      <strong>{{ filteredCompanies.length }}</strong>
+      <span>Visible companies</span>
+    </div>
+  </header>
+
+  <section class="toolbar-card">
+    <input type="text" [(ngModel)]="search" placeholder="Search by ID, name, or sector" />
+    <select [(ngModel)]="statusFilter">
+      <option value="All">All Status</option>
+      <option value="Approved">Approved</option>
+      <option value="Pending">Pending</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+    <p class="helper-copy">Switch pending companies to approved directly from the list.</p>
+  </section>
+
+  <section class="table-card">
+    <div class="section-head">
+      <div>
+        <h3>Recruiter Overview</h3>
+        <p>Packages, openings, and approval state in one place.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Company</th>
+            <th>Sector</th>
+            <th>Openings</th>
+            <th>Package</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let company of filteredCompanies">
+            <td>{{ company.id }}</td>
+            <td class="company-cell">
+              <strong>{{ company.name }}</strong>
+            </td>
+            <td>{{ company.sector }}</td>
+            <td>{{ company.openings }}</td>
+            <td>{{ company.packageLpa }} LPA</td>
+            <td><span class="status-pill" [class]="company.status">{{ company.status }}</span></td>
+            <td class="action-cell">
+              <button type="button" class="ghost-btn" (click)="toggleApproval(company)">
+                {{ company.status === 'Approved' ? 'Mark Pending' : 'Approve' }}
+              </button>
+              <a class="text-link" [routerLink]="['/admin/companies/details', company.id]">Details</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

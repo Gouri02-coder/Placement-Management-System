@@ -1,102 +1,70 @@
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { catchError, switchMap, take, filter } from 'rxjs/operators';
-import { BehaviorSubject, throwError, Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { TokenService } from '../services/token.service';
+import { AuthService } from '../services/auth.service';
 
-let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  private isRefreshing = false;
 
-export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
-  const authService = inject(AuthService);
-  const tokenService = inject(TokenService);
+  constructor(
+    private tokenService: TokenService,
+    private authService: AuthService
+  ) {}
 
-  // Log all requests
-  console.log('=== INTERCEPTOR ===');
-  console.log('Request URL:', req.url);
-  
-  // Add auth token to requests except for auth endpoints
-  if (shouldAddToken(req)) {
-    const token = tokenService.getToken();
-    console.log('Token from service:', token);
-    console.log('Token exists:', !!token);
-    if (token) {
-      console.log('Token parts:', token.split('.').length);
-      console.log('Token valid JWT:', tokenService.isValidJwtToken(token));
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Skip adding token for auth endpoints
+    if (req.url.includes('/api/auth/')) {
+      return next.handle(req);
     }
-    req = addToken(req, tokenService);
-  } else {
-    console.log('Skipping token for auth endpoint');
+
+    const token = this.tokenService.getToken();
+    
+    if (token) {
+      req = this.addTokenToRequest(req, token);
+    }
+
+    return next.handle(req).pipe(
+      catchError(error => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          return this.handle401Error(req, next);
+        }
+        return throwError(() => error);
+      })
+    );
   }
 
-  return next(req).pipe(
-    catchError((error) => {
-      console.log('Request error:', error.status, error.message);
-      if (error.status === 401 && shouldHandleRefresh(req)) {
-        return handle401Error(req, next, authService, tokenService);
-      }
-      return throwError(() => error) as Observable<HttpEvent<any>>;
-    })
-  );
-};
-
-function shouldAddToken(req: HttpRequest<any>): boolean {
-  const excludeUrls = ['/auth/login', '/auth/register', '/auth/refresh'];
-  const shouldAdd = !excludeUrls.some(url => req.url.includes(url));
-  console.log('shouldAddToken for', req.url, ':', shouldAdd);
-  return shouldAdd;
-}
-
-function shouldHandleRefresh(req: HttpRequest<any>): boolean {
-  return !req.url.includes('/auth/') && !req.url.includes('/refresh');
-}
-
-function addToken(req: HttpRequest<any>, tokenService: TokenService): HttpRequest<any> {
-  const token = tokenService.getToken();
-  if (token && tokenService.isValidJwtToken(token)) {
-    console.log('Adding Authorization header with token');
-    return req.clone({
+  private addTokenToRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+    return request.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
-  } else {
-    console.warn('No valid token to add to request');
-    if (token) {
-      console.warn('Token exists but invalid format. Parts:', token.split('.').length);
-    }
   }
-  return req;
-}
 
-function handle401Error(req: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService, tokenService: TokenService): Observable<HttpEvent<any>> {
-  if (!isRefreshing) {
-    isRefreshing = true;
-    refreshTokenSubject.next(null);
-
-    return authService.refreshToken().pipe(
-      switchMap((response: any) => {
-        isRefreshing = false;
-        if (response?.token) {
-          tokenService.setToken(response.token);
-          refreshTokenSubject.next(response.token);
-        }
-        return next(addToken(req, tokenService));
-      }),
-      catchError((error) => {
-        isRefreshing = false;
-        authService.logout();
-        return throwError(() => error) as Observable<HttpEvent<any>>;
-      })
-    );
-  } else {
-    return refreshTokenSubject.pipe(
-      filter((token): token is string => token != null),
-      take(1),
-      switchMap(() => {
-        return next(addToken(req, tokenService));
-      })
-    );
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      
+      return this.authService.refreshToken().pipe(
+        switchMap((response: any) => {
+          this.isRefreshing = false;
+          const newToken = response.token;
+          if (newToken) {
+            return next.handle(this.addTokenToRequest(request, newToken));
+          }
+          return throwError(() => new Error('No token in refresh response'));
+        }),
+        catchError(error => {
+          this.isRefreshing = false;
+          this.authService.logout();
+          return throwError(() => error);
+        })
+      );
+    }
+    
+    return next.handle(request);
   }
 }

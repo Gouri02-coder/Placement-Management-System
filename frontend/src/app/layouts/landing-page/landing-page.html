@@ -1,100 +1,361 @@
-<div class="landing-shell">
-  <header class="top-nav">
-    <a class="brand" routerLink="/">
-      <span class="brand-mark">PM</span>
-      <span>Placement Management</span>
-    </a>
+<div class="app-wrapper">
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  <div class="bg-shape shape-3"></div>
 
-    <button type="button" class="menu-btn" (click)="toggleMobileMenu()">Menu</button>
+  <header class="navbar">
+    <div class="nav-container">
+      <a routerLink="/" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="brand-text">Placement<strong>Hub</strong></span>
+      </a>
 
-    <nav [class.open]="mobileMenuOpen">
-      <button type="button" (click)="scrollTo('features')">Features</button>
-      <button type="button" (click)="scrollTo('workflow')">Workflow</button>
-      <button type="button" (click)="scrollTo('contact')">Contact</button>
-      <a routerLink="/auth/login" class="ghost">Login</a>
-      <a routerLink="/auth/register" class="solid">Get Started</a>
-    </nav>
+      <nav class="nav-links" [class.open]="mobileMenuOpen">
+        <a (click)="scrollTo('home')">Home</a>
+        <a (click)="scrollTo('features')">Features</a>
+        <a (click)="scrollTo('workflow')">Workflow</a>
+        <a (click)="scrollTo('outcomes')">Outcomes</a>
+        <a (click)="scrollTo('contact')">Contact</a>
+      </nav>
+
+      <div class="nav-buttons">
+        <a routerLink="/auth/login" class="btn-login">Log in</a>
+        <a routerLink="/auth/register" class="btn-signup glow-btn">Join Now</a>
+        <button class="menu-toggle" (click)="toggleMobileMenu()">☰</button>
+      </div>
+    </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Modern Campus Recruitment Platform</p>
-      <h1>Make placement operations faster, clearer, and data-driven.</h1>
-      <p>
-        Manage students, companies, applications, interviews, and reporting in one cohesive system built for placement teams.
-      </p>
-      <div class="hero-actions">
-        <a routerLink="/auth/register" class="cta-main">Create Account</a>
-        <button type="button" class="cta-alt" (click)="scrollTo('features')">Explore Features</button>
+  <section id="home" class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="badge glass-badge">🚀 Top Campus Recruitment Platform</div>
+        <h1 class="hero-title">
+          Find & Hire Top <br>
+          <span class="text-gradient">Talent From Campus.</span>
+        </h1>
+        <p class="hero-desc">
+          Bring students, recruiters, and placement teams into one elegant, seamless workflow for drives, approvals, shortlists, and reporting.
+        </p>
+        
+        <div class="hero-actions">
+          <a routerLink="/auth/register" class="btn-primary glow-btn">Get Started</a>
+          <button (click)="scrollTo('features')" class="btn-secondary">Explore Features <span class="arrow">→</span></button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <h3>92%</h3>
+            <p>Placement Rate</p>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <h3>3x</h3>
+            <p>Faster Hiring</p>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="avatars">
+              <div class="avatar bg-blue"></div>
+              <div class="avatar bg-purple"></div>
+              <div class="avatar bg-cyan"></div>
+              <div class="avatar bg-gray">+</div>
+            </div>
+            <p>15k+ Students</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visuals">
+        <div class="visual-wrapper">
+          <div class="main-image-placeholder">
+            <div class="mockup-ui">
+              <div class="mockup-sidebar">
+                <div class="ms-logo"></div>
+                <div class="ms-menu">
+                  <div class="ms-item active"></div>
+                  <div class="ms-item"></div>
+                  <div class="ms-item"></div>
+                  <div class="ms-item"></div>
+                </div>
+              </div>
+              
+              <div class="mockup-content">
+                <div class="mockup-header">
+                  <span class="mh-title">Placement Overview</span>
+                  <div class="mh-profile"></div>
+                </div>
+                
+                <div class="mockup-stats-row">
+                  <div class="m-stat-card">
+                    <span class="ms-label">Total Placed</span>
+                    <span class="ms-val text-cyan">1,245</span>
+                    <div class="ms-bar"><div class="fill cyan w-80"></div></div>
+                  </div>
+                  <div class="m-stat-card">
+                    <span class="ms-label">Active Drives</span>
+                    <span class="ms-val text-blue">24</span>
+                    <div class="ms-bar"><div class="fill blue w-60"></div></div>
+                  </div>
+                  <div class="m-stat-card">
+                    <span class="ms-label">Interviews Today</span>
+                    <span class="ms-val text-purple">128</span>
+                    <div class="ms-bar"><div class="fill purple w-40"></div></div>
+                  </div>
+                </div>
+
+                <div class="mockup-list-section">
+                  <span class="ml-title">Recent Activity</span>
+                  <div class="mockup-list">
+                    <div class="ml-item">
+                      <div class="ml-avatar bg-pink"></div>
+                      <div class="ml-info"><strong>Sarah Jenkins</strong><span>Software Engineer - Google</span></div>
+                      <div class="ml-badge success">Hired</div>
+                    </div>
+                    <div class="ml-item">
+                      <div class="ml-avatar bg-blue"></div>
+                      <div class="ml-info"><strong>Michael Chen</strong><span>Product Manager - Adobe</span></div>
+                      <div class="ml-badge pending">In Review</div>
+                    </div>
+                    <div class="ml-item">
+                      <div class="ml-avatar bg-purple"></div>
+                      <div class="ml-info"><strong>Aisha Patel</strong><span>Data Analyst - Amazon</span></div>
+                      <div class="ml-badge interview">Interview R2</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="float-card card-top-right float-anim-1 glass-card">
+            <div class="icon-check">✓</div>
+            <div>
+              <strong>Drive Active</strong>
+              <span>Microsoft SDE</span>
+            </div>
+          </div>
+
+          <div class="float-card card-bottom-left float-anim-2 glass-card">
+            <div class="card-icon">📊</div>
+            <div>
+              <strong>Application Status</strong>
+              <span>Shortlisted for R2</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="hero-panel">
-      <h3>Platform Snapshot</h3>
-      <div class="stat-grid">
-        <article *ngFor="let stat of statCards">
-          <h4>{{ stat.value }}{{ stat.suffix || '' }}</h4>
+  <section class="trusted-section">
+    <div class="container">
+      <p>Trusted By 1200+ Top Companies Worldwide</p>
+      
+      <div class="slider-container">
+        <div class="logo-track">
+          <div class="logo-set">
+            <div class="logo-card"><span class="logo-text tcs">TCS</span></div>
+            <div class="logo-card"><span class="logo-text wipro">Wipro</span></div>
+            <div class="logo-card"><span class="logo-text deloitte">Deloitte <span class="dot">.</span></span></div>
+            <div class="logo-card"><span class="logo-text infosys">Infosys</span></div>
+            <div class="logo-card"><span class="logo-text cognizant">Cognizant</span></div>
+            <div class="logo-card"><span class="logo-text accenture">Accenture <span class="greater">&gt;</span></span></div>
+            <div class="logo-card"><span class="logo-text capgemini">Capgemini</span></div>
+            <div class="logo-card"><span class="logo-text techm">Tech Mahindra</span></div>
+          </div>
+          <div class="logo-set">
+            <div class="logo-card"><span class="logo-text tcs">TCS</span></div>
+            <div class="logo-card"><span class="logo-text wipro">Wipro</span></div>
+            <div class="logo-card"><span class="logo-text deloitte">Deloitte <span class="dot">.</span></span></div>
+            <div class="logo-card"><span class="logo-text infosys">Infosys</span></div>
+            <div class="logo-card"><span class="logo-text cognizant">Cognizant</span></div>
+            <div class="logo-card"><span class="logo-text accenture">Accenture <span class="greater">&gt;</span></span></div>
+            <div class="logo-card"><span class="logo-text capgemini">Capgemini</span></div>
+            <div class="logo-card"><span class="logo-text techm">Tech Mahindra</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Role-Focused Workspaces</h2>
+        <p>Purpose-built views so every stakeholder sees exactly what they need, without the clutter.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card glass-panel">
+          <div class="feature-icon bg-blue-glow">👨‍🎓</div>
+          <h3>Student Dashboard</h3>
+          <p>A clean, personalized space for students to discover jobs, track applications, and manage interview schedules.</p>
+          <ul class="feature-list">
+            <li>✓ Job recommendations</li>
+            <li>✓ Real-time status tracking</li>
+            <li>✓ Automated resume building</li>
+          </ul>
+        </div>
+
+        <div class="feature-card glass-panel">
+          <div class="feature-icon bg-purple-glow">🏢</div>
+          <h3>Company Workspace</h3>
+          <p>Recruiters get a dedicated portal to post openings, manage talent pipelines, and execute campus drives smoothly.</p>
+          <ul class="feature-list">
+            <li>✓ 1-click candidate shortlisting</li>
+            <li>✓ Integrated interview scheduling</li>
+            <li>✓ Deep recruitment analytics</li>
+          </ul>
+        </div>
+
+        <div class="feature-card glass-panel">
+          <div class="feature-icon bg-cyan-glow">🛡️</div>
+          <h3>Admin Command Center</h3>
+          <p>Placement officers maintain total control over the entire ecosystem with robust oversight and reporting tools.</p>
+          <ul class="feature-list">
+            <li>✓ Live system monitoring</li>
+            <li>✓ Centralized offer verification</li>
+            <li>✓ Exportable compliance reports</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow" class="workflow-section">
+    <div class="container">
+      <div class="workflow-wrapper">
+        <div class="workflow-content">
+          <h2>One connected journey from registration to offer.</h2>
+          <p>Designed to reduce back-and-forth emails and give every stakeholder a confident next step.</p>
+          
+          <div class="step-list">
+            <div class="step-item glass-panel">
+              <div class="step-number">1</div>
+              <div class="step-text">
+                <h4>Clean Onboarding</h4>
+                <p>Role-specific registration with automated profile validation.</p>
+              </div>
+            </div>
+            <div class="step-item glass-panel">
+              <div class="step-number">2</div>
+              <div class="step-text">
+                <h4>Run Structured Drives</h4>
+                <p>Post jobs, verify eligibility, and track shortlists centrally.</p>
+              </div>
+            </div>
+            <div class="step-item glass-panel">
+              <div class="step-number">3</div>
+              <div class="step-text">
+                <h4>Closed-Loop Reporting</h4>
+                <p>Monitor bottlenecks and roll out final offers seamlessly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="workflow-image">
+           <div class="mockup-window glass-panel">
+             <div class="mockup-header-dots"><span></span><span></span><span></span></div>
+             <div class="workflow-mockup-body">
+               <div class="wm-row"><div class="wm-avatar"></div><div class="wm-lines"><div class="wm-line w-100"></div><div class="wm-line w-60"></div></div><div class="wm-btn"></div></div>
+               <div class="wm-row"><div class="wm-avatar"></div><div class="wm-lines"><div class="wm-line w-80"></div><div class="wm-line w-40"></div></div><div class="wm-btn"></div></div>
+               <div class="wm-row"><div class="wm-avatar"></div><div class="wm-lines"><div class="wm-line w-90"></div><div class="wm-line w-50"></div></div><div class="wm-btn"></div></div>
+             </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="outcomes" class="outcomes-section">
+    <div class="container">
+      <div class="section-header center">
+        <h2>Platform Snapshot</h2>
+        <p>What happens when you switch to a modern placement portal.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box glass-panel" *ngFor="let stat of statCards">
+          <h2>{{ stat.value }}{{ stat.suffix || '' }}</h2>
           <p>{{ stat.label }}</p>
-        </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="features" class="feature-zone">
-    <header>
-      <h2>Role-focused experiences</h2>
-      <p>Switch views to see what each role gets out of the platform.</p>
-    </header>
+  <section id="contact" class="contact-section">
+    <div class="container contact-container">
+      <div class="contact-info">
+        <h2>Get in touch with our team</h2>
+        <p>Ready to give your placement portal a premium first impression? Reach out to us for a personalized demo.</p>
+        
+        <div class="contact-details">
+          <div class="detail-row glass-panel">
+            <span class="icon">📍</span>
+            <span>Centurion University Campus Drive, BBSR</span>
+          </div>
+          <div class="detail-row glass-panel">
+            <span class="icon">✉️</span>
+            <span>support&#64;placementhub.com</span>
+          </div>
+          <div class="detail-row glass-panel">
+            <span class="icon">📞</span>
+            <span>+91 9938767258</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="feature-toggle">
-      <button type="button" [class.active]="activeFeature === 'students'" (click)="selectFeature('students')">Students</button>
-      <button type="button" [class.active]="activeFeature === 'companies'" (click)="selectFeature('companies')">Companies</button>
-      <button type="button" [class.active]="activeFeature === 'admin'" (click)="selectFeature('admin')">Admin</button>
-    </div>
-
-    <div class="feature-card" *ngIf="activeFeature === 'students'">
-      <h3>Student Dashboard</h3>
-      <ul>
-        <li>Job discovery with personalized recommendations</li>
-        <li>Application status timeline and interview schedule</li>
-        <li>Profile and resume completion insights</li>
-      </ul>
-    </div>
-
-    <div class="feature-card" *ngIf="activeFeature === 'companies'">
-      <h3>Company Workspace</h3>
-      <ul>
-        <li>Job posting and candidate pipeline management</li>
-        <li>Quick actions for interview drives and shortlisting</li>
-        <li>Recruitment analytics and response metrics</li>
-      </ul>
-    </div>
-
-    <div class="feature-card" *ngIf="activeFeature === 'admin'">
-      <h3>Admin Command Center</h3>
-      <ul>
-        <li>Student, company, and placement oversight</li>
-        <li>Report exports and live system monitoring</li>
-        <li>Centralized review workflows and governance</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="workflow" class="workflow">
-    <h2>How it works</h2>
-    <div class="steps">
-      <article><span>1</span><p>Students build profiles and apply.</p></article>
-      <article><span>2</span><p>Companies post jobs and shortlist candidates.</p></article>
-      <article><span>3</span><p>Admins monitor progress and publish outcomes.</p></article>
+      <div class="contact-form-card glass-panel">
+        <h3>Send us a message</h3>
+        <form class="contact-form" (submit)="$event.preventDefault()">
+          <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="John Doe">
+          </div>
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="john@university.edu">
+          </div>
+          <div class="input-group">
+            <label>Message</label>
+            <textarea placeholder="How can we help you?" rows="4"></textarea>
+          </div>
+          <button class="btn-primary w-100 glow-btn">Send Message</button>
+        </form>
+      </div>
     </div>
   </section>
 
-  <section id="contact" class="contact">
-    <h2>Ready to streamline placements?</h2>
-    <p>Start with role-based onboarding and manage campus recruitment end-to-end.</p>
-    <div class="contact-actions">
-      <a routerLink="/auth/register" class="solid">Sign Up</a>
-      <a routerLink="/auth/login" class="ghost">Go to Login</a>
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <span class="brand-text">Placement<strong>Hub</strong></span>
+        </div>
+        <p>Empowering universities and companies to connect seamlessly.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Platform</h4>
+        <a (click)="scrollTo('features')">Features</a>
+        <a (click)="scrollTo('workflow')">Workflow</a>
+        <a routerLink="/auth/login">Login</a>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Support</a>
+      </div>
     </div>
-  </section>
+    <div class="footer-bottom">
+      <p>&copy; 2026 PlacementHub. All rights reserved.</p>
+    </div>
+  </footer>
 </div>

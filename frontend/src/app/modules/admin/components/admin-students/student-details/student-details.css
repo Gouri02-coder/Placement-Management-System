@@ -1,0 +1,185 @@
+:host {
+  display: block;
+}
+
+.detail-card {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.head,
+.summary-grid article,
+.info-grid article,
+.status-actions,
+.note-box {
+  border: 1px solid #dce8f4;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.head {
+  padding: 1.35rem 1.45rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.head h2,
+.summary-grid h4,
+.info-grid h3,
+.note-box label {
+  margin: 0;
+  color: #132238;
+}
+
+.head p,
+.summary-grid p,
+.info-grid p,
+.info-grid li span {
+  color: #5b6c84;
+}
+
+.head a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 0.95rem;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #124a7c;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.summary-grid,
+.info-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.summary-grid article,
+.info-grid article,
+.note-box {
+  padding: 1.2rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.36rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.chip.Placed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.chip.In-Process {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.chip.Not-Started {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.info-grid {
+  grid-template-columns: 0.95fr 1.05fr;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.skills span {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.info-grid ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.info-grid li {
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #ebf1f7;
+}
+
+.info-grid li:last-child {
+  border-bottom: 0;
+}
+
+.info-grid li strong {
+  display: block;
+  color: #132238;
+  margin-bottom: 0.2rem;
+}
+
+.status-actions {
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-actions button,
+.note-box button {
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid #c9d8e9;
+  background: #fff;
+  color: #1d4ed8;
+  font-weight: 700;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.status-actions .muted {
+  color: #475569;
+}
+
+.note-box {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.note-box textarea {
+  width: 100%;
+  min-height: 110px;
+  border: 1px solid #cad9ea;
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  resize: vertical;
+}
+
+@media (max-width: 900px) {
+  .head,
+  .summary-grid,
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .head {
+    flex-direction: column;
+  }
+}

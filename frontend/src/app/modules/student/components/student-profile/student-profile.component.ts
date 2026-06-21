@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { StudentService } from '../../services/student.service';
 import { Student, Education, Project } from '../../models/student.model';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-student-profile',
@@ -25,7 +26,8 @@ export class StudentProfileComponent implements OnInit {
 
   constructor(
     private studentService: StudentService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService
   ) {
     this.profileForm = this.createProfileForm();
     this.educationForm = this.createEducationForm();
@@ -37,58 +39,12 @@ export class StudentProfileComponent implements OnInit {
   }
 
   loadStudentProfile(): void {
-    // For demo purposes, create a mock student
-    this.student = {
-      id: '123',
-      userId: 'user123',
-      personalInfo: {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com',
-        phone: '+1234567890',
-        address: '123 Main St, City, State',
-        dateOfBirth: new Date('2000-01-01')
-      },
-      academicInfo: {
-        college: 'ABC University',
-        degree: 'B.Tech',
-        branch: 'Computer Science',
-        semester: 6,
-        cgpa: 8.5,
-        graduationYear: 2024
-      },
-      skills: ['JavaScript', 'Angular', 'TypeScript'],
-      education: [
-        {
-          institution: 'ABC University',
-          degree: 'B.Tech',
-          field: 'Computer Science',
-          startDate: new Date('2020-08-01'),
-          endDate: new Date('2024-05-01'),
-          percentage: 85
-        }
-      ],
-      projects: [
-        {
-          title: 'Student Management System',
-          description: 'A comprehensive system for managing student data',
-          technologies: ['Angular', 'Node.js', 'MongoDB'],
-          duration: '3 months',
-          githubLink: 'https://github.com/johndoe/student-management'
-        }
-      ],
-      resumeUrl: '',
-      profilePhoto: '',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    this.populateProfileForm();
-    
-    // Uncomment for real API call:
-    /*
-    const studentId = '123';
-    this.studentService.getStudentProfile(studentId).subscribe({
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser?.id) {
+      return;
+    }
+
+    this.studentService.getStudentProfile(currentUser.id.toString()).subscribe({
       next: (student) => {
         this.student = student;
         this.populateProfileForm();
@@ -97,7 +53,6 @@ export class StudentProfileComponent implements OnInit {
         console.error('Error loading profile:', error);
       }
     });
-    */
   }
 
   createProfileForm(): FormGroup {

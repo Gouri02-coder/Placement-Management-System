@@ -1,92 +1,114 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { JobService } from '../../../services/job.service';
-import { Job } from '../../../models/job.model';
-import { CommonModule, SlicePipe } from '@angular/common';
-import { RouterLink, RouterOutlet } from '@angular/router';
-
+import { Router, RouterLink } from '@angular/router';
+import { JobPortalJob, JobPortalStoreService } from '../../../services/job-portal-store.service';
 
 @Component({
   selector: 'app-job-search',
-  imports: [CommonModule,ReactiveFormsModule,RouterLink,SlicePipe],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './job-search.component.html',
   styleUrls: ['./job-search.component.css']
 })
 export class JobSearchComponent implements OnInit {
-  jobs: Job[] = [];
-  filteredJobs: Job[] = [];
-  searchForm: FormGroup;
-  isLoading = false;
-  searchQuery = '';
+  portalForm: FormGroup;
+  jobs: JobPortalJob[] = [];
+  filteredJobs: JobPortalJob[] = [];
+  savedJobIds = new Set<string>();
 
   constructor(
-    private jobService: JobService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router,
+    private jobPortalStore: JobPortalStoreService
   ) {
-    this.searchForm = this.fb.group({
+    this.portalForm = this.fb.group({
       keyword: [''],
       location: [''],
+      category: [''],
       jobType: [''],
-      experience: ['']
+      workMode: [''],
+      savedOnly: [false]
     });
   }
 
   ngOnInit(): void {
-    this.loadJobs();
-    this.searchForm.valueChanges.subscribe(() => {
-      this.filterJobs();
-    });
+    this.jobs = this.jobPortalStore.getJobsSnapshot();
+    this.savedJobIds = new Set(this.jobPortalStore.getSavedJobIdsSnapshot());
+    this.applyFilters();
+
+    this.portalForm.valueChanges.subscribe(() => this.applyFilters());
   }
 
-  loadJobs(): void {
-    this.isLoading = true;
-    this.jobService.getAllJobs().subscribe({
-      next: (jobs) => {
-        this.jobs = jobs;
-        this.filteredJobs = jobs;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading jobs:', error);
-        this.isLoading = false;
-      }
-    });
+  get totalOpenings(): number {
+    return this.jobs.reduce((sum, job) => sum + job.positions, 0);
   }
 
-  filterJobs(): void {
-    const filters = this.searchForm.value;
+  get featuredCount(): number {
+    return this.jobs.filter(job => job.featured).length;
+  }
+
+  get savedCount(): number {
+    return this.savedJobIds.size;
+  }
+
+  get appliedCount(): number {
+    return this.jobs.filter(job => this.jobPortalStore.isJobApplied(job.id)).length;
+  }
+
+  get categories(): string[] {
+    return [...new Set(this.jobs.map(job => job.category))];
+  }
+
+  applyFilters(): void {
+    const filters = this.portalForm.getRawValue();
+    const keyword = String(filters.keyword || '').trim().toLowerCase();
+    const location = String(filters.location || '').trim().toLowerCase();
+
     this.filteredJobs = this.jobs.filter(job => {
-      const matchesKeyword = !filters.keyword || 
-        job.title.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        job.companyName.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        job.skillsRequired.some(skill => 
-          skill.toLowerCase().includes(filters.keyword.toLowerCase())
-        );
-
-      const matchesLocation = !filters.location || 
-        job.location.toLowerCase().includes(filters.location.toLowerCase());
-
+      const matchesKeyword = !keyword ||
+        job.title.toLowerCase().includes(keyword) ||
+        job.companyName.toLowerCase().includes(keyword) ||
+        job.skillsRequired.some(skill => skill.toLowerCase().includes(keyword)) ||
+        job.summaryPoints.some(point => point.toLowerCase().includes(keyword));
+      const matchesLocation = !location || job.location.toLowerCase().includes(location);
+      const matchesCategory = !filters.category || job.category === filters.category;
       const matchesType = !filters.jobType || job.type === filters.jobType;
+      const matchesWorkMode = !filters.workMode || job.workMode === filters.workMode;
+      const matchesSaved = !filters.savedOnly || this.savedJobIds.has(job.id);
 
-      return matchesKeyword && matchesLocation && matchesType;
+      return matchesKeyword && matchesLocation && matchesCategory && matchesType && matchesWorkMode && matchesSaved;
     });
   }
 
-  onSearch(): void {
-    this.filterJobs();
+  clearFilters(): void {
+    this.portalForm.reset({
+      keyword: '',
+      location: '',
+      category: '',
+      jobType: '',
+      workMode: '',
+      savedOnly: false
+    });
+    this.applyFilters();
   }
 
-  onClearFilters(): void {
-    this.searchForm.reset();
-    this.filteredJobs = this.jobs;
+  toggleSave(jobId: string): void {
+    this.jobPortalStore.toggleSavedJob(jobId);
+    this.savedJobIds = new Set(this.jobPortalStore.getSavedJobIdsSnapshot());
+    this.applyFilters();
   }
 
-  getJobTypeClass(jobType: string): string {
-    switch (jobType) {
-      case 'full-time': return 'full-time';
-      case 'part-time': return 'part-time';
-      case 'internship': return 'internship';
-      default: return '';
-    }
+  isSaved(jobId: string): boolean {
+    return this.savedJobIds.has(jobId);
+  }
+
+  isApplied(jobId: string): boolean {
+    return this.jobPortalStore.isJobApplied(jobId);
+  }
+
+  browseAllJobs(): void {
+    this.clearFilters();
+    void this.router.navigate(['/student/job-portals']);
   }
 }

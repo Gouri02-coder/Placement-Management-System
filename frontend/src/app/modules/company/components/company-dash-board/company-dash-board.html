@@ -1,175 +1,168 @@
-<!-- company-dash-board.html -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<div class="dashboard-layout">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-container">
-        <img [src]="companyProfile.logo || 'assets/default-company-logo.png'" alt="Company Logo">
-      </div>
-      <h2 class="company-name">{{ companyProfile.name || 'Company Name' }}</h2>
+<section class="dashboard-shell">
+  <header class="page-header">
+    <div class="header-copy">
+      <p class="eyebrow">Company Dashboard</p>
+      <h1>{{ companyProfile.name || 'Company Dashboard' }}</h1>
+      <p class="subtitle">
+        Manage jobs, applications, recruiter activity, and campus hiring from one unified company workspace.
+      </p>
     </div>
 
-    <div class="company-status" [ngClass]="'status-' + companyProfile.status">
-      <i class="material-icons">
-        {{ companyProfile.status === 'approved' ? 'check_circle' :
-           companyProfile.status === 'rejected' ? 'cancel' : 'schedule' }}
-      </i>
-      <span>Status: {{ companyProfile.status | titlecase }}</span>
-    </div>
-
-    <nav class="nav-menu">
-      <a class="nav-item" [class.active]="activeSection === 'dashboard'" (click)="switchSection('dashboard')">
-        <i class="material-icons">dashboard</i>
-        <span>Dashboard</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'profile'" (click)="switchSection('profile')">
-        <i class="material-icons">business</i>
-        <span>Company Profile</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'jobs'" (click)="switchSection('jobs')">
-        <i class="material-icons">work</i>
-        <span>Job Postings</span>
-        <span class="badge">{{ dashboardStats.activeJobs }}</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'applications'" (click)="switchSection('applications')">
-        <i class="material-icons">description</i>
-        <span>Applications</span>
-        <span class="badge">{{ dashboardStats.totalApplications }}</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'drives'" (click)="switchSection('drives')">
-        <i class="material-icons">event</i>
-        <span>Placement Drives</span>
-        <span class="badge">{{ dashboardStats.upcomingDrives }}</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'analytics'" (click)="switchSection('analytics')">
-        <i class="material-icons">analytics</i>
-        <span>Analytics</span>
-      </a>
-
-      <a class="nav-item" [class.active]="activeSection === 'communication'" (click)="switchSection('communication')">
-        <i class="material-icons">message</i>
-        <span>Communication</span>
-        <span class="badge">{{ dashboardStats.unreadNotifications }}</span>
-      </a>
-
-      <!-- Screenshot Button -->
-      <a class="nav-item screenshot-btn" (click)="takeScreenshot()">
-        <i class="material-icons">photo_camera</i>
-        <span>Take Screenshot</span>
-      </a>
-    </nav>
-
-    <div class="user-footer">
-      <div class="user-info">
-        <img src="assets/default-avatar.png" alt="User Avatar">
-        <div class="user-details">
-          <p class="user-name">{{ userName }}</p>
-          <p class="user-role">{{ userRole }}</p>
-        </div>
-      </div>
-      <button class="logout-btn" (click)="logout()">
-        <i class="material-icons">logout</i>
-      </button>
-    </div>
-  </aside>
-
-  <main class="main-content">
-    <div class="dashboard-header">
-      <h1>Company Dashboard</h1>
-      <button class="screenshot-action-btn" (click)="takeScreenshot()">
-        <i class="material-icons">photo_camera</i>
-        Capture Dashboard
-      </button>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon primary">
-          <i class="material-icons">work</i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ dashboardStats.activeJobs }}</h3>
-          <p>Active Jobs</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon success">
-          <i class="material-icons">description</i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ dashboardStats.totalApplications }}</h3>
-          <p>Total Applications</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon warning">
-          <i class="material-icons">schedule</i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ dashboardStats.pendingReviews }}</h3>
-          <p>Pending Reviews</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon info">
-          <i class="material-icons">event</i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ dashboardStats.upcomingDrives }}</h3>
-          <p>Upcoming Drives</p>
-        </div>
+    <div class="header-chip">
+      <div class="chip-icon">{{ (companyProfile.name || 'C').charAt(0) }}</div>
+      <div>
+        <strong>{{ userName || 'Recruitment Team' }}</strong>
+        <span>{{ userRole }}</span>
       </div>
     </div>
+  </header>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <h2>Quick Actions</h2>
-      <div class="action-buttons">
-        <button class="action-btn" (click)="postJob()">
-          <i class="material-icons">add</i>
-          Post New Job
-        </button>
-        <button class="action-btn" (click)="scheduleDrive()">
-          <i class="material-icons">event_available</i>
-          Schedule Drive
-        </button>
-        <button class="action-btn" (click)="viewApplications()">
-          <i class="material-icons">list_alt</i>
-          View Applications
-        </button>
-        <button class="action-btn" (click)="viewAnalytics()">
-          <i class="material-icons">analytics</i>
-          View Analytics
-        </button>
+  <section class="stats-grid">
+    <article class="stat-card jobs">
+      <div class="stat-icon">JB</div>
+      <div class="stat-content">
+        <h3>{{ dashboardStats.activeJobs }}</h3>
+        <p>Active Jobs</p>
       </div>
-    </div>
+      <span class="stat-note">Open roles</span>
+    </article>
 
-    <!-- Recent Activities -->
-    <div class="recent-activities">
-      <h2>Recent Activities</h2>
-      <div class="activity-list">
-        <div *ngFor="let activity of recentActivities" class="activity-item" [ngClass]="'activity-' + activity.type">
-          <div class="activity-icon">
-            <i class="material-icons">{{ activity.icon }}</i>
+    <article class="stat-card applications">
+      <div class="stat-icon">AP</div>
+      <div class="stat-content">
+        <h3>{{ dashboardStats.totalApplications }}</h3>
+        <p>Total Applications</p>
+      </div>
+      <span class="stat-note">Across all roles</span>
+    </article>
+
+    <article class="stat-card reviews">
+      <div class="stat-icon">RV</div>
+      <div class="stat-content">
+        <h3>{{ dashboardStats.pendingReviews }}</h3>
+        <p>Pending Reviews</p>
+      </div>
+      <span class="stat-note">Needs action</span>
+    </article>
+
+    <article class="stat-card drives">
+      <div class="stat-icon">DR</div>
+      <div class="stat-content">
+        <h3>{{ dashboardStats.upcomingDrives }}</h3>
+        <p>Upcoming Drives</p>
+      </div>
+      <span class="stat-note">Campus events</span>
+    </article>
+  </section>
+
+  <section class="feature-grid">
+    <article class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="section-label">Hiring Pulse</p>
+          <h3>Recruitment Snapshot</h3>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div>
+          <strong>{{ dashboardStats.activeJobs }}</strong>
+          <span>Live Jobs</span>
+        </div>
+        <div>
+          <strong>{{ dashboardStats.pendingReviews }}</strong>
+          <span>Pending Reviews</span>
+        </div>
+        <div>
+          <strong>{{ dashboardStats.unreadNotifications }}</strong>
+          <span>Unread Updates</span>
+        </div>
+      </div>
+
+      <div class="summary-lines compact">
+        <div><span>Local hires</span><strong>{{ dashboardStats.localHires }}</strong></div>
+        <div><span>Verification</span><strong class="status-text" [ngClass]="'status-' + companyProfile.status">{{ companyProfile.status | titlecase }}</strong></div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="section-label">Quick Actions</p>
+          <h3>Recruiter Actions</h3>
+        </div>
+      </div>
+
+      <div class="quick-links">
+        <button type="button" (click)="postJob()">Create Hiring Drive</button>
+        <button type="button" (click)="viewApplications()">View Applications</button>
+        <button type="button" (click)="scheduleDrive()">Schedule Drive</button>
+        <button type="button" (click)="viewAnalytics()">View Analytics</button>
+        <button type="button" (click)="editProfile()">Edit Profile</button>
+        <button type="button" (click)="takeScreenshot()">Capture Dashboard</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="panel">
+      <div class="panel-head">
+        <h3>Recent Activity</h3>
+      </div>
+
+      <ul class="activity-list">
+        <li *ngFor="let activity of recentActivities" [ngClass]="'activity-' + activity.type">
+          <span class="activity-icon">{{ activity.icon }}</span>
+          <div>
+            <strong>{{ activity.message }}</strong>
+            <p>{{ activity.time }}</p>
           </div>
-          <div class="activity-content">
-            <p class="activity-message">{{ activity.message }}</p>
-            <span class="activity-time">{{ activity.time }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        </li>
+      </ul>
+    </article>
 
-    <router-outlet></router-outlet>
-  </main>
-</div>
+    <article class="panel">
+      <div class="panel-head">
+        <h3>Priority Actions</h3>
+      </div>
+
+      <div class="action-grid">
+        <button type="button" class="ghost-btn" (click)="postJob()">Add Hiring Drive</button>
+        <button type="button" class="ghost-btn" (click)="viewApplications()">Review Applications</button>
+        <button type="button" class="ghost-btn" (click)="scheduleDrive()">Plan Campus Drive</button>
+        <button type="button" class="ghost-btn" (click)="editProfile()">Update Company Profile</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid lower">
+    <article class="panel">
+      <div class="panel-head">
+        <h3>Company Profile</h3>
+      </div>
+
+      <div class="profile-summary">
+        <p><strong>Website:</strong> {{ companyProfile.website || 'Not added yet' }}</p>
+        <p><strong>Address:</strong> {{ companyProfile.address || 'Not added yet' }}</p>
+        <p><strong>Description:</strong> {{ companyProfile.description || 'Add a company introduction to improve profile quality.' }}</p>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <h3>Workspace Actions</h3>
+      </div>
+
+      <div class="summary-lines">
+        <div><span>Unread notifications</span><strong>{{ dashboardStats.unreadNotifications }}</strong></div>
+        <div><span>Pending reviews</span><strong>{{ dashboardStats.pendingReviews }}</strong></div>
+        <div><span>Upcoming drives</span><strong>{{ dashboardStats.upcomingDrives }}</strong></div>
+      </div>
+
+      <div class="workspace-actions">
+        <button type="button" class="ghost-btn" (click)="editProfile()">Edit Profile</button>
+        <button type="button" class="ghost-btn danger" (click)="logout()">Logout</button>
+      </div>
+    </article>
+  </section>
+</section>

@@ -1,3 +1,43 @@
+:root {
+  --surface: #f7f3ec;
+  --surface-strong: #fffdf8;
+  --surface-muted: rgba(255, 250, 242, 0.72);
+  --ink: #1f2937;
+  --ink-soft: #5f6f7c;
+  --line: rgba(113, 82, 47, 0.14);
+  --brand: #b85c38;
+  --brand-deep: #7a3b26;
+  --brand-gold: #e3a64f;
+  --forest: #2d6a4f;
+  --shadow-lg: 0 26px 70px rgba(74, 47, 26, 0.14);
+  --shadow-md: 0 16px 40px rgba(74, 47, 26, 0.1);
+  --radius-xl: 28px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(227, 166, 79, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(45, 106, 79, 0.12), transparent 24%),
+    linear-gradient(180deg, #fdf7ef 0%, #f7f1e7 100%);
+  font-family: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -75,5 +115,936 @@ body.loading-active * {
 @media (max-width: 768px) {
   .sidebar-main {
     margin-left: 0;
+  }
+}
+
+/* Student Module Theme */
+.student-layout,
+.student-layout * {
+  box-sizing: border-box;
+}
+
+.student-layout {
+  --student-bg-main: #040a18;
+  --student-bg-secondary: #0a1226;
+  --student-panel: rgba(15, 23, 42, 0.72);
+  --student-border: rgba(59, 130, 246, 0.16);
+  --student-border-strong: rgba(96, 165, 250, 0.3);
+  --student-text: #f8fafc;
+  --student-muted: #94a3b8;
+  --student-cyan: #06b6d4;
+  --student-blue: #3b82f6;
+  --student-shadow: 0 18px 44px rgba(2, 6, 23, 0.34);
+}
+
+.student-layout .main-content :is(
+  .job-portal-shell,
+  .applications-shell,
+  .placement-drives-page,
+  .profile-container,
+  .resume-builder-container,
+  .interview-feedback-container,
+  .interview-schedule-container,
+  .interview-preparation-container,
+  .apply-job-container,
+  .application-edit-shell,
+  .application-detail-shell,
+  .job-detail-shell
+) {
+  min-height: 100vh;
+  padding: 32px;
+  background: transparent !important;
+  color: var(--student-text);
+}
+
+.student-layout .main-content :is(
+  .applications-hero,
+  .applications-content,
+  .summary-card,
+  .filter-card,
+  .application-card,
+  .hero-card,
+  .toolbar-card,
+  .drive-list-panel,
+  .drive-list-card,
+  .drive-detail-panel,
+  .portal-hero,
+  .stat-card,
+  .filters-panel,
+  .jobs-head,
+  .job-card,
+  .profile-header,
+  .profile-sidebar,
+  .profile-main,
+  .tab-content,
+  .builder-header,
+  .resume-form,
+  .form-section,
+  .education-item,
+  .project-item,
+  .header,
+  .view-toggle,
+  .controls,
+  .interview-card,
+  .interview-detail,
+  .detail-card,
+  .detail-section,
+  .interview-form,
+  .empty-state,
+  .job-header,
+  .job-overview,
+  .company-panel,
+  .skills-panel,
+  .tips-section,
+  .prep-card,
+  .feedback-card
+) {
+  background: var(--student-panel) !important;
+  color: var(--student-text) !important;
+  border: 1px solid var(--student-border) !important;
+  border-radius: 24px !important;
+  backdrop-filter: blur(14px);
+  box-shadow: var(--student-shadow);
+}
+
+.student-layout .main-content :is(h1, h2, h3, h4, strong, label) {
+  color: var(--student-text);
+}
+
+.student-layout .main-content :is(
+  p,
+  span,
+  small,
+  li,
+  .meta-line,
+  .hero-copy,
+  .subtitle,
+  .section-subtitle,
+  .helper-text,
+  .job-title,
+  .company-name,
+  .label,
+  .value
+) {
+  color: var(--student-muted);
+}
+
+.student-layout .main-content :is(
+  .eyebrow,
+  .summary-kicker,
+  .company-chip,
+  .results-badge,
+  .package-pill,
+  .status-pill,
+  .badge,
+  .mini-badge,
+  .skill-tag,
+  .chip
+) {
+  border-radius: 999px;
+}
+
+.student-layout .main-content :is(
+  .hero-action,
+  .hero-link,
+  .primary-btn,
+  .btn-primary,
+  .btn-save,
+  .btn-download,
+  .btn-add,
+  .btn-join,
+  .btn-join-large,
+  .save-btn,
+  .filter-btn.active
+) {
+  background: linear-gradient(135deg, var(--student-cyan), var(--student-blue)) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22);
+}
+
+.student-layout .main-content :is(
+  .secondary-btn,
+  .ghost-btn,
+  .btn-view,
+  .btn-edit,
+  .btn-cancel,
+  .btn-preview,
+  .edit-btn,
+  .panel-action,
+  .link-btn,
+  .toggle-btn,
+  .filter-btn
+) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--student-text) !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+}
+
+.student-layout .main-content :is(input, select, textarea) {
+  background: rgba(15, 23, 42, 0.88) !important;
+  color: var(--student-text) !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 16px !important;
+}
+
+.student-layout .main-content :is(input::placeholder, textarea::placeholder) {
+  color: #7c8da6;
+}
+
+.student-layout .main-content :is(.filter-card.active, .drive-list-card.selected) {
+  border-color: var(--student-border-strong) !important;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.14), var(--student-shadow);
+}
+
+.student-layout .main-content :is(
+  .skills-row span,
+  .skill-row span,
+  .quick-links a,
+  .meta-tag,
+  .status-badge,
+  .results-badge
+) {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+}
+
+.student-layout .main-content a {
+  color: #93c5fd;
+}
+
+@media (max-width: 768px) {
+  .student-layout .main-content :is(
+    .job-portal-shell,
+    .applications-shell,
+    .placement-drives-page,
+    .profile-container,
+    .resume-builder-container,
+    .interview-feedback-container,
+    .interview-schedule-container,
+    .interview-preparation-container,
+    .apply-job-container,
+    .application-edit-shell,
+    .application-detail-shell,
+    .job-detail-shell
+  ) {
+    padding: 20px 16px 24px;
+  }
+}
+
+/* Company And Admin Module Theme */
+:is(.company-layout, .admin-shell),
+:is(.company-layout, .admin-shell) * {
+  box-sizing: border-box;
+}
+
+:is(.company-layout, .admin-shell) {
+  --portal-bg-main: #040a18;
+  --portal-bg-secondary: #0a1226;
+  --portal-panel: rgba(17, 26, 51, 0.74);
+  --portal-panel-strong: rgba(7, 17, 38, 0.92);
+  --portal-panel-soft: rgba(255, 255, 255, 0.04);
+  --portal-border: rgba(59, 130, 246, 0.16);
+  --portal-border-strong: rgba(96, 165, 250, 0.3);
+  --portal-text: #f8fafc;
+  --portal-muted: #94a3b8;
+  --portal-blue: #3b82f6;
+  --portal-cyan: #06b6d4;
+  --portal-purple: #8b5cf6;
+  --portal-green: #10b981;
+  --portal-amber: #f59e0b;
+  --portal-red: #ef4444;
+  --portal-shadow: 0 18px 40px rgba(2, 6, 23, 0.24);
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) {
+  color: var(--portal-text);
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .application-list-container,
+  .shortlist-container,
+  .candidate-profile-container,
+  .candidate-profile-page,
+  .company-profile-container,
+  .job-create-container,
+  .job-edit-container,
+  .company-job-page,
+  .analytics-dashboard,
+  .reports-page,
+  .reports-shell,
+  .notifications-container,
+  .messaging-container,
+  .company-drive-page,
+  .company-drive-detail-page,
+  .page-shell,
+  .page-card
+) {
+  color: var(--portal-text);
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .page-header,
+  .page-hero,
+  .toolbar-card,
+  .table-card,
+  .table-wrap,
+  .page-card,
+  .approval-card,
+  .detail-card,
+  .schedule-card,
+  .drive-card,
+  .drive-item,
+  .company-drive-card,
+  .company-drive-hero,
+  .company-drive-filter-bar,
+  .company-drive-empty,
+  .company-drive-modal,
+  .company-drive-pagination,
+  .company-job-hero,
+  .company-job-filters,
+  .company-job-card,
+  .company-job-loading,
+  .company-job-empty,
+  .company-job-pagination,
+  .application-card,
+  .candidate-card,
+  .summary-card,
+  .summary-section,
+  .filters-section,
+  .filter-card,
+  .job-form,
+  .form-section,
+  .panel,
+  .metric,
+  .metric-card,
+  .chart-card,
+  .report-card,
+  .insight-card,
+  .empty-state,
+  .loading-state,
+  .hero,
+  .focus-card,
+  .overview-card,
+  .insight-strip article,
+  .profile-header,
+  .profile-overview,
+  .profile-section,
+  .profile-card,
+  .notification-card,
+  .message-card,
+  .meta-grid,
+  .summary-grid article,
+  .info-grid article,
+  .status-actions,
+  .note-box,
+  .toolbar,
+  .controls,
+  .search-box,
+  .filter-group select,
+  .radio-option,
+  .checkbox-option,
+  .common-skills,
+  .skills-section,
+  .company-job-meta-box,
+  .company-job-footer-item,
+  .company-job-section,
+  .company-job-footer,
+  .company-cell,
+  .top-row
+) {
+  background: var(--portal-panel) !important;
+  color: var(--portal-text) !important;
+  border: 1px solid var(--portal-border) !important;
+  border-radius: 22px !important;
+  backdrop-filter: blur(16px);
+  box-shadow: var(--portal-shadow);
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  label,
+  th,
+  .section-head h3,
+  .company-cell strong,
+  .candidate-basic-info h3,
+  .company-job-title-block h3,
+  .page-hero h2,
+  .page-card header h2
+) {
+  color: var(--portal-text) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  p,
+  span,
+  small,
+  li,
+  .subtitle,
+  .helper-copy,
+  .filter-label,
+  .message,
+  .count,
+  .meta,
+  .ratio,
+  .company,
+  .label,
+  .help-text,
+  .char-count,
+  .section-head p,
+  .company-job-title-block p,
+  .company-job-section-label,
+  .company-job-meta-box span,
+  .company-job-footer-item span,
+  .candidate-email,
+  .candidate-job,
+  .detail-item label,
+  .detail-item span,
+  .meta-grid p
+) {
+  color: var(--portal-muted) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  input,
+  select,
+  textarea
+) {
+  background: rgba(8, 14, 30, 0.88) !important;
+  color: var(--portal-text) !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  input::placeholder,
+  textarea::placeholder
+) {
+  color: #7c8da6 !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  input:focus,
+  select:focus,
+  textarea:focus
+) {
+  outline: none !important;
+  border-color: var(--portal-border-strong) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  button,
+  .btn,
+  .ghost-btn,
+  .text-link,
+  .btn-back,
+  .btn-secondary,
+  .btn-outline,
+  .page-btn,
+  .page-number,
+  .company-job-secondary-btn,
+  .company-job-clear-btn,
+  .company-job-page-btn,
+  .company-job-page-number,
+  .open-link,
+  .hero-action.secondary
+) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--portal-text) !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .btn-primary,
+  .hero-action,
+  .btn-export,
+  .company-job-primary-btn,
+  .company-job-page-number-active,
+  .page-number.active,
+  .page-btn.active,
+  .open-link
+) {
+  background: linear-gradient(135deg, var(--portal-cyan), var(--portal-blue)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .btn-success,
+  .status-shortlisted,
+  .status-approved
+) {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #86efac !important;
+  border: 1px solid rgba(16, 185, 129, 0.24) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .danger,
+  .btn-danger
+) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.22) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  a,
+  .text-link
+) {
+  color: #93c5fd !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .status-badge,
+  .status-pill,
+  .status,
+  .chip,
+  .badge,
+  .pill,
+  .tag,
+  .skill-tag,
+  .company-job-badge,
+  .company-job-tag,
+  .company-job-tag-small,
+  .hero-stat,
+  .cgpa,
+  .skill-level
+) {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #dbeafe !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 999px !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .Approved,
+  .Published,
+  .Scheduled,
+  .Running,
+  .Placed
+) {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #86efac !important;
+  border-color: rgba(16, 185, 129, 0.24) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .Pending,
+  .In-Process,
+  .warning
+) {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fde68a !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .Rejected,
+  .Cancelled,
+  .Closed,
+  .Not-Started
+) {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.24) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  table,
+  thead,
+  tbody,
+  tr,
+  th,
+  td
+) {
+  color: var(--portal-text) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) thead th {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) tbody tr:hover td {
+  background: rgba(59, 130, 246, 0.06) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .progress-bar,
+  .progress-track
+) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .progress-fill
+) {
+  background: linear-gradient(135deg, var(--portal-cyan), var(--portal-blue)) !important;
+}
+
+:is(.company-layout .main-content, .admin-shell .admin-main) :is(
+  .spinner,
+  .company-job-spinner
+) {
+  border-top-color: var(--portal-blue) !important;
+}
+
+@media (max-width: 768px) {
+  :is(.company-layout .main-content, .admin-shell .admin-main) :is(
+    .application-list-container,
+    .shortlist-container,
+    .candidate-profile-container,
+    .candidate-profile-page,
+    .company-profile-container,
+    .job-create-container,
+    .job-edit-container,
+    .company-job-page,
+    .analytics-dashboard,
+    .reports-page,
+    .reports-shell,
+    .notifications-container,
+    .messaging-container,
+    .company-drive-page,
+    .company-drive-detail-page,
+    .page-shell,
+    .page-card
+  ) {
+    padding-inline: 0;
+  }
+}
+
+/* PTO Module Theme */
+.pto-layout,
+.pto-layout * {
+  box-sizing: border-box;
+}
+
+.pto-layout {
+  --pto-bg-main: #040a18;
+  --pto-bg-secondary: #0a1226;
+  --pto-panel: rgba(17, 26, 51, 0.76);
+  --pto-panel-strong: rgba(7, 17, 38, 0.92);
+  --pto-panel-soft: rgba(255, 255, 255, 0.04);
+  --pto-border: rgba(59, 130, 246, 0.16);
+  --pto-border-strong: rgba(96, 165, 250, 0.3);
+  --pto-text: #f8fafc;
+  --pto-muted: #94a3b8;
+  --pto-blue: #3b82f6;
+  --pto-cyan: #06b6d4;
+  --pto-purple: #8b5cf6;
+  --pto-green: #10b981;
+  --pto-amber: #f59e0b;
+  --pto-red: #ef4444;
+  --pto-shadow: 0 18px 40px rgba(2, 6, 23, 0.24);
+}
+
+.pto-layout .main-content {
+  color: var(--pto-text);
+}
+
+.pto-layout .main-content :is(
+  .dashboard-wrapper,
+  .student-list-container,
+  .company-list-container,
+  .drive-management-container,
+  .pto-component-shell,
+  .header-card,
+  .verification-shell,
+  .verification-grid
+) {
+  background: transparent !important;
+  color: var(--pto-text) !important;
+}
+
+.pto-layout .main-content :is(
+  .page-header,
+  .dashboard-header,
+  .dashboard-card,
+  .stat-card,
+  .hero-card,
+  .metric-card,
+  .content-card,
+  .debug-section,
+  .debug-content,
+  .toolbar,
+  .filters-section,
+  .table-container,
+  .header-card,
+  .verification-card,
+  .queue-card,
+  .state-card,
+  .count-card,
+  .summary-card,
+  .hero,
+  .contact-card,
+  .detail-grid div,
+  .search-wrapper,
+  .loading-container,
+  .modal-container,
+  .drive-card,
+  .card-header,
+  .card-body,
+  .card-footer,
+  .position-card,
+  .sidebar-header
+) {
+  background: var(--pto-panel) !important;
+  color: var(--pto-text) !important;
+  border: 1px solid var(--pto-border) !important;
+  border-radius: 22px !important;
+  backdrop-filter: blur(16px);
+  box-shadow: var(--pto-shadow);
+}
+
+.pto-layout .main-content :is(
+  .hero-card,
+  .header-card,
+  .hero,
+  .page-header
+) {
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.22), transparent 26%),
+    linear-gradient(135deg, rgba(7, 17, 38, 0.96), rgba(17, 26, 51, 0.84)) !important;
+}
+
+.pto-layout .main-content :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  label,
+  th
+) {
+  color: var(--pto-text) !important;
+}
+
+.pto-layout .main-content :is(
+  p,
+  span,
+  small,
+  li,
+  .subtitle,
+  .stat-label,
+  .section-subtitle,
+  .helper-copy,
+  .detail-row span,
+  .card-top p,
+  .activity-details p,
+  .activity-details small,
+  .hero-meta span
+) {
+  color: var(--pto-muted) !important;
+}
+
+.pto-layout .main-content :is(
+  input,
+  select,
+  textarea,
+  .search-input,
+  .filter-select,
+  .form-control
+) {
+  background: rgba(8, 14, 30, 0.88) !important;
+  color: var(--pto-text) !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.pto-layout .main-content :is(
+  input::placeholder,
+  textarea::placeholder
+) {
+  color: #7c8da6 !important;
+}
+
+.pto-layout .main-content :is(
+  input:focus,
+  select:focus,
+  textarea:focus,
+  .search-input:focus,
+  .filter-select:focus,
+  .form-control:focus
+) {
+  outline: none !important;
+  border-color: var(--pto-border-strong) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+
+.pto-layout .main-content :is(
+  .btn-refresh,
+  .create-drive-btn,
+  .refresh-btn,
+  .save-btn,
+  .view-btn,
+  .approve-btn,
+  .back-btn,
+  .test-api-btn
+) {
+  background: linear-gradient(135deg, var(--pto-cyan), var(--pto-blue)) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.22) !important;
+}
+
+.pto-layout .main-content :is(
+  .filter-btn,
+  .page-btn,
+  .cancel-btn,
+  .edit-btn,
+  .debug-btn,
+  .close-debug,
+  .close-modal
+) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--pto-text) !important;
+  border: 1px solid rgba(148, 163, 184, 0.18) !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.pto-layout .main-content :is(
+  .reject-btn,
+  .delete-btn
+) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.22) !important;
+  border-radius: 14px !important;
+}
+
+.pto-layout .main-content :is(
+  .filter-btn.active,
+  .status-pill,
+  .status-badge,
+  .status,
+  .count-badge,
+  .hero-meta span,
+  .stat-trend
+) {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #dbeafe !important;
+  border: 1px solid rgba(96, 165, 250, 0.18) !important;
+  border-radius: 999px !important;
+}
+
+.pto-layout .main-content :is(
+  .approved,
+  .Approved,
+  .success
+) {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #86efac !important;
+  border-color: rgba(16, 185, 129, 0.24) !important;
+}
+
+.pto-layout .main-content :is(
+  .pending,
+  .Pending,
+  .warning
+) {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fde68a !important;
+  border-color: rgba(245, 158, 11, 0.24) !important;
+}
+
+.pto-layout .main-content :is(
+  .rejected,
+  .Rejected,
+  .error,
+  .cancelled
+) {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.24) !important;
+}
+
+.pto-layout .main-content :is(
+  .student-table,
+  .company-table,
+  table,
+  thead,
+  tbody,
+  tr,
+  th,
+  td
+) {
+  color: var(--pto-text) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.pto-layout .main-content :is(
+  .student-table,
+  .company-table,
+  table
+) {
+  background: transparent !important;
+}
+
+.pto-layout .main-content thead :is(th, td) {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.pto-layout .main-content tbody tr:hover :is(td, th) {
+  background: rgba(59, 130, 246, 0.06) !important;
+}
+
+.pto-layout .main-content :is(
+  .progress-track,
+  .progress-bar
+) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+}
+
+.pto-layout .main-content :is(
+  .progress-fill
+) {
+  background: linear-gradient(135deg, var(--pto-cyan), var(--pto-blue)) !important;
+}
+
+.pto-layout .main-content :is(
+  .search-icon,
+  .stat-icon,
+  .activity-icon,
+  .icon
+) {
+  color: #bfdbfe !important;
+}
+
+.pto-layout .main-content pre {
+  background: rgba(2, 6, 23, 0.7) !important;
+  color: #dbeafe !important;
+  border: 1px solid rgba(96, 165, 250, 0.16) !important;
+  border-radius: 16px !important;
+}
+
+@media (max-width: 768px) {
+  .pto-layout .main-content :is(
+    .dashboard-wrapper,
+    .student-list-container,
+    .company-list-container,
+    .drive-management-container,
+    .pto-component-shell
+  ) {
+    padding-inline: 0 !important;
   }
 }

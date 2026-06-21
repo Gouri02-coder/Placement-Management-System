@@ -17,31 +17,37 @@
 
   <!-- Auto-save indicator -->
   <div class="auto-save-indicator" *ngIf="isSavingDraft">
-    <i class="material-icons spin">refresh</i> Saving draft...
+    <span class="inline-badge spin">...</span> Saving draft...
   </div>
 
   <div class="profile-header">
     <div class="header-left">
       <button class="btn btn-back" (click)="goBack()">
-        <span class="material-icons">arrow_back</span> Back to Dashboard
+        <span class="btn-badge">Back</span>
+        <span>Back to Dashboard</span>
       </button>
       <h1>Company Profile</h1>
     </div>
     <div class="header-actions">
       <button *ngIf="!isEditing" class="btn btn-primary" (click)="toggleEdit()">
-        <span class="material-icons">edit</span> Edit Profile
+        <span class="btn-badge">Edit</span>
+        <span>Edit Profile</span>
       </button>
       <button class="btn btn-info" (click)="getVerificationStatus()">
-        <span class="material-icons">verified</span> Check Status
+        <span class="btn-badge">Stat</span>
+        <span>Check Status</span>
       </button>
       <button *ngIf="!isEditing" class="btn btn-outline" (click)="togglePreviewMode()">
-        <span class="material-icons">visibility</span> Preview
+        <span class="btn-badge">View</span>
+        <span>Preview</span>
       </button>
       <button *ngIf="!isEditing" class="btn btn-outline" (click)="exportProfile()">
-        <span class="material-icons">download</span> Export
+        <span class="btn-badge">File</span>
+        <span>Export</span>
       </button>
       <button *ngIf="!isEditing && changeHistory.length > 0" class="btn btn-outline" (click)="showChangeHistory = !showChangeHistory">
-        <span class="material-icons">history</span> History
+        <span class="btn-badge">Log</span>
+        <span>History</span>
       </button>
     </div>
   </div>
@@ -89,7 +95,7 @@
     <!-- Status Banner -->
     <div class="status-banner" [class]="getStatusClass()">
       <div class="status-content">
-        <span class="status-icon">{{getStatusIcon()}}</span>
+        <span class="status-icon">{{getStatusBadgeText()}}</span>
         <div class="status-text">
           <h3>Verification Status: {{companyProfile.status | uppercase}}</h3>
           <p *ngIf="companyProfile.verificationNotes">{{companyProfile.verificationNotes}}</p>
@@ -102,6 +108,25 @@
       </div>
     </div>
 
+    <div class="overview-grid" *ngIf="!isEditing && !showPreviewMode">
+      <article class="overview-card">
+        <span>Industry</span>
+        <strong>{{ companyProfile.industry || 'Add industry' }}</strong>
+      </article>
+      <article class="overview-card">
+        <span>Founded</span>
+        <strong>{{ companyProfile.foundedYear || 'Add year' }}</strong>
+      </article>
+      <article class="overview-card">
+        <span>Company Size</span>
+        <strong>{{ companyProfile.employeeCount || 'Add company size' }}</strong>
+      </article>
+      <article class="overview-card">
+        <span>Primary Contact</span>
+        <strong>{{ primaryHRContact?.name || 'Add contact' }}</strong>
+      </article>
+    </div>
+
     <!-- Logo Section -->
     <div class="logo-section">
       <div class="logo-preview">
@@ -111,15 +136,16 @@
         <div class="logo-actions" *ngIf="isEditing">
           <input type="file" #logoInput accept="image/*" (change)="onLogoSelected($event)" hidden>
           <button class="btn btn-outline" (click)="logoInput.click()" [disabled]="isUploadingLogo">
-            <span class="material-icons">photo_camera</span> Change Logo
+            <span class="btn-badge">Logo</span>
+            <span>Change Logo</span>
           </button>
           <button *ngIf="logoPreview || companyProfile.logo" class="btn btn-outline btn-danger" 
                   (click)="removeLogo()" [disabled]="isUploadingLogo">
-            <span class="material-icons">delete</span> Remove
+            <span class="btn-badge">Del</span>
+            <span>Remove</span>
           </button>
           <button *ngIf="logoFile" class="btn btn-primary" (click)="uploadLogo()" [disabled]="isUploadingLogo">
-            <span class="material-icons" *ngIf="isUploadingLogo" class="spin">refresh</span>
-            <span class="material-icons" *ngIf="!isUploadingLogo">cloud_upload</span>
+            <span class="btn-badge" [class.spin]="isUploadingLogo">{{ isUploadingLogo ? '...' : 'Up' }}</span>
             {{ isUploadingLogo ? 'Uploading...' : 'Upload' }}
           </button>
         </div>
@@ -146,14 +172,14 @@
         <div class="preview-card">
           <img [src]="companyProfile.logo || 'assets/default-company-logo.png'" class="preview-logo" alt="{{companyProfile.name}} Logo" title="Company Logo">
           <h2>{{companyProfile.name}}</h2>
-          <p><span class="material-icons">language</span> <a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a></p>
-          <p><span class="material-icons">location_on</span> {{companyProfile.address}}</p>
+          <p><span class="inline-badge">Web</span> <a [href]="companyProfile.website" target="_blank">{{companyProfile.website}}</a></p>
+          <p><span class="inline-badge">Loc</span> {{companyProfile.address}}</p>
           <p class="preview-description">{{companyProfile.description}}</p>
           <div class="preview-hr" *ngIf="primaryHRContact">
             <h4>Contact:</h4>
             <p><strong>{{primaryHRContact.name}}</strong> ({{primaryHRContact.position}})</p>
-            <p><span class="material-icons">email</span> {{primaryHRContact.email}}</p>
-            <p><span class="material-icons">phone</span> {{primaryHRContact.phone}}</p>
+            <p><span class="inline-badge">Mail</span> {{primaryHRContact.email}}</p>
+            <p><span class="inline-badge">Call</span> {{primaryHRContact.phone}}</p>
           </div>
         </div>
       </div>
@@ -209,6 +235,50 @@
             {{ description?.value?.length || 0 }}/50 characters
           </div>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="industry">Industry *</label>
+            <input type="text" id="industry" formControlName="industry"
+                   [class.error]="industry?.invalid && industry?.touched"
+                   placeholder="Software, Fintech, Manufacturing...">
+            <div class="error-message" *ngIf="industry?.invalid && industry?.touched">
+              <span *ngIf="industry?.errors?.['required']">Industry is required</span>
+              <span *ngIf="industry?.errors?.['minlength']">Industry must be at least 2 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="employeeCount">Company Size</label>
+            <input type="text" id="employeeCount" formControlName="employeeCount"
+                   [class.error]="employeeCount?.invalid && employeeCount?.touched"
+                   placeholder="201-500 employees">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="foundedYear">Founded Year</label>
+            <input type="number" id="foundedYear" formControlName="foundedYear"
+                   [class.error]="foundedYear?.invalid && foundedYear?.touched"
+                   placeholder="2018">
+          </div>
+
+          <div class="form-group">
+            <label for="tagInput">Focus Tags</label>
+            <input type="text" id="tagInput" [(ngModel)]="tagInput" [ngModelOptions]="{standalone: true}"
+                   (keydown)="handleTagInput($event)" placeholder="Hiring, SaaS, AI, Campus Hiring">
+            <div class="tag-input-row">
+              <button type="button" class="btn btn-outline btn-small" (click)="addTag()">Add Tag</button>
+            </div>
+            <div class="tag-list" *ngIf="companyTags.length">
+              <span class="tag-chip" *ngFor="let tag of companyTags">
+                {{ tag }}
+                <button type="button" (click)="removeTag(tag)" aria-label="Remove tag">×</button>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- HR Contacts Section -->
@@ -216,7 +286,8 @@
         <div class="section-header">
           <h3>HR Contacts</h3>
           <button type="button" class="btn btn-small btn-outline" (click)="addHRContact()">
-            <span class="material-icons">add</span> Add HR Contact
+            <span class="btn-badge">Add</span>
+            <span>Add HR Contact</span>
           </button>
         </div>
 
@@ -229,12 +300,12 @@
                 <button *ngIf="!contact.get('isPrimary')?.value" 
                         type="button" class="btn-icon" (click)="setPrimaryContact(i)" 
                         title="Set as Primary">
-                  <span class="material-icons">star_border</span>
+                  <span>Primary</span>
                 </button>
                 <button *ngIf="hrContacts.length > 1" 
                         type="button" class="btn-icon btn-danger" (click)="removeHRContact(i)"
                         title="Remove Contact">
-                  <span class="material-icons">delete</span>
+                  <span>Remove</span>
                 </button>
               </div>
             </div>
@@ -336,13 +407,13 @@
         
         <div class="documents-list">
           <div class="document-item" *ngFor="let doc of verificationDocuments; let i = index">
-            <span class="material-icons">description</span>
+            <span class="inline-badge">Doc</span>
             <div class="doc-info">
               <span class="doc-name">{{doc.name}}</span>
               <span class="doc-status" [class]="'status-' + doc.status">{{doc.status}}</span>
             </div>
             <a [href]="doc.url" target="_blank" class="btn-icon" title="View Document">
-              <span class="material-icons">visibility</span>
+              <span>View</span>
             </a>
           </div>
         </div>
@@ -351,8 +422,7 @@
           <input type="file" #documentInput (change)="onDocumentSelected($event, 'verification')" hidden>
           <button type="button" class="btn btn-outline" (click)="documentInput.click()" 
                   [disabled]="isUploadingDocument">
-            <span class="material-icons" *ngIf="!isUploadingDocument">cloud_upload</span>
-            <span class="material-icons spin" *ngIf="isUploadingDocument">refresh</span>
+            <span class="btn-badge" [class.spin]="isUploadingDocument">{{ isUploadingDocument ? '...' : 'Up' }}</span>
             {{ isUploadingDocument ? 'Uploading...' : 'Upload Document' }}
           </button>
         </div>
@@ -364,7 +434,7 @@
           Cancel
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || !profileForm.valid">
-          <span class="material-icons spin" *ngIf="isSubmitting">refresh</span>
+          <span class="btn-badge spin" *ngIf="isSubmitting">...</span>
           {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
@@ -373,20 +443,16 @@
     <!-- Read-only View -->
     <div *ngIf="!isEditing && !showPreviewMode" class="profile-view">
       <!-- Social Links Display -->
-      <div class="social-links" *ngIf="companyProfile.socialLinks && (companyProfile.socialLinks.linkedin || companyProfile.socialLinks.twitter || companyProfile.socialLinks.github || companyProfile.socialLinks.facebook)">
+      <div class="social-links" *ngIf="populatedSocialLinks.length">
         <h4>Connect With Us</h4>
         <div class="social-icons">
-          <a *ngIf="companyProfile.socialLinks.linkedin" [href]="companyProfile.socialLinks.linkedin" target="_blank" class="social-icon linkedin">
-            <span class="material-icons">linkedin</span>
-          </a>
-          <a *ngIf="companyProfile.socialLinks.twitter" [href]="companyProfile.socialLinks.twitter" target="_blank" class="social-icon twitter">
-            <span class="material-icons">x</span>
-          </a>
-          <a *ngIf="companyProfile.socialLinks.github" [href]="companyProfile.socialLinks.github" target="_blank" class="social-icon github">
-            <span class="material-icons">code</span>
-          </a>
-          <a *ngIf="companyProfile.socialLinks.facebook" [href]="companyProfile.socialLinks.facebook" target="_blank" class="social-icon facebook">
-            <span class="material-icons">facebook</span>
+          <a *ngFor="let social of populatedSocialLinks"
+             [href]="social.url"
+             target="_blank"
+             class="social-icon"
+             [ngClass]="social.cssClass"
+             [attr.aria-label]="social.label">
+            <span>{{ social.badge }}</span>
           </a>
         </div>
       </div>
@@ -407,6 +473,24 @@
         <div class="info-item full-width">
           <label>Description</label>
           <p class="description-text">{{companyProfile.description}}</p>
+        </div>
+        <div class="info-item">
+          <label>Industry</label>
+          <p>{{ companyProfile.industry || 'Not added yet' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Company Size</label>
+          <p>{{ companyProfile.employeeCount || 'Not added yet' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Founded Year</label>
+          <p>{{ companyProfile.foundedYear || 'Not added yet' }}</p>
+        </div>
+        <div class="info-item full-width" *ngIf="companyProfile.tags?.length">
+          <label>Focus Tags</label>
+          <div class="tag-list read-only">
+            <span class="tag-chip" *ngFor="let tag of companyProfile.tags">{{ tag }}</span>
+          </div>
         </div>
       </div>
 
@@ -442,7 +526,7 @@
         <h4>Verification Documents</h4>
         <div class="documents-list">
           <div class="document-item" *ngFor="let doc of verificationDocuments">
-            <span class="material-icons">verified</span>
+            <span class="inline-badge">Doc</span>
             <div class="doc-info">
               <span class="doc-name">{{doc.name}}</span>
               <span class="doc-status" [class]="'status-' + doc.status">{{doc.status}}</span>

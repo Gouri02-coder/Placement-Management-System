@@ -1,59 +1,58 @@
-<div class="app-layout">
+<div class="student-layout">
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-icon">P</div>
-      <span class="logo-text">Placement<span>Pro</span></span>
+    <div class="brand-header">
+      <div class="brand-logo">S</div>
+      <span class="brand-name">Student Portal</span>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav>
+      <div class="nav-label">Management</div>
+
       <a routerLink="/student/dashboard" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-house"></i> <span>Dashboard</span>
+        <span class="nav-icon">DB</span> Dashboard
       </a>
-      <a routerLink="/student/job/job-search" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-magnifying-glass"></i> <span>Explore Jobs</span>
+      <a routerLink="/student/job-portals" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">JB</span> Explore Jobs
       </a>
       <a routerLink="/student/applications" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-file-text"></i> <span>My Applications</span>
+        <span class="nav-icon">AP</span> My Applications
       </a>
-      <a routerLink="/student/interviews/schedule" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-calendar"></i> <span>Interviews</span>
+      <a routerLink="/student/interviews" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">IV</span> Interviews
       </a>
-      <div class="nav-divider"></div>
       <a routerLink="/student/resume-builder" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-scroll"></i> <span>Resume Builder</span>
+        <span class="nav-icon">CV</span> Resume Builder
+      </a>
+      <a routerLink="/student/placement-drives" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">PD</span> Placement Drives
       </a>
       <a routerLink="/student/profile" routerLinkActive="active" class="nav-item">
-        <i class="ph-bold ph-user-gear"></i> <span>Settings</span>
+        <span class="nav-icon">PF</span> Profile Settings
       </a>
     </nav>
 
     <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="avatar">{{ student?.personalInfo?.firstName?.[0] || 'S' }}</div>
+        <div class="user-meta">
+          <span class="name">{{ student?.personalInfo?.firstName || 'Student' }}</span>
+          <span class="role">Student</span>
+        </div>
+      </div>
+
       <button class="logout-btn" (click)="onLogout()">
-        <i class="ph-bold ph-sign-out"></i> <span>Sign Out</span>
+        <span class="nav-icon">LO</span> Sign Out
       </button>
     </div>
   </aside>
 
-  <main class="main-wrapper">
-    <header class="top-navbar">
-      <div class="search-bar">
-        <i class="ph-bold ph-magnifying-glass"></i>
-        <input type="text" placeholder="Search for jobs, companies...">
-      </div>
-      <div class="top-actions">
-        <button class="icon-btn"><i class="ph-bold ph-bell"></i></button>
-        <div class="user-profile" routerLink="/student/profile">
-          <div class="avatar">{{ student?.personalInfo?.firstName?.[0] || 'S' }}</div>
-          <div class="user-meta">
-            <span class="name">{{ student?.personalInfo?.firstName }}</span>
-            <span class="role">Student</span>
-          </div>
-        </div>
-      </div>
-    </header>
+  <main class="main-content">
+    <div class="main-glow glow-one"></div>
+    <div class="main-glow glow-two"></div>
+    <div class="main-glow glow-three"></div>
 
-    <section class="content-body">
+    <div class="page-content">
       <router-outlet></router-outlet>
-    </section>
+    </div>
   </main>
 </div>

@@ -33,6 +33,24 @@
         </span>
       </a>
     </nav>
+
+    <div class="sidebar-footer" *ngIf="currentUser as user">
+      <div class="profile-card" [title]="user.name || user.email">
+        <div class="profile-avatar">{{ (user.name || user.email || 'A')[0] | uppercase }}</div>
+        <div class="profile-copy" *ngIf="!sidebarCollapsed">
+          <strong>{{ user.name || 'Admin User' }}</strong>
+          <span>{{ user.email }}</span>
+          <small>Role: {{ (user.role || 'admin') | titlecase }}</small>
+        </div>
+      </div>
+
+      <button type="button" class="logout-btn" (click)="logout()" [title]="sidebarCollapsed ? 'Logout' : ''">
+        <span class="logout-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M10 17v-3H3v-4h7V7l5 5Zm8 4h-7v-2h7V5h-7V3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2Z"/></svg>
+        </span>
+        <span *ngIf="!sidebarCollapsed">Logout</span>
+      </button>
+    </div>
   </aside>
 
   <main class="admin-main">

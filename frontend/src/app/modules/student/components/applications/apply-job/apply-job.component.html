@@ -1,109 +1,153 @@
-<div class="apply-job-container">
-  <div class="application-form">
-    <!-- Job Details -->
-    <div class="job-preview">
-      <h2>Apply for Position</h2>
-      
-      <div class="job-card">
-        <div class="job-header">
-          <h3>{{ job.title }}</h3>
-          <span class="company">{{ job.company }}</span>
-        </div>
-        
-        <div class="job-details">
-          <div class="detail-row">
-            <span class="label">Package:</span>
-            <span class="value">{{ job.package }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Location:</span>
-            <span class="value">{{ job.location }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Job Type:</span>
-            <span class="value">{{ job.type }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="label">Application Deadline:</span>
-            <span class="value">{{ job.deadline | date:'mediumDate' }}</span>
-          </div>
-        </div>
+<section class="apply-job-shell" *ngIf="job; else missingJob">
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
 
-        <div class="job-description">
-          <h4>Job Description</h4>
-          <p>{{ job.description }}</p>
-        </div>
-
-        <div class="job-requirements">
-          <h4>Requirements</h4>
-          <ul>
-            <li *ngFor="let requirement of job.requirements">{{ requirement }}</li>
-          </ul>
-        </div>
-
-        <div *ngIf="!canApply()" class="deadline-warning">
-          ‚ö†Ô∏è Application deadline has passed
-        </div>
+  <header class="apply-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Job Portal Submission</p>
+      <h1>{{ job.title }}</h1>
+      <p class="hero-subtitle">
+        {{ job.companyName }} ï {{ job.category }} ï {{ job.location }} ï {{ job.workMode }}
+      </p>
+      <div class="hero-pills">
+        <span>{{ getCompensationRange() }}</span>
+        <span>{{ getDeadlineMessage() }}</span>
+        <span>{{ job.type | titlecase }}</span>
       </div>
     </div>
 
-    <!-- Application Form -->
-    <form #applyForm="ngForm" class="application-details" (ngSubmit)="onSubmit()">
-      <h3>Application Details</h3>
+    <a routerLink="/student/job-portals" class="ghost-link">Back to Job Portals</a>
+  </header>
 
-      <div class="form-group">
-        <label for="resume">Select Resume *</label>
-        <select id="resume" [(ngModel)]="application.resume" name="resume" required>
-          <option value="">Choose a resume...</option>
-          <option *ngFor="let resume of resumes" [value]="resume">
-            {{ resume }}
-          </option>
-        </select>
-        <small>
-          <a routerLink="/student/resume-builder" class="link">Create new resume</a>
-        </small>
+  <section class="workspace-grid">
+    <article class="panel opportunity-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Opportunity Brief</p>
+          <h3>Role snapshot</h3>
+        </div>
+        <span class="feature-pill" *ngIf="job.featured">Featured</span>
       </div>
 
-      <div class="form-group">
-        <label for="coverLetter">Cover Letter</label>
-        <textarea id="coverLetter" [(ngModel)]="application.coverLetter" 
-                  name="coverLetter" rows="6" 
-                  placeholder="Write a custom cover letter for this position..."></textarea>
+      <div class="opportunity-card">
+        <div class="company-mark">{{ job.companyName.charAt(0) }}</div>
+        <div>
+          <strong>{{ job.companyName }}</strong>
+          <p>{{ job.companyTagline }}</p>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="availability">Availability</label>
-        <select id="availability" [(ngModel)]="application.availability" name="availability">
-          <option value="immediately">Immediately</option>
-          <option value="2-weeks">2 Weeks Notice</option>
-          <option value="1-month">1 Month Notice</option>
-          <option value="2-months">2 Months Notice</option>
-        </select>
+      <div class="detail-grid">
+        <div>
+          <span>Category</span>
+          <strong>{{ job.category }}</strong>
+        </div>
+        <div>
+          <span>Compensation</span>
+          <strong>{{ getCompensationRange() }}</strong>
+        </div>
+        <div>
+          <span>Deadline</span>
+          <strong>{{ job.applicationDeadline | date:'mediumDate' }}</strong>
+        </div>
+        <div>
+          <span>Work Setup</span>
+          <strong>{{ job.location }} ï {{ job.workMode }}</strong>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="expectedSalary">Expected Salary (Optional)</label>
-        <input type="text" id="expectedSalary" [(ngModel)]="application.expectedSalary" 
-               name="expectedSalary" placeholder="e.g., ‚Çπ12 LPA">
+      <div class="copy-block">
+        <p class="section-title">Opportunity Summary</p>
+        <p>{{ job.description }}</p>
       </div>
 
-      <div class="form-group">
-        <label for="additionalInfo">Additional Information</label>
-        <textarea id="additionalInfo" [(ngModel)]="application.additionalInfo" 
-                  name="additionalInfo" rows="4" 
-                  placeholder="Any additional information you'd like to share..."></textarea>
+      <div class="copy-block">
+        <p class="section-title">Key Requirements</p>
+        <ul class="requirements-list">
+          <li *ngFor="let requirement of job.requirements">{{ requirement }}</li>
+        </ul>
+      </div>
+
+      <div class="skills-row">
+        <span *ngFor="let skill of job.skillsRequired">{{ skill }}</span>
+      </div>
+    </article>
+
+    <form #applyForm="ngForm" class="panel config-panel" (ngSubmit)="onSubmit()">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Application Configuration</p>
+          <h3>Package your submission</h3>
+        </div>
+      </div>
+
+      <div class="callout" *ngIf="hasAlreadyApplied">
+        <strong>Application already submitted</strong>
+        <p>You already applied for this role from the job portal. You can review your application from the applications section.</p>
+      </div>
+
+      <label class="field">
+        <span>Resume URL *</span>
+        <small>Use the most current resume version you want recruiters to review.</small>
+        <input id="resumeUrl" [(ngModel)]="application.resumeUrl" name="resumeUrl" required placeholder="Paste your latest resume link" />
+        <a routerLink="/student/resume-builder" class="inline-link">Open resume builder</a>
+      </label>
+
+      <label class="field" *ngIf="job.applicationConfig.requiresCoverLetter">
+        <span>Cover Letter *</span>
+        <small>Tailor this pitch to the role and the team behind it.</small>
+        <textarea id="coverLetter" [(ngModel)]="application.coverLetter" name="coverLetter" rows="6" required placeholder="Tailor your application for this role"></textarea>
+      </label>
+
+      <div class="field-grid">
+        <label class="field" *ngIf="job.applicationConfig.requiresAvailability">
+          <span>Availability</span>
+          <small>Tell the company how quickly you can join.</small>
+          <select id="availability" [(ngModel)]="application.availability" name="availability">
+            <option value="Available within 30 days">Available within 30 days</option>
+            <option value="Immediate joiner">Immediate joiner</option>
+            <option value="Available after final semester">Available after final semester</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Expected Compensation</span>
+          <small>Optional, but useful if you want to signal your range.</small>
+          <input id="expectedSalary" [(ngModel)]="application.expectedSalary" name="expectedSalary" placeholder="Optional salary expectation" />
+        </label>
+      </div>
+
+      <div class="field-grid optional-grid">
+        <label class="field" *ngIf="job.applicationConfig.requiresPortfolio">
+          <span>Portfolio URL</span>
+          <small>Share project work, UI case studies, or product samples.</small>
+          <input id="portfolioUrl" [(ngModel)]="application.portfolioUrl" name="portfolioUrl" placeholder="Share your portfolio link" />
+        </label>
+
+        <label class="field" *ngIf="job.applicationConfig.requiresGithub">
+          <span>GitHub Profile</span>
+          <small>Useful for engineering roles with code-review based screening.</small>
+          <input id="githubUrl" [(ngModel)]="application.githubUrl" name="githubUrl" placeholder="Share your GitHub profile" />
+        </label>
       </div>
 
       <div class="form-actions">
-        <button type="button" (click)="onCancel()" class="btn-cancel">
-          Cancel
-        </button>
-        <button type="submit" 
-                [disabled]="!applyForm.valid || !canApply()" 
-                class="btn-submit">
-          {{ canApply() ? 'Submit Application' : 'Application Closed' }}
+        <button type="button" (click)="onCancel()" class="btn-cancel">Cancel</button>
+        <button type="submit" [disabled]="!applyForm.valid || hasAlreadyApplied || isSubmitting" class="btn-submit">
+          {{ hasAlreadyApplied ? 'Already Applied' : (isSubmitting ? 'Submitting...' : 'Submit Application') }}
         </button>
       </div>
     </form>
-  </div>
-</div>
+  </section>
+</section>
+
+<ng-template #missingJob>
+  <section class="apply-job-shell missing-shell">
+    <article class="panel empty-panel">
+      <p class="eyebrow">Job Portal Submission</p>
+      <h2>Job notification not found</h2>
+      <p>The selected portal notification is unavailable. Browse other active jobs from the portal.</p>
+      <button type="button" (click)="onCancel()" class="btn-submit">Back to Job Portal</button>
+    </article>
+  </section>
+</ng-template>

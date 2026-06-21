@@ -22,9 +22,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { StudentDashboardComponent } from './components/student-dashboard/student-dashboard.component';
 import { StudentProfileComponent } from './components/student-profile/student-profile.component';
 import { JobSearchComponent } from './components/job/job-search/job-search.component';
+import { JobDetailsComponent } from './components/job/job-details/job-details.component';
 import { MyApplicationsComponent } from './components/applications/my-applications/my-applications.component';
 import { ApplicationStatusComponent } from './components/applications/application-status/application-status.component';
 import { ApplyJobComponent } from './components/applications/apply-job/apply-job.component';
+import { ApplicationDetailsComponent } from './components/applications/application-details/application-details.component';
+import { ApplicationEditComponent } from './components/applications/application-edit/application-edit.component';
 import { InterviewScheduleComponent } from './components/interviews/interview-schedule/interview-schedule.component';
 import { InterviewPreparationComponent } from './components/interviews/interview-preparation/interview-preparation.component';
 import { InterviewFeedbackComponent } from './components/interviews/interview-feedback/interview-feedback.component';
@@ -66,9 +69,12 @@ import { StudentRoutingModule } from './student.routes';
     StudentDashboardComponent,
     StudentProfileComponent,
     JobSearchComponent,
+    JobDetailsComponent,
     MyApplicationsComponent,
     ApplicationStatusComponent,
     ApplyJobComponent,
+    ApplicationDetailsComponent,
+    ApplicationEditComponent,
     InterviewScheduleComponent,
     InterviewPreparationComponent,
     InterviewFeedbackComponent,

@@ -2,6 +2,77 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import {
+  CompanyDriveRecord,
+  CompanyDriveRole,
+  getCompanyAnalyticsActivities,
+  getCompanyAnalyticsAlerts,
+  getCompanyDrives,
+  getCompanyPortalContext,
+} from '../../../data/company-drive.data';
+
+interface AnalyticsMetricState {
+  activeDrives: number;
+  liveRolePosts: number;
+  totalApplications: number;
+  totalInterviews: number;
+  offerConversion: number;
+  averagePackage: number;
+}
+
+interface TrendPoint {
+  label: string;
+  actual: number;
+  target: number;
+}
+
+interface RoleLeaderboardEntry {
+  title: string;
+  driveCode: string;
+  applications: number;
+  offers: number;
+  averagePackage: number;
+  team: string;
+}
+
+interface PipelineEntry {
+  label: string;
+  applications: number;
+  shortlisted: number;
+  offered: number;
+}
+
+interface SkillDemandEntry {
+  name: string;
+  demand: number;
+  growth: number;
+}
+
+interface DrivePerformanceEntry {
+  name: string;
+  roles: number;
+  applications: number;
+  offers: number;
+  conversion: number;
+  avgPackage: number;
+}
+
+interface ActivityEntry {
+  id: number;
+  candidateName: string;
+  roleTitle: string;
+  driveCode: string;
+  branch: string;
+  stage: string;
+  updatedOn: string;
+}
+
+interface AlertEntry {
+  id: number;
+  type: 'success' | 'info' | 'warning';
+  message: string;
+  time: string;
+}
 
 @Component({
   selector: 'app-analytics-dashboard',
@@ -11,149 +82,169 @@ import { RouterModule } from '@angular/router';
   styleUrl: './analytics-dashboard.css',
 })
 export class AnalyticsDashboard implements OnInit {
-  // Date range
-  dateRange: string = 'month';
-  customStartDate: string = '';
-  customEndDate: string = '';
+  dateRange = 'month';
+  customStartDate = '';
+  customEndDate = '';
   isLoading = false;
-  
-  // Dashboard metrics
-  metrics = {
-    totalPlacements: 0,
-    totalCompanies: 0,
-    totalJobs: 0,
+  companyName = '';
+
+  metrics: AnalyticsMetricState = {
+    activeDrives: 0,
+    liveRolePosts: 0,
     totalApplications: 0,
-    placementRate: 0,
-    averageSalary: 0,
-    topPerformingBranch: '',
-    growthRate: 0
+    totalInterviews: 0,
+    offerConversion: 0,
+    averagePackage: 0,
   };
-  
-  // Charts data
-  placementTrend: any[] = [];
-  topCompanies: any[] = [];
-  branchPerformance: any[] = [];
-  skillDemand: any[] = [];
-  monthlyData: any[] = [];
-  
-  // Recent placements
-  recentPlacements: any[] = [];
-  
-  // Notifications
-  notifications: any[] = [];
-  
-  constructor() {}
+
+  placementTrend: TrendPoint[] = [];
+  topRoles: RoleLeaderboardEntry[] = [];
+  drivePerformance: DrivePerformanceEntry[] = [];
+  skillDemand: SkillDemandEntry[] = [];
+  pipelineData: PipelineEntry[] = [];
+  recentActivities: ActivityEntry[] = [];
+  notifications: AlertEntry[] = [];
 
   ngOnInit(): void {
-    this.loadDashboardData();
     this.setDefaultDates();
+    this.loadDashboardData();
   }
 
   private setDefaultDates(): void {
     const today = new Date();
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
-    
+
     this.customStartDate = lastMonth.toISOString().split('T')[0];
     this.customEndDate = today.toISOString().split('T')[0];
   }
 
   loadDashboardData(): void {
     this.isLoading = true;
-    
-    // Simulate API call - replace with actual service
+
     setTimeout(() => {
-      // Metrics
-      this.metrics = {
-        totalPlacements: 342,
-        totalCompanies: 28,
-        totalJobs: 156,
-        totalApplications: 2450,
-        placementRate: 68.5,
-        averageSalary: 850000,
-        topPerformingBranch: 'Computer Science',
-        growthRate: 15.8
-      };
-      
-      // Placement Trend (last 12 months)
-      this.placementTrend = [
-        { month: 'Jan', placements: 28, target: 25 },
-        { month: 'Feb', placements: 32, target: 30 },
-        { month: 'Mar', placements: 45, target: 40 },
-        { month: 'Apr', placements: 38, target: 42 },
-        { month: 'May', placements: 52, target: 48 },
-        { month: 'Jun', placements: 48, target: 50 },
-        { month: 'Jul', placements: 42, target: 45 },
-        { month: 'Aug', placements: 35, target: 38 },
-        { month: 'Sep', placements: 0, target: 0 },
-        { month: 'Oct', placements: 0, target: 0 },
-        { month: 'Nov', placements: 0, target: 0 },
-        { month: 'Dec', placements: 0, target: 0 }
-      ];
-      
-      // Top Companies
-      this.topCompanies = [
-        { name: 'Tech Mahindra', logo: 'TM', placements: 28, avgSalary: 720000 },
-        { name: 'Infosys', logo: 'INF', placements: 24, avgSalary: 680000 },
-        { name: 'Amazon', logo: 'AMZ', placements: 18, avgSalary: 1450000 },
-        { name: 'TCS', logo: 'TCS', placements: 32, avgSalary: 580000 },
-        { name: 'Microsoft', logo: 'MS', placements: 12, avgSalary: 1800000 },
-        { name: 'Google', logo: 'GOOG', placements: 8, avgSalary: 2200000 }
-      ];
-      
-      // Branch Performance
-      this.branchPerformance = [
-        { name: 'Computer Science', placements: 142, students: 210, rate: 67.6, avgSalary: 950000 },
-        { name: 'Information Technology', placements: 98, students: 145, rate: 67.6, avgSalary: 890000 },
-        { name: 'Electronics & Comm', placements: 52, students: 95, rate: 54.7, avgSalary: 780000 },
-        { name: 'Data Science', placements: 28, students: 45, rate: 62.2, avgSalary: 1020000 },
-        { name: 'Mechanical', placements: 12, students: 35, rate: 34.3, avgSalary: 620000 },
-        { name: 'Civil', placements: 8, students: 28, rate: 28.6, avgSalary: 580000 }
-      ];
-      
-      // Skill Demand
-      this.skillDemand = [
-        { name: 'JavaScript', demand: 85, growth: 12 },
-        { name: 'Python', demand: 78, growth: 15 },
-        { name: 'React', demand: 72, growth: 18 },
-        { name: 'Node.js', demand: 65, growth: 10 },
-        { name: 'SQL', demand: 58, growth: 5 },
-        { name: 'AWS', demand: 52, growth: 22 },
-        { name: 'Angular', demand: 48, growth: 8 },
-        { name: 'Machine Learning', demand: 45, growth: 25 }
-      ];
-      
-      // Monthly Data for charts
-      this.monthlyData = [
-        { month: 'Jan', applications: 185, shortlisted: 52, hired: 28 },
-        { month: 'Feb', applications: 210, shortlisted: 58, hired: 32 },
-        { month: 'Mar', applications: 245, shortlisted: 72, hired: 45 },
-        { month: 'Apr', applications: 228, shortlisted: 65, hired: 38 },
-        { month: 'May', applications: 268, shortlisted: 82, hired: 52 },
-        { month: 'Jun', applications: 242, shortlisted: 75, hired: 48 },
-        { month: 'Jul', applications: 215, shortlisted: 68, hired: 42 },
-        { month: 'Aug', applications: 0, shortlisted: 0, hired: 0 }
-      ];
-      
-      // Recent Placements
-      this.recentPlacements = [
-        { id: 1, name: 'John Doe', company: 'Tech Mahindra', package: '₹8.5 LPA', date: '2024-03-15', branch: 'Computer Science' },
-        { id: 2, name: 'Jane Smith', company: 'Infosys', package: '₹6.8 LPA', date: '2024-03-14', branch: 'Information Technology' },
-        { id: 3, name: 'Mike Johnson', company: 'Amazon', package: '₹14.5 LPA', date: '2024-03-12', branch: 'Computer Science' },
-        { id: 4, name: 'Sarah Williams', company: 'TCS', package: '₹5.8 LPA', date: '2024-03-10', branch: 'Electronics' },
-        { id: 5, name: 'Alex Kumar', company: 'Microsoft', package: '₹18.0 LPA', date: '2024-03-08', branch: 'Data Science' }
-      ];
-      
-      // Notifications
-      this.notifications = [
-        { id: 1, type: 'success', message: 'Placement milestone achieved! 300+ students placed this year.', time: '2 hours ago' },
-        { id: 2, type: 'info', message: 'New company registered: Google is coming for campus drive.', time: '5 hours ago' },
-        { id: 3, type: 'warning', message: 'Registration deadline approaching for Tech Mahindra drive.', time: '1 day ago' },
-        { id: 4, type: 'success', message: 'Average salary increased by 12% compared to last year.', time: '2 days ago' }
-      ];
-      
+      const context = getCompanyPortalContext();
+      const drives = getCompanyDrives();
+      const roles = drives.flatMap((drive) =>
+        drive.roles.map((role) => ({
+          ...role,
+          driveCode: drive.driveCode,
+          driveName: drive.driveName,
+          driveStatus: drive.status,
+        }))
+      );
+
+      this.companyName = context.companyName;
+      this.metrics = this.buildMetrics(drives, roles);
+      this.placementTrend = this.buildTrendData();
+      this.topRoles = this.buildRoleLeaderboard(roles);
+      this.drivePerformance = this.buildDrivePerformance(drives);
+      this.pipelineData = this.buildPipelineData(drives);
+      this.skillDemand = this.buildSkillDemand(roles);
+      this.recentActivities = getCompanyAnalyticsActivities();
+      this.notifications = getCompanyAnalyticsAlerts(context.companyName);
       this.isLoading = false;
-    }, 1000);
+    }, 250);
+  }
+
+  private buildMetrics(
+    drives: CompanyDriveRecord[],
+    roles: Array<CompanyDriveRole & { driveCode: string; driveName: string; driveStatus: string }>
+  ): AnalyticsMetricState {
+    const activeDrives = drives.filter((drive) => drive.status === 'scheduled' || drive.status === 'ongoing').length;
+    const liveRolePosts = roles.length;
+    const totalApplications = roles.reduce((count, role) => count + role.applications, 0);
+    const totalInterviews = roles.reduce((count, role) => count + role.interviews, 0);
+    const totalOffers = roles.reduce((count, role) => count + role.offers, 0);
+    const packageTotal = roles.reduce((count, role) => count + role.averagePackageLpa, 0);
+
+    return {
+      activeDrives,
+      liveRolePosts,
+      totalApplications,
+      totalInterviews,
+      offerConversion: totalApplications > 0 ? (totalOffers / totalApplications) * 100 : 0,
+      averagePackage: roles.length > 0 ? packageTotal / roles.length : 0,
+    };
+  }
+
+  private buildTrendData(): TrendPoint[] {
+    return [
+      { label: 'Jan', actual: 72, target: 65 },
+      { label: 'Feb', actual: 88, target: 76 },
+      { label: 'Mar', actual: 104, target: 92 },
+      { label: 'Apr', actual: 116, target: 108 },
+      { label: 'May', actual: 94, target: 90 },
+      { label: 'Jun', actual: 102, target: 98 },
+      { label: 'Jul', actual: 111, target: 104 },
+      { label: 'Aug', actual: 97, target: 95 },
+    ];
+  }
+
+  private buildRoleLeaderboard(
+    roles: Array<CompanyDriveRole & { driveCode: string; driveName: string; driveStatus: string }>
+  ): RoleLeaderboardEntry[] {
+    return [...roles]
+      .sort((left, right) => right.applications - left.applications)
+      .slice(0, 5)
+      .map((role) => ({
+        title: role.title,
+        driveCode: role.driveCode,
+        applications: role.applications,
+        offers: role.offers,
+        averagePackage: role.averagePackageLpa,
+        team: role.team,
+      }));
+  }
+
+  private buildDrivePerformance(drives: CompanyDriveRecord[]): DrivePerformanceEntry[] {
+    return drives.map((drive) => {
+      const applications = drive.roles.reduce((count, role) => count + role.applications, 0);
+      const offers = drive.roles.reduce((count, role) => count + role.offers, 0);
+      const packageAverage =
+        drive.roles.reduce((count, role) => count + role.averagePackageLpa, 0) / Math.max(drive.roles.length, 1);
+
+      return {
+        name: drive.driveName,
+        roles: drive.roles.length,
+        applications,
+        offers,
+        conversion: applications > 0 ? (offers / applications) * 100 : 0,
+        avgPackage: packageAverage,
+      };
+    });
+  }
+
+  private buildPipelineData(drives: CompanyDriveRecord[]): PipelineEntry[] {
+    return drives.map((drive) => ({
+      label: drive.driveCode,
+      applications: drive.roles.reduce((count, role) => count + role.applications, 0),
+      shortlisted: drive.roles.reduce((count, role) => count + role.shortlisted, 0),
+      offered: drive.roles.reduce((count, role) => count + role.offers, 0),
+    }));
+  }
+
+  private buildSkillDemand(
+    roles: Array<CompanyDriveRole & { driveCode: string; driveName: string; driveStatus: string }>
+  ): SkillDemandEntry[] {
+    const totals = new Map<string, number>();
+
+    roles.forEach((role) => {
+      role.skills.forEach((skill) => {
+        totals.set(skill, (totals.get(skill) ?? 0) + role.applications);
+      });
+    });
+
+    const maxDemand = Math.max(...Array.from(totals.values()), 1);
+
+    return Array.from(totals.entries())
+      .map(([name, total], index) => ({
+        name,
+        demand: Math.round((total / maxDemand) * 100),
+        growth: 6 + ((index * 4) % 19),
+      }))
+      .sort((left, right) => right.demand - left.demand)
+      .slice(0, 8);
   }
 
   refreshData(): void {
@@ -165,35 +256,55 @@ export class AnalyticsDashboard implements OnInit {
     this.loadDashboardData();
   }
 
-  getMaxPlacements(): number {
-    return Math.max(...this.placementTrend.map(p => p.placements), 1);
+  getTrendMaxValue(): number {
+    return Math.max(...this.placementTrend.map((item) => Math.max(item.actual, item.target)), 1);
   }
 
-  getBarHeight(placements: number): number {
-    const max = this.getMaxPlacements();
-    return (placements / max) * 100;
+  getTrendY(value: number): number {
+    return 90 - (value / this.getTrendMaxValue()) * 70;
   }
 
-  formatNumber(num: number): string {
-    return num.toLocaleString();
-  }
-
-  formatSalary(salary: number): string {
-    if (salary >= 10000000) {
-      return `₹${(salary / 10000000).toFixed(1)}Cr`;
-    } else if (salary >= 100000) {
-      return `₹${(salary / 100000).toFixed(1)}L`;
+  getTrendPoints(key: 'actual' | 'target'): string {
+    if (this.placementTrend.length === 0) {
+      return '';
     }
-    return `₹${salary.toLocaleString()}`;
+
+    const step = this.placementTrend.length > 1 ? 100 / (this.placementTrend.length - 1) : 100;
+    return this.placementTrend
+      .map((item, index) => `${(index * step).toFixed(2)},${this.getTrendY(item[key]).toFixed(2)}`)
+      .join(' ');
+  }
+
+  getAreaPoints(): string {
+    const linePoints = this.getTrendPoints('actual');
+    return `0,90 ${linePoints} 100,90`;
+  }
+
+  getPipelineMaxValue(): number {
+    return Math.max(
+      ...this.pipelineData.map((item) => Math.max(item.applications, item.shortlisted, item.offered)),
+      1
+    );
+  }
+
+  getMonthlyBarHeight(value: number): number {
+    return (value / this.getPipelineMaxValue()) * 100;
+  }
+
+  formatNumber(value: number): string {
+    return value.toLocaleString();
+  }
+
+  formatPackage(value: number): string {
+    return `INR ${value.toFixed(1)}L`;
   }
 
   formatDate(date: string): string {
-    const d = new Date(date);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  getGrowthIcon(growth: number): string {
-    return growth >= 0 ? 'trending_up' : 'trending_down';
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   }
 
   getGrowthClass(growth: number): string {
@@ -201,35 +312,60 @@ export class AnalyticsDashboard implements OnInit {
   }
 
   getDemandClass(demand: number): string {
-    if (demand >= 70) return 'high';
-    if (demand >= 50) return 'medium';
+    if (demand >= 70) {
+      return 'high';
+    }
+
+    if (demand >= 50) {
+      return 'medium';
+    }
+
     return 'low';
   }
 
   getBranchClass(rate: number): string {
-    if (rate >= 60) return 'excellent';
-    if (rate >= 40) return 'good';
-    if (rate >= 20) return 'average';
+    if (rate >= 14) {
+      return 'excellent';
+    }
+
+    if (rate >= 9) {
+      return 'good';
+    }
+
+    if (rate >= 5) {
+      return 'average';
+    }
+
     return 'poor';
   }
 
   getNotificationIcon(type: string): string {
     switch (type) {
-      case 'success': return 'check_circle';
-      case 'info': return 'info';
-      case 'warning': return 'warning';
-      case 'error': return 'error';
-      default: return 'notifications';
+      case 'success':
+        return 'check_circle';
+      case 'info':
+        return 'info';
+      case 'warning':
+        return 'warning';
+      case 'error':
+        return 'error';
+      default:
+        return 'notifications';
     }
   }
 
   getNotificationClass(type: string): string {
     switch (type) {
-      case 'success': return 'notification-success';
-      case 'info': return 'notification-info';
-      case 'warning': return 'notification-warning';
-      case 'error': return 'notification-error';
-      default: return 'notification-default';
+      case 'success':
+        return 'notification-success';
+      case 'info':
+        return 'notification-info';
+      case 'warning':
+        return 'notification-warning';
+      case 'error':
+        return 'notification-error';
+      default:
+        return 'notification-default';
     }
   }
 }

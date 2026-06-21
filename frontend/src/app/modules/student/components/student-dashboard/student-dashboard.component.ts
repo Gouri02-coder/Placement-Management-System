@@ -2,14 +2,15 @@
 import { Component, OnInit } from '@angular/core';
 import { StudentService } from '../../services/student.service';
 import { ApplicationService } from '../../services/application.service';
-import { InterviewService } from '../../services/interview.service';
 import { JobService } from '../../services/job.service';
 import { Student } from '../../models/student.model';
 import { JobApplication } from '../../models/job.model';
-import { Interview } from '../../models/interview.model';
 import { Job } from '../../models/job.model';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { JobPortalJob, JobPortalStoreService } from '../../services/job-portal-store.service';
+import { cloneStudentInterviews } from '../../data/interview-schedule.data';
+import { InterviewSchedule } from '../../models/interview-schedule.model';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -20,8 +21,9 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 export class StudentDashboardComponent implements OnInit {
   student: Student | null = null;
   applications: JobApplication[] = [];
-  interviews: Interview[] = [];
-  recommendedJobs: Job[] = [];
+  interviews: InterviewSchedule[] = [];
+  upcomingInterviews: InterviewSchedule[] = [];
+  recommendedJobs: JobPortalJob[] = [];
   stats = {
     totalApplications: 0,
     pendingApplications: 0,
@@ -32,8 +34,8 @@ export class StudentDashboardComponent implements OnInit {
   constructor(
     private studentService: StudentService,
     private applicationService: ApplicationService,
-    private interviewService: InterviewService,
-    private jobService: JobService
+    private jobService: JobService,
+    private jobPortalStore: JobPortalStoreService
   ) {}
 
   ngOnInit(): void {
@@ -57,35 +59,34 @@ export class StudentDashboardComponent implements OnInit {
     // Load applications
     this.applicationService.getStudentApplications(studentId).subscribe({
       next: (applications) => {
-        this.applications = applications.filter(
-          app => app.status !== 'draft'
-        ) as JobApplication[];
+        const portalApplications = this.jobPortalStore.getApplicationsSnapshot();
+        this.applications = portalApplications.length > 0
+          ? portalApplications
+          : applications.filter(app => app.status !== 'draft') as JobApplication[];
         this.calculateApplicationStats();
       },
       error: (error) => {
         console.error('Error loading applications:', error);
+        this.applications = this.jobPortalStore.getApplicationsSnapshot();
+        this.calculateApplicationStats();
       }
     });
 
-    // Load interviews
-    this.interviewService.getStudentInterviews(studentId).subscribe({
-      next: (interviews) => {
-        this.interviews = interviews;
-        this.stats.interviewsScheduled = interviews.length;
-      },
-      error: (error) => {
-        console.error('Error loading interviews:', error);
-      }
-    });
+    this.loadInterviews();
 
     // Load recommended jobs
       // Load recommended jobs
     this.jobService.getRecommendedJobs(studentId).subscribe({
       next: (jobs: Job[]) => {
-        this.recommendedJobs = jobs.slice(0, 4);
+        if (jobs.length > 0) {
+          this.recommendedJobs = jobs.slice(0, 4) as JobPortalJob[];
+          return;
+        }
+        this.recommendedJobs = this.jobPortalStore.getJobsSnapshot().slice(0, 4);
       },
       error: (error: any) => {
         console.error('Error loading recommended jobs:', error);
+        this.recommendedJobs = this.jobPortalStore.getJobsSnapshot().slice(0, 4);
       }
     });
   }
@@ -126,6 +127,17 @@ export class StudentDashboardComponent implements OnInit {
     this.stats.pendingApplications = this.applications.filter(
       app => app.status === 'applied' || app.status === 'under-review'
     ).length;
+  }
+
+  loadInterviews(): void {
+    this.interviews = cloneStudentInterviews().sort(
+      (left, right) => left.interviewDate.getTime() - right.interviewDate.getTime()
+    );
+    this.upcomingInterviews = this.interviews.filter(interview =>
+      (interview.status === 'scheduled' || interview.status === 'rescheduled') &&
+      interview.interviewDate.getTime() > Date.now()
+    );
+    this.stats.interviewsScheduled = this.upcomingInterviews.length;
   }
 
   calculateDaysAgo(date: Date): string {

@@ -1,18 +1,17 @@
 <div class="analytics-dashboard">
-  <!-- Header -->
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>Analytics Dashboard</h1>
-      <p>Real-time insights into placement performance and trends</p>
+      <p class="eyebrow">Company Analytics</p>
+      <h1>{{ companyName }} hiring intelligence</h1>
+      <p>Track drive performance, role-post demand, interview flow, and offer conversion for your own company campaigns only.</p>
     </div>
     <div class="header-actions">
       <button class="btn-refresh" (click)="refreshData()" aria-label="Refresh data">
-        <i class="material-icons" aria-hidden="true">refresh</i>
+        <span>R</span> Refresh
       </button>
     </div>
   </div>
 
-  <!-- Date Range Selector -->
   <div class="date-range-section">
     <div class="range-buttons">
       <button class="range-btn" [class.active]="dateRange === 'week'" (click)="changeDateRange('week')">Week</button>
@@ -28,109 +27,121 @@
     </div>
   </div>
 
-  <!-- Loading State -->
   <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
     <div class="spinner" aria-hidden="true"></div>
     <p>Loading analytics data...</p>
   </div>
 
-  <!-- Dashboard Content -->
   <div *ngIf="!isLoading">
-    <!-- Key Metrics -->
     <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-icon placements">
-          <i class="material-icons" aria-hidden="true">work</i>
-        </div>
+      <div class="metric-card placements">
+        <div class="metric-icon">DR</div>
         <div class="metric-info">
-          <h3>{{formatNumber(metrics.totalPlacements)}}</h3>
-          <p>Total Placements</p>
-          <span class="trend positive">
-            <i class="material-icons" aria-hidden="true">trending_up</i> +{{metrics.growthRate}}%
-          </span>
+          <h3>{{ formatNumber(metrics.activeDrives) }}</h3>
+          <p>Active Drives</p>
         </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon companies">
-          <i class="material-icons" aria-hidden="true">business</i>
-        </div>
+      <div class="metric-card companies">
+        <div class="metric-icon">RP</div>
         <div class="metric-info">
-          <h3>{{metrics.totalCompanies}}</h3>
-          <p>Companies</p>
+          <h3>{{ formatNumber(metrics.liveRolePosts) }}</h3>
+          <p>Live Role Posts</p>
         </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon jobs">
-          <i class="material-icons" aria-hidden="true">work_outline</i>
-        </div>
+      <div class="metric-card jobs">
+        <div class="metric-icon">AP</div>
         <div class="metric-info">
-          <h3>{{metrics.totalJobs}}</h3>
-          <p>Job Openings</p>
+          <h3>{{ formatNumber(metrics.totalApplications) }}</h3>
+          <p>Total Applications</p>
         </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon applications">
-          <i class="material-icons" aria-hidden="true">description</i>
-        </div>
+      <div class="metric-card applications">
+        <div class="metric-icon">IN</div>
         <div class="metric-info">
-          <h3>{{formatNumber(metrics.totalApplications)}}</h3>
-          <p>Applications</p>
+          <h3>{{ formatNumber(metrics.totalInterviews) }}</h3>
+          <p>Interviews in Pipeline</p>
         </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon rate">
-          <i class="material-icons" aria-hidden="true">trending_up</i>
-        </div>
+      <div class="metric-card rate">
+        <div class="metric-icon">OF</div>
         <div class="metric-info">
-          <h3>{{metrics.placementRate}}%</h3>
-          <p>Placement Rate</p>
+          <h3>{{ metrics.offerConversion | number:'1.0-1' }}%</h3>
+          <p>Offer Conversion</p>
         </div>
       </div>
-      <div class="metric-card">
-        <div class="metric-icon salary">
-          <i class="material-icons" aria-hidden="true">attach_money</i>
-        </div>
+      <div class="metric-card salary">
+        <div class="metric-icon">PK</div>
         <div class="metric-info">
-          <h3>{{formatSalary(metrics.averageSalary)}}</h3>
-          <p>Average Salary</p>
+          <h3>{{ formatPackage(metrics.averagePackage) }}</h3>
+          <p>Average Package</p>
         </div>
       </div>
     </div>
 
-    <!-- Charts Row -->
     <div class="charts-row">
-      <!-- Placement Trend Chart -->
-      <div class="chart-card">
-        <h3>Placement Trend</h3>
-        <div class="bar-chart-container">
-          <div class="bar-chart">
-            <div class="bar-item" *ngFor="let data of placementTrend">
-              <div class="bar-label">{{data.month}}</div>
-              <div class="bar-wrapper">
-                <div class="bar-fill placements-bar" [style.height.%]="getBarHeight(data.placements)">
-                  <span class="bar-value">{{data.placements}}</span>
-                </div>
-              </div>
+      <div class="chart-card line-chart-card">
+        <div class="card-head">
+          <div>
+            <p class="section-label">Intake Trend</p>
+            <h3>Applications vs Plan</h3>
+          </div>
+          <div class="chart-summary">
+            <span><i class="dot actual"></i>Actual</span>
+            <span><i class="dot target"></i>Target</span>
+          </div>
+        </div>
+
+        <div class="line-chart-shell">
+          <div class="chart-y-axis">
+            <span>{{ getTrendMaxValue() }}</span>
+            <span>{{ (getTrendMaxValue() * 0.66) | number:'1.0-0' }}</span>
+            <span>{{ (getTrendMaxValue() * 0.33) | number:'1.0-0' }}</span>
+            <span>0</span>
+          </div>
+          <div class="line-chart-body">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="trend-svg">
+              <line x1="0" y1="90" x2="100" y2="90" class="grid-line"></line>
+              <line x1="0" y1="66" x2="100" y2="66" class="grid-line"></line>
+              <line x1="0" y1="43" x2="100" y2="43" class="grid-line"></line>
+              <line x1="0" y1="20" x2="100" y2="20" class="grid-line"></line>
+              <polygon [attr.points]="getAreaPoints()" class="area-fill"></polygon>
+              <polyline [attr.points]="getTrendPoints('target')" class="trend-line target-line"></polyline>
+              <polyline [attr.points]="getTrendPoints('actual')" class="trend-line actual-line"></polyline>
+              <circle
+                *ngFor="let point of placementTrend; let i = index"
+                [attr.cx]="placementTrend.length > 1 ? (i * 100) / (placementTrend.length - 1) : 50"
+                [attr.cy]="getTrendY(point.actual)"
+                r="1.8"
+                class="point-circle">
+              </circle>
+            </svg>
+            <div class="chart-x-axis" [style.--points-count]="placementTrend.length">
+              <span *ngFor="let data of placementTrend">{{ data.label }}</span>
             </div>
           </div>
         </div>
-        <div class="chart-legend">
-          <span class="legend-color placements-color"></span>
-          <span>Actual Placements</span>
-        </div>
       </div>
 
-      <!-- Top Companies -->
       <div class="chart-card">
-        <h3>Top Hiring Companies</h3>
+        <div class="card-head">
+          <div>
+            <p class="section-label">Role Performance</p>
+            <h3>Most Active Role Posts</h3>
+          </div>
+        </div>
         <div class="companies-list">
-          <div class="company-item" *ngFor="let company of topCompanies.slice(0, 5)">
-            <div class="company-logo">{{company.logo}}</div>
+          <div class="company-item" *ngFor="let role of topRoles">
+            <div class="company-logo">{{ role.driveCode }}</div>
             <div class="company-info">
-              <div class="company-name">{{company.name}}</div>
+              <div class="company-name">{{ role.title }}</div>
               <div class="company-stats">
-                <span>{{company.placements}} hires</span>
-                <span>{{formatSalary(company.avgSalary)}}</span>
+                <span>{{ role.team }}</span>
+                <span>{{ role.applications }} applicants</span>
+                <span>{{ role.offers }} offers</span>
+                <span>{{ formatPackage(role.averagePackage) }}</span>
+              </div>
+              <div class="mini-progress">
+                <div class="mini-fill" [style.width.%]="topRoles[0]?.applications ? (role.applications / topRoles[0].applications) * 100 : 0"></div>
               </div>
             </div>
           </div>
@@ -138,85 +149,126 @@
       </div>
     </div>
 
-    <!-- Branch Performance -->
+    <div class="charts-row secondary">
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <p class="section-label">Drive Funnel</p>
+            <h3>Applications to Offers</h3>
+          </div>
+        </div>
+        <div class="grouped-chart" [style.--group-count]="pipelineData.length">
+          <div class="group-item" *ngFor="let item of pipelineData">
+            <div class="group-bars">
+              <div class="mini-bar applications-bar" [style.height.%]="getMonthlyBarHeight(item.applications)"></div>
+              <div class="mini-bar shortlisted-bar" [style.height.%]="getMonthlyBarHeight(item.shortlisted)"></div>
+              <div class="mini-bar hired-bar" [style.height.%]="getMonthlyBarHeight(item.offered)"></div>
+            </div>
+            <span class="group-label">{{ item.label }}</span>
+          </div>
+        </div>
+        <div class="chart-summary">
+          <span><i class="dot applications-bar"></i>Applications</span>
+          <span><i class="dot shortlisted-bar"></i>Shortlisted</span>
+          <span><i class="dot hired-bar"></i>Offers</span>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <p class="section-label">In-Demand Skills</p>
+            <h3>Role Skill Index</h3>
+          </div>
+        </div>
+        <div class="skills-grid">
+          <div class="skill-card" *ngFor="let skill of skillDemand">
+            <div class="skill-header">
+              <span class="skill-name">{{ skill.name }}</span>
+              <span class="skill-growth" [class]="getGrowthClass(skill.growth)">
+                {{ skill.growth }}%
+              </span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-fill" [class]="getDemandClass(skill.demand)" [style.width.%]="skill.demand"></div>
+            </div>
+            <div class="skill-demand">{{ skill.demand }}% role demand</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="branch-section">
-      <h3>Branch-wise Performance</h3>
+      <div class="card-head">
+        <div>
+          <p class="section-label">Drive Performance</p>
+          <h3>Campaign-wise Outcomes</h3>
+        </div>
+      </div>
       <div class="branch-table">
         <div class="branch-header">
-          <span>Branch</span>
-          <span>Students</span>
-          <span>Placements</span>
-          <span>Rate</span>
-          <span>Avg Salary</span>
+          <span>Drive</span>
+          <span>Roles</span>
+          <span>Applications</span>
+          <span>Offers</span>
+          <span>Avg Package</span>
         </div>
-        <div class="branch-row" *ngFor="let branch of branchPerformance">
-          <span class="branch-name">{{branch.name}}</span>
-          <span>{{branch.students}}</span>
-          <span>{{branch.placements}}</span>
+        <div class="branch-row" *ngFor="let drive of drivePerformance">
+          <span class="branch-name">{{ drive.name }}</span>
+          <span>{{ drive.roles }}</span>
+          <span>{{ drive.applications }}</span>
           <span>
-            <span class="rate-badge" [class]="getBranchClass(branch.rate)">
-              {{branch.rate}}%
+            <span class="rate-badge" [class]="getBranchClass(drive.conversion)">
+              {{ drive.offers }} | {{ drive.conversion | number:'1.0-0' }}%
             </span>
           </span>
-          <span class="salary">{{formatSalary(branch.avgSalary)}}</span>
+          <span class="salary">{{ formatPackage(drive.avgPackage) }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Skill Demand -->
-    <div class="skills-section">
-      <h3>In-Demand Skills</h3>
-      <div class="skills-grid">
-        <div class="skill-card" *ngFor="let skill of skillDemand">
-          <div class="skill-header">
-            <span class="skill-name">{{skill.name}}</span>
-            <span class="skill-growth" [class]="getGrowthClass(skill.growth)">
-              <i class="material-icons" aria-hidden="true">{{getGrowthIcon(skill.growth)}}</i>
-              {{skill.growth}}%
-            </span>
-          </div>
-          <div class="skill-bar">
-            <div class="skill-fill" [class]="getDemandClass(skill.demand)" [style.width.%]="skill.demand"></div>
-          </div>
-          <div class="skill-demand">{{skill.demand}}% demand</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Two Column Layout -->
     <div class="two-column">
-      <!-- Recent Placements -->
       <div class="recent-section">
-        <h3>Recent Placements</h3>
+        <div class="card-head">
+          <div>
+            <p class="section-label">Recent Activity</p>
+            <h3>Candidate Movement</h3>
+          </div>
+        </div>
         <div class="placements-list">
-          <div class="placement-item" *ngFor="let placement of recentPlacements">
+          <div class="placement-item" *ngFor="let activity of recentActivities">
             <div class="placement-avatar">
-              {{placement.name.charAt(0)}}
+              {{ activity.candidateName.charAt(0) }}
             </div>
             <div class="placement-info">
-              <div class="placement-name">{{placement.name}}</div>
+              <div class="placement-name">{{ activity.candidateName }}</div>
               <div class="placement-details">
-                <span class="company">{{placement.company}}</span>
-                <span class="package">{{placement.package}}</span>
-                <span class="branch">{{placement.branch}}</span>
+                <span class="company">{{ activity.roleTitle }}</span>
+                <span class="package">{{ activity.driveCode }}</span>
+                <span class="branch">{{ activity.branch }}</span>
+                <span class="branch">{{ activity.stage }}</span>
               </div>
             </div>
-            <div class="placement-date">{{formatDate(placement.date)}}</div>
+            <div class="placement-date">{{ formatDate(activity.updatedOn) }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Notifications -->
       <div class="notifications-section">
-        <h3>Notifications</h3>
+        <div class="card-head">
+          <div>
+            <p class="section-label">Team Alerts</p>
+            <h3>Hiring Updates</h3>
+          </div>
+        </div>
         <div class="notifications-list">
           <div class="notification-item" *ngFor="let notification of notifications" [class]="getNotificationClass(notification.type)">
             <div class="notification-icon">
-              <i class="material-icons" aria-hidden="true">{{getNotificationIcon(notification.type)}}</i>
+              <i class="material-icons" aria-hidden="true">{{ getNotificationIcon(notification.type) }}</i>
             </div>
             <div class="notification-content">
-              <p>{{notification.message}}</p>
-              <span class="notification-time">{{notification.time}}</span>
+              <p>{{ notification.message }}</p>
+              <span class="notification-time">{{ notification.time }}</span>
             </div>
           </div>
         </div>

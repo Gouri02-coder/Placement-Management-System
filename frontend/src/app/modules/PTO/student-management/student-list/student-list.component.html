@@ -1,11 +1,14 @@
 <div class="student-list-container">
-  <!-- Header -->
   <div class="page-header">
-    <h1>Student Management</h1>
-    <p>Manage and verify student records for placement activities</p>
+    <div class="page-header-copy">
+      <h1>Student Management</h1>
+      <p>Manage and verify student records for placement activities</p>
+    </div>
+    <button (click)="refresh()" class="refresh-btn header-refresh-btn" [disabled]="loading">
+      Refresh List
+    </button>
   </div>
 
-  <!-- Debug Section -->
   <div class="debug-section" *ngIf="debugInfo">
     <div class="debug-content">
       <h3>Debug Information</h3>
@@ -14,92 +17,101 @@
     </div>
   </div>
 
-  <!-- Stats Cards -->
   <div class="stats-cards">
-    <div class="stat-card total">
-      <div class="stat-icon">👥</div>
+    <div class="stat-card stat-total">
+      <div class="stat-icon">Students</div>
       <div class="stat-info">
         <h3>{{ totalStudents }}</h3>
         <p>Total Students</p>
       </div>
+      <div class="stat-trend">All records</div>
     </div>
-    <div class="stat-card approved">
-      <div class="stat-icon">✅</div>
+    <div class="stat-card stat-approved">
+      <div class="stat-icon">Approved</div>
       <div class="stat-info">
         <h3>{{ approved }}</h3>
         <p>Approved</p>
       </div>
+      <div class="stat-trend">Verified</div>
     </div>
-    <div class="stat-card pending">
-      <div class="stat-icon">⏳</div>
+    <div class="stat-card stat-pending">
+      <div class="stat-icon">Pending</div>
       <div class="stat-info">
         <h3>{{ pendingReview }}</h3>
         <p>Pending Review</p>
       </div>
+      <div class="stat-trend">Awaiting action</div>
+    </div>
+    <div class="stat-card stat-rejected">
+      <div class="stat-icon">Rejected</div>
+      <div class="stat-info">
+        <h3>{{ rejectedStudents }}</h3>
+        <p>Rejected</p>
+      </div>
+      <div class="stat-trend">Closed cases</div>
     </div>
   </div>
 
-  <!-- Toolbar -->
   <div class="toolbar">
     <div class="search-bar">
-      <input 
-        type="text" 
-        [(ngModel)]="searchTerm" 
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
         (input)="filterStudents()"
         placeholder="Search by name, email, department, or ID..."
         class="search-input"
       />
-      <span class="search-icon">🔍</span>
+      <span class="search-icon" aria-hidden="true"></span>
     </div>
-    
+
     <div class="filter-buttons">
-      <button 
-        [class.active]="selectedFilter === 'all'" 
+      <button
+        [class.active]="selectedFilter === 'all'"
         (click)="selectedFilter = 'all'; filterStudents()"
         class="filter-btn">
         All
       </button>
-      <button 
-        [class.active]="selectedFilter === 'approved'" 
+      <button
+        [class.active]="selectedFilter === 'approved'"
         (click)="selectedFilter = 'approved'; filterStudents()"
         class="filter-btn">
         Approved
       </button>
-      <button 
-        [class.active]="selectedFilter === 'pending'" 
+      <button
+        [class.active]="selectedFilter === 'pending'"
         (click)="selectedFilter = 'pending'; filterStudents()"
         class="filter-btn">
         Pending
       </button>
-    </div>
-    
-    <div class="action-buttons">
-      <button (click)="refresh()" class="refresh-btn" [disabled]="loading">
-        🔄 Refresh
+      <button
+        [class.active]="selectedFilter === 'rejected'"
+        (click)="selectedFilter = 'rejected'; filterStudents()"
+        class="filter-btn">
+        Rejected
       </button>
+    </div>
+
+    <div class="action-buttons">
       <button (click)="debugToken()" class="debug-btn">
-        🐛 Debug
+        Debug
       </button>
       <button (click)="testApi()" class="test-api-btn">
-        📡 Test API
+        Test API
       </button>
     </div>
   </div>
 
-  <!-- Error Message -->
   <div *ngIf="error" class="error-message">
-    <span class="error-icon">⚠️</span>
+    <span class="error-icon">!</span>
     <span>{{ error }}</span>
-    <button (click)="error = ''" class="close-error">×</button>
+    <button (click)="error = ''" class="close-error">x</button>
   </div>
 
-  <!-- Loading State -->
   <div *ngIf="loading" class="loading-state">
     <div class="spinner"></div>
     <p>Loading students...</p>
   </div>
 
-  <!-- Student Table -->
   <div *ngIf="!loading && filteredStudents.length > 0" class="table-container">
     <table class="student-table">
       <thead>
@@ -116,7 +128,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let student of paginatedStudents">
-          <td class="student-id">{{ student.id || student.rollNumber || 'N/A' }}</td>
+          <td class="student-id">{{ student.id || 'N/A' }}</td>
           <td class="student-name">
             <div class="name-cell">
               <span class="avatar">{{ (student.name || 'S')[0] }}</span>
@@ -128,27 +140,27 @@
           <td>{{ student.year || 'N/A' }}</td>
           <td>{{ student.cgpa || 'N/A' }}</td>
           <td>
-            <span [class]="'status-badge ' + (student.verified || student.approved ? 'approved' : 'pending')">
-              {{ student.verified || student.approved ? 'Approved' : 'Pending' }}
+            <span [ngClass]="['status-badge', 'status-' + getStudentStatusClass(student)]">
+              {{ getStudentStatus(student) }}
             </span>
           </td>
           <td class="action-buttons-cell">
             <button (click)="viewStudentDetails(student.id)" class="view-btn" title="View Details">
-              👁️
+              View
             </button>
-            <button 
-              *ngIf="!(student.verified || student.approved)" 
-              (click)="approveStudent(student)" 
-              class="approve-btn" 
+            <button
+              *ngIf="canApprove(student)"
+              (click)="approveStudent(student)"
+              class="approve-btn"
               title="Approve">
-              ✅
+              Approve
             </button>
-            <button 
-              *ngIf="!(student.verified || student.approved)" 
-              (click)="rejectStudent(student)" 
-              class="reject-btn" 
+            <button
+              *ngIf="canReject(student)"
+              (click)="rejectStudent(student)"
+              class="reject-btn"
               title="Reject">
-              ❌
+              Reject
             </button>
           </td>
         </tr>
@@ -156,18 +168,16 @@
     </table>
   </div>
 
-  <!-- Empty State -->
   <div *ngIf="!loading && filteredStudents.length === 0" class="empty-state">
-    <div class="empty-icon">📭</div>
+    <div class="empty-icon">No Data</div>
     <h3>No students found</h3>
     <p>Try adjusting your search or filter criteria</p>
     <button (click)="refresh()" class="refresh-btn">Refresh List</button>
   </div>
 
-  <!-- Pagination -->
   <div *ngIf="!loading && filteredStudents.length > 0" class="pagination">
-    <button 
-      (click)="changePage(currentPage - 1)" 
+    <button
+      (click)="changePage(currentPage - 1)"
       [disabled]="currentPage === 1"
       class="page-btn">
       Previous
@@ -175,8 +185,8 @@
     <span class="page-info">
       Page {{ currentPage }} of {{ totalPages }}
     </span>
-    <button 
-      (click)="changePage(currentPage + 1)" 
+    <button
+      (click)="changePage(currentPage + 1)"
       [disabled]="currentPage === totalPages"
       class="page-btn">
       Next

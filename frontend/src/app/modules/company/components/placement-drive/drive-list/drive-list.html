@@ -1,273 +1,227 @@
-<div class="drive-list-container">
-  <!-- Header Section -->
-  <div class="header-section">
-    <div class="header-content">
-      <h1>Placement Drives</h1>
-      <p>Explore and register for upcoming placement opportunities</p>
+<div class="company-drive-page">
+  <section class="company-drive-hero">
+    <div class="company-drive-hero-copy">
+      <p class="company-drive-eyebrow">Company Drives</p>
+      <h1>Drive workspace for {{ companyName }}</h1>
+      <p>Track every hiring campaign, manage the role posts inside each drive, and move from scheduling to final offers without leaving the company portal.</p>
     </div>
-  </div>
+  </section>
 
-  <!-- Statistics Cards -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon total">
-        <i class="material-icons" aria-hidden="true">work</i>
-      </div>
-      <div class="stat-info">
-        <h3>{{stats.total}}</h3>
+  <section class="company-drive-stats">
+    <article class="company-drive-stat company-drive-stat-total">
+      <div class="company-drive-stat-icon">DB</div>
+      <div>
+        <h3>{{ stats.total }}</h3>
         <p>Total Drives</p>
       </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon upcoming">
-        <i class="material-icons" aria-hidden="true">event</i>
-      </div>
-      <div class="stat-info">
-        <h3>{{stats.upcoming}}</h3>
+    </article>
+
+    <article class="company-drive-stat company-drive-stat-upcoming">
+      <div class="company-drive-stat-icon">UP</div>
+      <div>
+        <h3>{{ stats.upcoming }}</h3>
         <p>Upcoming</p>
       </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon ongoing">
-        <i class="material-icons" aria-hidden="true">play_circle</i>
-      </div>
-      <div class="stat-info">
-        <h3>{{stats.ongoing}}</h3>
+    </article>
+
+    <article class="company-drive-stat company-drive-stat-ongoing">
+      <div class="company-drive-stat-icon">ON</div>
+      <div>
+        <h3>{{ stats.ongoing }}</h3>
         <p>Ongoing</p>
       </div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon completed">
-        <i class="material-icons" aria-hidden="true">check_circle</i>
-      </div>
-      <div class="stat-info">
-        <h3>{{stats.completed}}</h3>
+    </article>
+
+    <article class="company-drive-stat company-drive-stat-completed">
+      <div class="company-drive-stat-icon">CL</div>
+      <div>
+        <h3>{{ stats.completed }}</h3>
         <p>Completed</p>
       </div>
-    </div>
-  </div>
+    </article>
+  </section>
 
-  <!-- Search and Filters Section -->
-  <div class="filters-section">
-    <div class="search-box">
-      <i class="material-icons" aria-hidden="true">search</i>
-      <input 
-        type="text" 
-        placeholder="Search by drive name, company, or description..." 
-        [(ngModel)]="searchTerm" 
+  <section class="company-drive-filters">
+    <div class="company-drive-search">
+      <span class="company-drive-search-icon">Q</span>
+      <input
+        type="text"
+        placeholder="Search by drive code, campaign name, or role title..."
+        [(ngModel)]="searchTerm"
         (input)="applyFilters()"
         aria-label="Search drives">
     </div>
-    
-    <div class="filters-grid">
-      <div class="filter-group">
-        <label for="statusFilter" class="filter-label">Status</label>
-        <select 
-          id="statusFilter"
-          [(ngModel)]="selectedStatus" 
+
+    <div class="company-drive-filter-grid">
+      <label class="company-drive-filter">
+        <span>Status</span>
+        <select
+          [(ngModel)]="selectedStatus"
           (change)="applyFilters()"
           aria-label="Filter by status">
-          <option *ngFor="let status of driveStatuses" [value]="status.value">{{status.label}}</option>
+          <option *ngFor="let status of driveStatuses" [value]="status.value">{{ status.label }}</option>
         </select>
-      </div>
+      </label>
 
-      <div class="filter-group">
-        <label for="typeFilter" class="filter-label">Drive Type</label>
-        <select 
-          id="typeFilter"
-          [(ngModel)]="selectedType" 
+      <label class="company-drive-filter">
+        <span>Drive Type</span>
+        <select
+          [(ngModel)]="selectedType"
           (change)="applyFilters()"
           aria-label="Filter by drive type">
-          <option *ngFor="let type of driveTypes" [value]="type.value">{{type.label}}</option>
+          <option *ngFor="let type of driveTypes" [value]="type.value">{{ type.label }}</option>
         </select>
-      </div>
+      </label>
 
-      <div class="filter-group">
-        <label for="branchFilter" class="filter-label">Eligible Branch</label>
-        <select 
-          id="branchFilter"
-          [(ngModel)]="selectedBranch" 
+      <label class="company-drive-filter">
+        <span>Eligible Branch</span>
+        <select
+          [(ngModel)]="selectedBranch"
           (change)="applyFilters()"
           aria-label="Filter by eligible branch">
           <option value="all">All Branches</option>
-          <option *ngFor="let branch of branches" [value]="branch">{{branch}}</option>
+          <option *ngFor="let branch of branches" [value]="branch">{{ branch }}</option>
         </select>
-      </div>
+      </label>
 
-      <button class="btn-clear" (click)="clearFilters()" aria-label="Clear all filters">
-        <i class="material-icons" aria-hidden="true">clear</i> Clear All
+      <button class="company-drive-clear-btn" (click)="clearFilters()" aria-label="Clear all filters">
+        Clear All
       </button>
     </div>
 
-    <div class="results-info">
-      <span class="results-count">
-        <i class="material-icons" aria-hidden="true">list</i>
-        Showing {{filteredDrives.length}} of {{drives.length}} drives
-      </span>
+    <div class="company-drive-results">
+      Showing {{ filteredDrives.length }} of {{ drives.length }} company drives
     </div>
-  </div>
+  </section>
 
-  <!-- Loading State -->
-  <div class="loading-state" *ngIf="isLoading" role="status" aria-live="polite">
-    <div class="spinner" aria-hidden="true"></div>
-    <p>Loading placement drives...</p>
-  </div>
+  <section class="company-drive-loading" *ngIf="isLoading" role="status" aria-live="polite">
+    <div class="company-drive-spinner" aria-hidden="true"></div>
+    <p>Loading drive workspace...</p>
+  </section>
 
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!isLoading && filteredDrives.length === 0">
-    <i class="material-icons" aria-hidden="true">event_busy</i>
+  <section class="company-drive-empty" *ngIf="!isLoading && filteredDrives.length === 0">
+    <div class="company-drive-empty-icon">0</div>
     <h3>No Drives Found</h3>
-    <p>Try adjusting your search filters or check back later for new opportunities</p>
-    <button class="btn-primary" (click)="clearFilters()" aria-label="Clear all filters">
-      <i class="material-icons" aria-hidden="true">refresh</i> Clear Filters
-    </button>
-  </div>
+    <p>Try adjusting the workspace filters to find the campaign or role post you want to manage.</p>
+    <button class="company-drive-primary-btn" (click)="clearFilters()">Clear Filters</button>
+  </section>
 
-  <!-- Drives Grid -->
-  <div class="drives-grid" *ngIf="!isLoading && filteredDrives.length > 0">
-    <div class="drive-card" *ngFor="let drive of paginatedDrives">
-      <div class="card-badge" [class]="drive.status">
-        <i class="material-icons" aria-hidden="true">{{getStatusIcon(drive.status)}}</i>
-        {{drive.status | uppercase}}
+  <section class="company-drive-grid" *ngIf="!isLoading && filteredDrives.length > 0">
+    <article class="company-drive-card" *ngFor="let drive of paginatedDrives">
+      <div class="company-drive-card-status" [class]="'company-drive-status-' + drive.status">
+        {{ drive.status | uppercase }}
       </div>
-      
-      <div class="card-header">
-        <div class="company-logo">
-          <img [src]="drive.companyLogo" [alt]="drive.companyName + ' logo'" [title]="drive.companyName">
+
+      <div class="company-drive-card-head">
+        <div class="company-drive-card-logo" [attr.aria-label]="drive.companyName">
+          <span>{{ drive.companyBadge }}</span>
         </div>
-        <div class="company-info">
-          <h3>{{drive.driveName}}</h3>
-          <p class="company-name">{{drive.companyName}}</p>
-          <div class="drive-type" [class]="drive.driveType">
-            <i class="material-icons" aria-hidden="true">{{getDriveTypeIcon(drive.driveType)}}</i>
-            {{drive.driveType | uppercase}}
-          </div>
+        <div class="company-drive-card-title">
+          <h3>{{ drive.driveName }}</h3>
+          <p>{{ drive.driveCode }} | {{ getDriveTypeLabel(drive.driveType) }}</p>
+          <span class="company-drive-type-pill">{{ getTotalRoles(drive) }} role posts</span>
         </div>
       </div>
 
-      <div class="drive-details">
-        <div class="detail-row">
-          <div class="detail-item">
-            <i class="material-icons" aria-hidden="true">event</i>
-            <div>
-              <span class="detail-label">Date & Time</span>
-              <span class="detail-value">{{formatDate(drive.driveDate)}} at {{drive.driveTime}}</span>
-            </div>
+      <div class="company-drive-card-details">
+        <div class="company-drive-detail-row">
+          <div class="company-drive-detail-box">
+            <span class="company-drive-detail-label">Date & Time</span>
+            <strong>{{ formatDate(drive.driveDate) }} at {{ drive.driveTime }}</strong>
           </div>
-          <div class="detail-item">
-            <i class="material-icons" aria-hidden="true">location_on</i>
-            <div>
-              <span class="detail-label">Venue</span>
-              <span class="detail-value">{{drive.venue}}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="detail-row">
-          <div class="detail-item">
-            <i class="material-icons" aria-hidden="true">people</i>
-            <div>
-              <span class="detail-label">Registered</span>
-              <span class="detail-value">{{drive.registeredCount}} / {{drive.vacancies}} Students</span>
-            </div>
-          </div>
-          <div class="detail-item">
-            <i class="material-icons" aria-hidden="true">school</i>
-            <div>
-              <span class="detail-label">Min CGPA</span>
-              <span class="detail-value">{{drive.minCGPA || 'No minimum'}}</span>
-            </div>
+          <div class="company-drive-detail-box">
+            <span class="company-drive-detail-label">Venue</span>
+            <strong>{{ drive.venue }}</strong>
           </div>
         </div>
 
-        <div class="detail-item full-width">
-          <i class="material-icons" aria-hidden="true">work</i>
-          <div>
-            <span class="detail-label">Positions Available</span>
-            <div class="tags">
-              <span class="tag" *ngFor="let position of drive.positions">{{position}}</span>
-            </div>
+        <div class="company-drive-detail-row">
+          <div class="company-drive-detail-box">
+            <span class="company-drive-detail-label">Registered</span>
+            <strong>{{ drive.registeredCount }} / {{ drive.targetApplications }} target</strong>
+          </div>
+          <div class="company-drive-detail-box">
+            <span class="company-drive-detail-label">Offers Released</span>
+            <strong>{{ getFilledSeats(drive) }} / {{ drive.vacancies }}</strong>
           </div>
         </div>
 
-        <div class="detail-item full-width">
-          <i class="material-icons" aria-hidden="true">check_circle</i>
-          <div>
-            <span class="detail-label">Eligible Branches</span>
-            <div class="tags">
-              <span class="tag" *ngFor="let branch of drive.eligibleBranches.slice(0, 3)">{{branch}}</span>
-              <span class="tag more" *ngIf="drive.eligibleBranches.length > 3">+{{drive.eligibleBranches.length - 3}}</span>
-            </div>
+        <div class="company-drive-block">
+          <span class="company-drive-detail-label">Role Posts</span>
+          <div class="company-drive-tags">
+            <span class="company-drive-tag" *ngFor="let role of drive.roles.slice(0, 3)">{{ role.title }}</span>
+            <span class="company-drive-tag company-drive-tag-more" *ngIf="drive.roles.length > 3">
+              +{{ drive.roles.length - 3 }} more
+            </span>
+          </div>
+        </div>
+
+        <div class="company-drive-block">
+          <span class="company-drive-detail-label">Eligible Branches</span>
+          <div class="company-drive-tags">
+            <span class="company-drive-tag" *ngFor="let branch of drive.eligibleBranches.slice(0, 3)">{{ branch }}</span>
+            <span class="company-drive-tag company-drive-tag-more" *ngIf="drive.eligibleBranches.length > 3">
+              +{{ drive.eligibleBranches.length - 3 }}
+            </span>
           </div>
         </div>
       </div>
 
-      <div class="drive-description">
-        <p>{{drive.description | slice:0:120}}{{drive.description.length > 120 ? '...' : ''}}</p>
+      <div class="company-drive-card-description">
+        <p>{{ drive.description }}</p>
       </div>
 
-      <div class="drive-footer">
-        <div class="deadline-info" [class.urgent]="getDaysRemaining(drive.registrationDeadline) <= 7 && drive.status === 'scheduled'">
-          <i class="material-icons" aria-hidden="true">schedule</i>
-          <span *ngIf="!isRegistrationOpen(drive.registrationDeadline, drive.status) && drive.status === 'scheduled'">
-            Registration closed on {{formatDate(drive.registrationDeadline)}}
-          </span>
+      <div class="company-drive-card-footer">
+        <div class="company-drive-deadline" [class.company-drive-deadline-urgent]="getDaysRemaining(drive.registrationDeadline) <= 7 && drive.status === 'scheduled'">
           <span *ngIf="isRegistrationOpen(drive.registrationDeadline, drive.status)">
-            Registration closes in {{getDaysRemaining(drive.registrationDeadline)}} days
+            Registration closes in {{ getDaysRemaining(drive.registrationDeadline) }} days
           </span>
-          <span *ngIf="drive.status === 'ongoing'">
-            Drive in progress
+          <span *ngIf="!isRegistrationOpen(drive.registrationDeadline, drive.status) && drive.status === 'scheduled'">
+            Registration closed on {{ formatDate(drive.registrationDeadline) }}
           </span>
-          <span *ngIf="drive.status === 'completed'">
-            Drive completed
-          </span>
+          <span *ngIf="drive.status === 'ongoing'">Panels are active for this drive</span>
+          <span *ngIf="drive.status === 'completed'">Offers and closure notes are available</span>
         </div>
-        
-        <div class="card-actions">
-          <button class="btn-outline" (click)="viewDetails(drive)" aria-label="View details for {{drive.driveName}}">
-            <i class="material-icons" aria-hidden="true">visibility</i> View Details
+
+        <div class="company-drive-actions">
+          <button class="company-drive-secondary-btn" (click)="viewDetails(drive)" aria-label="Open overview for {{ drive.driveName }}">
+            View Drive
           </button>
-          <button 
-            class="btn-primary" 
-            (click)="registerForDrive(drive)" 
-            [disabled]="!isRegistrationOpen(drive.registrationDeadline, drive.status)"
-            [attr.aria-label]="isRegistrationOpen(drive.registrationDeadline, drive.status) ? 'Register for ' + drive.driveName : 'Registration closed for ' + drive.driveName">
-            <i class="material-icons" aria-hidden="true">how_to_reg</i>
-            {{isRegistrationOpen(drive.registrationDeadline, drive.status) ? 'Register Now' : 'Registration Closed'}}
+          <button class="company-drive-primary-btn" (click)="manageDrive(drive)" aria-label="Manage roles for {{ drive.driveName }}">
+            Manage Roles
           </button>
         </div>
       </div>
-    </div>
-  </div>
+    </article>
+  </section>
 
-  <!-- Pagination -->
-  <div class="pagination" *ngIf="!isLoading && filteredDrives.length > 0 && totalPages > 1" role="navigation" aria-label="Pagination">
-    <button 
-      class="page-btn" 
-      (click)="changePage(currentPage - 1)" 
+  <section class="company-drive-pagination" *ngIf="!isLoading && filteredDrives.length > 0 && totalPages > 1" role="navigation" aria-label="Pagination">
+    <button
+      class="company-drive-page-btn"
+      (click)="changePage(currentPage - 1)"
       [disabled]="currentPage === 1"
       aria-label="Previous page">
-      <i class="material-icons" aria-hidden="true">chevron_left</i> Previous
+      Previous
     </button>
-    
-    <div class="page-numbers">
-      <button 
-        *ngFor="let page of getPages()" 
-        class="page-number" 
-        [class.active]="page === currentPage"
+
+    <div class="company-drive-page-numbers">
+      <button
+        *ngFor="let page of getPages()"
+        class="company-drive-page-number"
+        [class.company-drive-page-number-active]="page === currentPage"
         (click)="changePage(page)"
         [attr.aria-label]="'Go to page ' + page"
         [attr.aria-current]="page === currentPage ? 'page' : null">
-        {{page}}
+        {{ page }}
       </button>
     </div>
-    
-    <button 
-      class="page-btn" 
-      (click)="changePage(currentPage + 1)" 
+
+    <button
+      class="company-drive-page-btn"
+      (click)="changePage(currentPage + 1)"
       [disabled]="currentPage === totalPages"
       aria-label="Next page">
-      Next <i class="material-icons" aria-hidden="true">chevron_right</i>
+      Next
     </button>
-  </div>
+  </section>
 </div>

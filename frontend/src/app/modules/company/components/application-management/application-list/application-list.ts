@@ -1,9 +1,148 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApplicationService } from '../../../services/application.service';
 import { Application, ApplicationFilter } from '../../../models/application.model';
 import { CommonModule, DatePipe, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+const STATIC_APPLICATIONS: Application[] = [
+  {
+    id: 'app_001',
+    jobId: 'drive_frontend_01',
+    jobTitle: 'Frontend Developer',
+    studentId: 'stud_001',
+    candidateName: 'Aarav Mehta',
+    candidateEmail: 'aarav.mehta@example.com',
+    candidatePhone: '+91 9876543210',
+    branch: 'Computer Science',
+    cgpa: 8.7,
+    yearOfPassing: 2026,
+    skills: ['Angular', 'TypeScript', 'RxJS', 'Tailwind CSS'],
+    resumeUrl: 'https://example.com/resumes/aarav-mehta.pdf',
+    coverLetter: 'Excited to contribute to scalable frontend systems and design-led product teams.',
+    status: 'pending',
+    appliedAt: new Date('2026-03-18T10:30:00'),
+    updatedAt: new Date('2026-03-18T10:30:00')
+  },
+  {
+    id: 'app_002',
+    jobId: 'drive_frontend_01',
+    jobTitle: 'Frontend Developer',
+    studentId: 'stud_002',
+    candidateName: 'Diya Nair',
+    candidateEmail: 'diya.nair@example.com',
+    candidatePhone: '+91 9876543211',
+    branch: 'Information Technology',
+    cgpa: 9.1,
+    yearOfPassing: 2026,
+    skills: ['Angular', 'Figma', 'JavaScript', 'SCSS'],
+    resumeUrl: 'https://example.com/resumes/diya-nair.pdf',
+    status: 'reviewed',
+    appliedAt: new Date('2026-03-17T14:20:00'),
+    updatedAt: new Date('2026-03-19T09:00:00')
+  },
+  {
+    id: 'app_003',
+    jobId: 'drive_backend_01',
+    jobTitle: 'Backend Engineer',
+    studentId: 'stud_003',
+    candidateName: 'Rohan Kapoor',
+    candidateEmail: 'rohan.kapoor@example.com',
+    candidatePhone: '+91 9876543212',
+    branch: 'Computer Science',
+    cgpa: 8.4,
+    yearOfPassing: 2025,
+    skills: ['Java', 'Spring Boot', 'SQL', 'REST APIs'],
+    resumeUrl: 'https://example.com/resumes/rohan-kapoor.pdf',
+    status: 'shortlisted',
+    appliedAt: new Date('2026-03-14T11:45:00'),
+    updatedAt: new Date('2026-03-20T12:10:00')
+  },
+  {
+    id: 'app_004',
+    jobId: 'drive_backend_01',
+    jobTitle: 'Backend Engineer',
+    studentId: 'stud_004',
+    candidateName: 'Sneha Iyer',
+    candidateEmail: 'sneha.iyer@example.com',
+    candidatePhone: '+91 9876543213',
+    branch: 'Data Science',
+    cgpa: 8.9,
+    yearOfPassing: 2026,
+    skills: ['Python', 'FastAPI', 'PostgreSQL', 'Docker'],
+    resumeUrl: 'https://example.com/resumes/sneha-iyer.pdf',
+    status: 'pending',
+    appliedAt: new Date('2026-03-20T09:10:00'),
+    updatedAt: new Date('2026-03-20T09:10:00')
+  },
+  {
+    id: 'app_005',
+    jobId: 'drive_data_01',
+    jobTitle: 'Data Analyst',
+    studentId: 'stud_005',
+    candidateName: 'Karthik Raman',
+    candidateEmail: 'karthik.raman@example.com',
+    candidatePhone: '+91 9876543214',
+    branch: 'Electronics & Communication',
+    cgpa: 7.9,
+    yearOfPassing: 2026,
+    skills: ['SQL', 'Power BI', 'Excel', 'Python'],
+    resumeUrl: 'https://example.com/resumes/karthik-raman.pdf',
+    status: 'reviewed',
+    appliedAt: new Date('2026-03-16T16:40:00'),
+    updatedAt: new Date('2026-03-21T08:25:00')
+  },
+  {
+    id: 'app_006',
+    jobId: 'drive_devops_01',
+    jobTitle: 'Cloud Support Associate',
+    studentId: 'stud_006',
+    candidateName: 'Nisha Verma',
+    candidateEmail: 'nisha.verma@example.com',
+    candidatePhone: '+91 9876543215',
+    branch: 'Information Technology',
+    cgpa: 8.2,
+    yearOfPassing: 2025,
+    skills: ['AWS', 'Linux', 'Networking', 'CI/CD'],
+    resumeUrl: 'https://example.com/resumes/nisha-verma.pdf',
+    status: 'hired',
+    appliedAt: new Date('2026-03-11T13:15:00'),
+    updatedAt: new Date('2026-03-22T17:45:00')
+  },
+  {
+    id: 'app_007',
+    jobId: 'drive_ops_01',
+    jobTitle: 'Operations Analyst',
+    studentId: 'stud_007',
+    candidateName: 'Pranav Shah',
+    candidateEmail: 'pranav.shah@example.com',
+    candidatePhone: '+91 9876543216',
+    branch: 'Mechanical Engineering',
+    cgpa: 7.6,
+    yearOfPassing: 2026,
+    skills: ['Excel', 'Operations', 'Reporting', 'Communication'],
+    resumeUrl: 'https://example.com/resumes/pranav-shah.pdf',
+    status: 'rejected',
+    appliedAt: new Date('2026-03-12T15:50:00'),
+    updatedAt: new Date('2026-03-19T11:05:00')
+  },
+  {
+    id: 'app_008',
+    jobId: 'drive_uiux_01',
+    jobTitle: 'UI Engineer',
+    studentId: 'stud_008',
+    candidateName: 'Ishita Sen',
+    candidateEmail: 'ishita.sen@example.com',
+    candidatePhone: '+91 9876543217',
+    branch: 'Computer Science',
+    cgpa: 9.3,
+    yearOfPassing: 2026,
+    skills: ['HTML', 'CSS', 'Angular', 'Design Systems'],
+    resumeUrl: 'https://example.com/resumes/ishita-sen.pdf',
+    status: 'shortlisted',
+    appliedAt: new Date('2026-03-23T10:05:00'),
+    updatedAt: new Date('2026-03-24T14:30:00')
+  }
+];
 
 @Component({
   selector: 'app-application-list',
@@ -13,6 +152,11 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule, UpperCasePipe, DatePipe]
 })
 export class ApplicationListComponent implements OnInit {
+  private readonly allApplications: Application[] = STATIC_APPLICATIONS.map(application => ({
+    ...application,
+    skills: [...application.skills]
+  }));
+
   applications: Application[] = [];
   filteredApplications: Application[] = [];
   isLoading = false;
@@ -35,7 +179,6 @@ export class ApplicationListComponent implements OnInit {
   selectAll = false;
 
   constructor(
-    private applicationService: ApplicationService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -52,22 +195,13 @@ export class ApplicationListComponent implements OnInit {
 
   private loadApplications(): void {
     this.isLoading = true;
-    const companyId = this.getCompanyId();
-    
-    this.applicationService.getApplicationsByCompany(companyId, this.filters).subscribe({
-      next: (applications) => {
-        this.applications = applications || [];
-        this.filteredApplications = applications || [];
-        this.calculateTotalPages();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading applications:', error);
-        this.applications = [];
-        this.filteredApplications = [];
-        this.isLoading = false;
-      }
-    });
+    this.getCompanyId();
+    this.applications = this.allApplications.map(application => ({
+      ...application,
+      skills: [...application.skills]
+    }));
+    this.refreshFilteredApplications();
+    this.isLoading = false;
   }
 
   private getCompanyId(): string {
@@ -76,7 +210,6 @@ export class ApplicationListComponent implements OnInit {
   }
 
   applyFilters(): void {
-    // Update filters object
     this.filters = {};
     
     if (this.jobFilter !== 'all') {
@@ -95,28 +228,13 @@ export class ApplicationListComponent implements OnInit {
       this.filters.minCGPA = parseFloat(this.minCGPAPicker);
     }
 
-    this.loadApplications();
+    this.currentPage = 1;
+    this.refreshFilteredApplications();
   }
 
   searchApplications(): void {
-    if (!this.applications) {
-      this.filteredApplications = [];
-      return;
-    }
-
-    this.filteredApplications = this.applications.filter(application => {
-      if (!application) return false;
-      
-      const searchLower = this.searchTerm.toLowerCase();
-      const matchesSearch = 
-        application.candidateName?.toLowerCase().includes(searchLower) ||
-        application.candidateEmail?.toLowerCase().includes(searchLower) ||
-        application.jobTitle?.toLowerCase().includes(searchLower);
-      return matchesSearch;
-    });
-    
     this.currentPage = 1;
-    this.calculateTotalPages();
+    this.refreshFilteredApplications();
   }
 
   private calculateTotalPages(): void {
@@ -203,25 +321,13 @@ export class ApplicationListComponent implements OnInit {
   // Status update methods
   updateApplicationStatus(applicationId: string | undefined, newStatus: string): void {
     if (!applicationId) return;
+    const application = this.allApplications.find(app => app.id === applicationId);
+    if (!application) return;
 
-    this.applicationService.updateApplicationStatus({
-      applicationId,
-      status: newStatus as any
-    }).subscribe({
-      next: (updatedApplication) => {
-        const index = this.applications.findIndex(app => app.id === applicationId);
-        if (index !== -1) {
-          this.applications[index] = updatedApplication;
-        }
-        this.applyFilters();
-        this.selectedApplications.clear();
-        this.selectAll = false;
-      },
-      error: (error) => {
-        console.error('Error updating application status:', error);
-        alert('Error updating application status. Please try again.');
-      }
-    });
+    application.status = newStatus as Application['status'];
+    application.updatedAt = new Date();
+    this.selectedApplications.delete(applicationId);
+    this.refreshFilteredApplications();
   }
 
   bulkUpdateStatus(newStatus: string): void {
@@ -231,48 +337,55 @@ export class ApplicationListComponent implements OnInit {
     }
 
     if (confirm(`Are you sure you want to update ${this.selectedApplications.size} application(s) to ${newStatus.toUpperCase()}?`)) {
-      const applicationIds = Array.from(this.selectedApplications);
-      this.applicationService.bulkUpdateApplicationStatus(applicationIds, newStatus).subscribe({
-        next: () => {
-          this.loadApplications();
-          this.selectedApplications.clear();
-          this.selectAll = false;
-          alert('Applications updated successfully!');
-        },
-        error: (error) => {
-          console.error('Error bulk updating applications:', error);
-          alert('Error updating applications. Please try again.');
+      Array.from(this.selectedApplications).forEach(applicationId => {
+        const application = this.allApplications.find(app => app.id === applicationId);
+        if (application) {
+          application.status = newStatus as Application['status'];
+          application.updatedAt = new Date();
         }
       });
+
+      this.selectedApplications.clear();
+      this.selectAll = false;
+      this.refreshFilteredApplications();
+      alert('Applications updated successfully!');
     }
   }
 
   // Export methods
   exportToExcel(): void {
-    const companyId = this.getCompanyId();
-    this.applicationService.downloadApplicationsExcel(companyId, this.filters).subscribe({
-      next: (blob) => {
-        this.downloadFile(blob, `applications_${new Date().toISOString().split('T')[0]}.xlsx`, 
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      },
-      error: (error) => {
-        console.error('Error exporting to Excel:', error);
-        alert('Error exporting applications. Please try again.');
-      }
-    });
+    const headers = ['Candidate', 'Email', 'Phone', 'Job', 'Branch', 'CGPA', 'Status', 'Applied On'];
+    const rows = this.filteredApplications.map(application => ([
+      application.candidateName,
+      application.candidateEmail,
+      application.candidatePhone,
+      application.jobTitle,
+      application.branch,
+      application.cgpa.toFixed(2),
+      application.status,
+      application.appliedAt.toISOString().split('T')[0]
+    ]));
+
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    this.downloadFile(new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }), `applications_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
   }
 
   exportToPDF(): void {
-    const companyId = this.getCompanyId();
-    this.applicationService.downloadApplicationsPDF(companyId, this.filters).subscribe({
-      next: (blob) => {
-        this.downloadFile(blob, `applications_${new Date().toISOString().split('T')[0]}.pdf`, 'application/pdf');
-      },
-      error: (error) => {
-        console.error('Error exporting to PDF:', error);
-        alert('Error exporting applications. Please try again.');
-      }
-    });
+    const reportContent = this.filteredApplications.map(application =>
+      [
+        `Candidate: ${application.candidateName}`,
+        `Job: ${application.jobTitle}`,
+        `Branch: ${application.branch}`,
+        `CGPA: ${application.cgpa.toFixed(2)}`,
+        `Status: ${application.status.toUpperCase()}`,
+        `Applied: ${application.appliedAt.toDateString()}`
+      ].join('\n')
+    ).join('\n\n');
+
+    this.downloadFile(new Blob([reportContent], { type: 'text/plain;charset=utf-8;' }), `applications_report_${new Date().toISOString().split('T')[0]}.txt`, 'text/plain');
   }
 
   private downloadFile(blob: Blob, filename: string, contentType: string): void {
@@ -346,6 +459,44 @@ export class ApplicationListComponent implements OnInit {
     this.branchFilter = 'all';
     this.minCGPAPicker = '';
     this.filters = {};
-    this.loadApplications();
+    this.currentPage = 1;
+    this.refreshFilteredApplications();
+  }
+
+  private refreshFilteredApplications(): void {
+    const minimumCgpa = this.minCGPAPicker ? parseFloat(this.minCGPAPicker) : null;
+    const searchLower = this.searchTerm.trim().toLowerCase();
+
+    this.filteredApplications = this.applications.filter(application => {
+      if (!application) {
+        return false;
+      }
+
+      const matchesJob = this.jobFilter === 'all' ||
+        application.jobTitle === this.jobFilter ||
+        application.jobId === this.jobFilter;
+      const matchesStatus = this.statusFilter === 'all' || application.status === this.statusFilter;
+      const matchesBranch = this.branchFilter === 'all' || application.branch === this.branchFilter;
+      const matchesCgpa = minimumCgpa === null || application.cgpa >= minimumCgpa;
+      const matchesSearch = !searchLower ||
+        application.candidateName.toLowerCase().includes(searchLower) ||
+        application.candidateEmail.toLowerCase().includes(searchLower) ||
+        application.jobTitle.toLowerCase().includes(searchLower);
+
+      return matchesJob && matchesStatus && matchesBranch && matchesCgpa && matchesSearch;
+    });
+
+    this.pruneSelection();
+    this.calculateTotalPages();
+    this.updateSelectAllState();
+  }
+
+  private pruneSelection(): void {
+    const validIds = new Set(this.applications.map(application => application.id));
+    this.selectedApplications.forEach(applicationId => {
+      if (!validIds.has(applicationId)) {
+        this.selectedApplications.delete(applicationId);
+      }
+    });
   }
 }

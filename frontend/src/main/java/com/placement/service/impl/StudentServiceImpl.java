@@ -31,6 +31,9 @@ public class StudentServiceImpl implements StudentService {
         if (studentRepository.existsByEmail(student.getEmail())) {
             throw new RuntimeException("Student with email " + student.getEmail() + " already exists");
         }
+        student.setVerifiedByAdmin(false);
+        student.setRejectedByAdmin(false);
+        student.setRejectionReason(null);
         return studentRepository.save(student);
     }
 
@@ -82,6 +85,36 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> getStudentsByCgpaGreaterThanEqual(Double cgpa) {
         return studentRepository.findByCgpaGreaterThanEqual(cgpa);
+    }
+
+    @Override
+    public List<Student> getVerifiedStudents() {
+        return studentRepository.findByVerifiedByAdminTrue();
+    }
+
+    @Override
+    public List<Student> getRejectedStudents() {
+        return studentRepository.findByRejectedByAdminTrue();
+    }
+
+    @Override
+    public void verifyStudent(@NonNull Long id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        student.setVerifiedByAdmin(true);
+        student.setRejectedByAdmin(false);
+        student.setRejectionReason(null);
+        studentRepository.save(student);
+    }
+
+    @Override
+    public void rejectStudent(@NonNull Long id, String reason) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        student.setVerifiedByAdmin(false);
+        student.setRejectedByAdmin(true);
+        student.setRejectionReason(reason);
+        studentRepository.save(student);
     }
 
     @Override

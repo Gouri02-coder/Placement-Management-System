@@ -1,22 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-export interface InterviewSchedule {
-  id: string;
-  companyName: string;
-  jobTitle: string;
-  interviewType: 'phone' | 'video' | 'onsite' | 'technical' | 'hr';
-  interviewDate: Date;
-  duration: number; // in minutes
-  interviewer: string;
-  interviewLink?: string;
-  location?: string;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'rescheduled';
-  preparationNotes: string;
-  feedback?: string;
-  reminder: boolean;
-}
+import { cloneStudentInterviews } from '../../../data/interview-schedule.data';
+import { InterviewSchedule } from '../../../models/interview-schedule.model';
 
 @Component({
   selector: 'app-interview-schedule',
@@ -63,48 +49,7 @@ export class InterviewScheduleComponent implements OnInit {
   }
 
   loadSampleData(): void {
-    this.interviews = [
-      {
-        id: '1',
-        companyName: 'Tech Innovations Inc.',
-        jobTitle: 'Software Engineer',
-        interviewType: 'technical',
-        interviewDate: new Date('2024-02-15T14:00:00'),
-        duration: 90,
-        interviewer: 'John Smith',
-        interviewLink: 'https://meet.google.com/abc-def-ghi',
-        status: 'scheduled',
-        preparationNotes: 'Review data structures and algorithms. Practice system design questions.',
-        reminder: true
-      },
-      {
-        id: '2',
-        companyName: 'Data Systems Ltd.',
-        jobTitle: 'Data Analyst',
-        interviewType: 'video',
-        interviewDate: new Date('2024-02-20T10:30:00'),
-        duration: 60,
-        interviewer: 'Sarah Johnson',
-        interviewLink: 'https://zoom.us/j/123456789',
-        status: 'scheduled',
-        preparationNotes: 'Prepare SQL queries and statistical analysis examples.',
-        reminder: true
-      },
-      {
-        id: '3',
-        companyName: 'Web Solutions Co.',
-        jobTitle: 'Frontend Developer',
-        interviewType: 'onsite',
-        interviewDate: new Date('2024-02-10T09:00:00'),
-        duration: 120,
-        interviewer: 'Mike Wilson',
-        location: '123 Tech Park, Bangalore',
-        status: 'completed',
-        preparationNotes: 'Review Angular concepts and JavaScript fundamentals.',
-        feedback: 'Good technical skills but need improvement in communication.',
-        reminder: false
-      }
-    ];
+    this.interviews = cloneStudentInterviews();
   }
 
   filterInterviews(): void {

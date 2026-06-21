@@ -4,86 +4,198 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TokenService {
-  private tokenKey = 'token';
-  private refreshTokenKey = 'refreshToken';
-
-  getToken(): string | null {
-    const token = localStorage.getItem(this.tokenKey);
-    console.log('TokenService.getToken() - Token from localStorage:', !!token);
-    if (token) {
-      console.log('Token preview:', token.substring(0, 30) + '...');
-      console.log('Token length:', token.length);
-      console.log('Token parts count:', token.split('.').length);
-    }
-    return token;
-  }
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
 
   setToken(token: string): void {
-    console.log('TokenService.setToken() called');
-    console.log('Token to store preview:', token.substring(0, 30) + '...');
-    console.log('Token parts count:', token.split('.').length);
-    
-    if (token && this.isValidJwtToken(token)) {
-      localStorage.setItem(this.tokenKey, token);
-      console.log('Token stored successfully');
-    } else {
-      console.error('Attempted to store invalid JWT token');
-      console.error('Token value:', token);
-      console.error('Token parts:', token?.split('.').length);
+    if (!token) {
+      console.error('Attempted to set null/undefined token');
+      return;
     }
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.refreshTokenKey);
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   setRefreshToken(token: string): void {
-    localStorage.setItem(this.refreshTokenKey, token);
+    if (!token) {
+      console.error('Attempted to set null/undefined refresh token');
+      return;
+    }
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, token);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   clearTokens(): void {
-    console.log('Clearing tokens');
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
   }
 
-  isValidJwtToken(token: string): boolean {
-    if (!token) return false;
-    const parts = token.split('.');
-    const isValid = parts.length === 3;
-    if (!isValid) {
-      console.error('Invalid JWT token format. Parts count:', parts.length);
-    }
-    return isValid;
-  }
-
+  // Decode JWT token to get payload
   decodeToken(token: string): any {
+    if (!token) {
+      console.error('Token is null or undefined');
+      return null;
+    }
+    
     try {
+      // Split the token into parts
       const parts = token.split('.');
       if (parts.length !== 3) {
-        console.error('Cannot decode invalid token');
+        console.error('Invalid token format: token does not have 3 parts');
         return null;
       }
+      
+      // Decode the payload (second part)
       const payload = parts[1];
-      let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-      switch (base64.length % 4) {
-        case 0: break;
-        case 2: base64 += '=='; break;
-        case 3: base64 += '='; break;
-      }
-      return JSON.parse(atob(base64));
+      const decodedPayload = atob(payload);
+      const parsedPayload = JSON.parse(decodedPayload);
+      
+      console.log('Decoded token payload:', parsedPayload);
+      return parsedPayload;
     } catch (e) {
-      console.error('Error decoding token:', e);
+      console.error('Failed to decode token:', e);
       return null;
     }
   }
 
-  isTokenExpired(token: string): boolean {
+  // Get specific claim from token
+  getClaimFromToken(token: string, claim: string): any {
     const decoded = this.decodeToken(token);
-    if (!decoded || !decoded.exp) {
+    if (decoded) {
+      return decoded[claim];
+    }
+    return null;
+  }
+
+  isValidJwtToken(token: string): boolean {
+    if (!token) {
+      console.error('Token is null or undefined');
+      return false;
+    }
+    
+    // Check if token has 3 parts (header, payload, signature)
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('Token does not have 3 parts, found:', parts.length);
+      return false;
+    }
+    
+    // Check if payload is valid base64
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      console.log('Token payload:', payload);
+      console.log('Token expiration:', new Date(payload.exp * 1000));
+      return true;
+    } catch (e) {
+      console.error('Failed to parse token payload:', e);
+      return false;
+    }
+  }
+
+  isTokenExpired(token: string): boolean {
+    if (!token) return true;
+    
+    try {
+      const decoded = this.decodeToken(token);
+      if (!decoded) return true;
+      
+      const expiration = decoded.exp * 1000; // Convert to milliseconds
+      const now = Date.now();
+      const isExpired = now >= expiration;
+      
+      if (isExpired) {
+        console.log('Token expired at:', new Date(expiration));
+        console.log('Current time:', new Date(now));
+      }
+      
+      return isExpired;
+    } catch (e) {
+      console.error('Failed to check token expiration:', e);
       return true;
     }
-    const expirationDate = new Date(decoded.exp * 1000);
-    return expirationDate < new Date();
+  }
+
+  getUserRoleFromToken(token: string): string | null {
+    try {
+      const decoded = this.decodeToken(token);
+      if (decoded) {
+        const role = decoded.role || null;
+        console.log('Extracted role from token:', role);
+        return role;
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to extract role from token:', e);
+      return null;
+    }
+  }
+
+  getUserEmailFromToken(token: string): string | null {
+    try {
+      const decoded = this.decodeToken(token);
+      if (decoded) {
+        return decoded.sub || decoded.username || null;
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to extract email from token:', e);
+      return null;
+    }
+  }
+
+  getUserIdFromToken(token: string): string | null {
+    try {
+      const decoded = this.decodeToken(token);
+      if (decoded) {
+        return decoded.userId || decoded.id || null;
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to extract user ID from token:', e);
+      return null;
+    }
+  }
+
+  // Get token expiration time
+  getTokenExpiration(token: string): Date | null {
+    try {
+      const decoded = this.decodeToken(token);
+      if (decoded && decoded.exp) {
+        return new Date(decoded.exp * 1000);
+      }
+      return null;
+    } catch (e) {
+      console.error('Failed to get token expiration:', e);
+      return null;
+    }
+  }
+
+  // Check if token is about to expire (within the next minutes)
+  isTokenExpiringSoon(token: string, minutes: number = 5): boolean {
+    try {
+      const decoded = this.decodeToken(token);
+      if (!decoded || !decoded.exp) return true;
+      
+      const expirationTime = decoded.exp * 1000;
+      const currentTime = Date.now();
+      const timeUntilExpiry = expirationTime - currentTime;
+      const minutesUntilExpiry = timeUntilExpiry / (1000 * 60);
+      
+      return minutesUntilExpiry <= minutes;
+    } catch (e) {
+      console.error('Failed to check if token is expiring soon:', e);
+      return true;
+    }
+  }
+
+  // Get all claims from token
+  getAllClaims(token: string): any {
+    return this.decodeToken(token);
   }
 }

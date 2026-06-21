@@ -1,178 +1,156 @@
-<div class="job-search-container">
-  <div class="search-header">
-    <h1>Find Your Dream Job</h1>
-    <p>Discover opportunities that match your skills and interests</p>
-  </div>
+<div class="job-portal-shell">
+  <section class="portal-hero">
+    <div>
+      <p class="eyebrow">Job Portals</p>
+      <h1>Student Recruitment Hub</h1>
+      <p>
+        Explore active recruitment notifications, save promising roles, review details, and submit targeted applications from one polished portal.
+      </p>
+    </div>
+    <a routerLink="/student/applications" class="hero-link">Open My Applications</a>
+  </section>
 
-  <!-- Search Filters -->
-  <div class="search-filters">
-    <form [formGroup]="searchForm" class="filters-form">
-      <div class="filters-grid">
-        <div class="filter-group">
-          <label>Keywords</label>
-          <input 
-            type="text" 
-            formControlName="keyword"
-            placeholder="Job title, company, or skills...">
-        </div>
+  <section class="portal-stats">
+    <article class="stat-card open">
+      <span>Open Roles</span>
+      <strong>{{ filteredJobs.length }}</strong>
+      <p>{{ totalOpenings }} total openings across active notifications</p>
+    </article>
+    <article class="stat-card featured">
+      <span>Featured</span>
+      <strong>{{ featuredCount }}</strong>
+      <p>Priority hiring campaigns with stronger response windows</p>
+    </article>
+    <article class="stat-card saved">
+      <span>Saved</span>
+      <strong>{{ savedCount }}</strong>
+      <p>Shortlisted for later review and follow-up</p>
+    </article>
+    <article class="stat-card applied">
+      <span>Applied</span>
+      <strong>{{ appliedCount }}</strong>
+      <p>Already synced into your student applications flow</p>
+    </article>
+  </section>
 
-        <div class="filter-group">
-          <label>Location</label>
-          <input 
-            type="text" 
-            formControlName="location"
-            placeholder="City or state...">
-        </div>
+  <section class="filters-panel">
+    <form [formGroup]="portalForm" class="filters-grid">
+      <label class="field wide">
+        <span>Search</span>
+        <input formControlName="keyword" placeholder="Role, company, skills, or hiring keywords" />
+      </label>
 
-        <div class="filter-group">
-          <label>Job Type</label>
-          <select formControlName="jobType">
-            <option value="">All Types</option>
-            <option value="full-time">Full Time</option>
-            <option value="part-time">Part Time</option>
-            <option value="internship">Internship</option>
-          </select>
-        </div>
+      <label class="field">
+        <span>Location</span>
+        <input formControlName="location" placeholder="City or preferred region" />
+      </label>
 
-        <div class="filter-group">
-          <label>Experience</label>
-          <select formControlName="experience">
-            <option value="">Any Experience</option>
-            <option value="fresher">Fresher</option>
-            <option value="0-2">0-2 years</option>
-            <option value="2-5">2-5 years</option>
-            <option value="5+">5+ years</option>
-          </select>
-        </div>
-      </div>
+      <label class="field">
+        <span>Category</span>
+        <select formControlName="category">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+        </select>
+      </label>
 
-      <div class="filter-actions">
-        <button 
-          type="button" 
-          class="clear-btn"
-          (click)="onClearFilters()">
-          Clear Filters
-        </button>
-        <button 
-          type="button" 
-          class="search-btn"
-          (click)="onSearch()">
-          Search Jobs
-        </button>
-      </div>
+      <label class="field">
+        <span>Job Type</span>
+        <select formControlName="jobType">
+          <option value="">All Types</option>
+          <option value="full-time">Full Time</option>
+          <option value="part-time">Part Time</option>
+          <option value="internship">Internship</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Work Mode</span>
+        <select formControlName="workMode">
+          <option value="">Any Mode</option>
+          <option value="Remote">Remote</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="On-site">On-site</option>
+        </select>
+      </label>
+
+      <label class="save-toggle">
+        <input type="checkbox" formControlName="savedOnly" />
+        <span>Show saved jobs only</span>
+      </label>
     </form>
-  </div>
 
-  <!-- Results Section -->
-  <div class="results-section">
-    <div class="results-header">
+    <div class="panel-actions">
+      <button type="button" class="secondary-btn" (click)="clearFilters()">Clear Filters</button>
+      <button type="button" class="primary-btn" (click)="browseAllJobs()">Browse All Jobs</button>
+    </div>
+  </section>
+
+  <section class="jobs-head">
+    <div>
       <h2>Job Opportunities</h2>
-      <span class="results-count">{{ filteredJobs.length }} jobs found</span>
+      <p>Professional recruitment notifications arranged as actionable portal cards.</p>
     </div>
+    <span class="results-badge">{{ filteredJobs.length }} jobs visible</span>
+  </section>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading jobs...</p>
-    </div>
-
-    <!-- Jobs List -->
-    <div *ngIf="!isLoading" class="jobs-list">
-      <div 
-        *ngFor="let job of filteredJobs" 
-        class="job-card"
-        [class.featured]="job.positions > 5">
-        
-        <!-- Job Header -->
-        <div class="job-header">
-          <div class="company-info">
-            <div class="company-logo">
-              {{ job.companyName.charAt(0) }}
-            </div>
-            <div class="job-details">
-              <h3 class="job-title">{{ job.title }}</h3>
+  <section class="jobs-grid" *ngIf="filteredJobs.length > 0; else emptyState">
+    <article class="job-card" *ngFor="let job of filteredJobs">
+      <div class="card-top">
+        <div>
+          <div class="company-row">
+            <span class="company-mark">{{ job.companyName.charAt(0) }}</span>
+            <div>
               <p class="company-name">{{ job.companyName }}</p>
-              <p class="job-location">
-                <i class="fas fa-map-marker-alt"></i>
-                {{ job.location }}
-              </p>
+              <h3>{{ job.title }}</h3>
             </div>
           </div>
-          <div class="job-meta">
-            <span class="job-type {{ getJobTypeClass(job.type) }}">
-              {{ job.type }}
-            </span>
-            <span class="salary">
-              ₹{{ job.salary.min/1000 }}k - ₹{{ job.salary.max/1000 }}k
-            </span>
+
+          <div class="badge-row">
+            <span class="mini-badge work">{{ job.workMode }}</span>
+            <span class="mini-badge type">{{ job.type | titlecase }}</span>
+            <span class="mini-badge hot" *ngIf="job.hot">Hot</span>
+            <span class="mini-badge featured" *ngIf="job.featured">Featured</span>
+            <span class="mini-badge applied" *ngIf="isApplied(job.id)">Applied</span>
           </div>
         </div>
 
-        <!-- Job Description -->
-        <div class="job-description">
-          <p>{{ job.description | slice:0:150 }}...</p>
-        </div>
-
-        <!-- Skills Required -->
-        <div class="skills-section">
-          <h4>Skills Required:</h4>
-          <div class="skills-list">
-            <span 
-              *ngFor="let skill of job.skillsRequired.slice(0, 4)" 
-              class="skill-tag">
-              {{ skill }}
-            </span>
-            <span *ngIf="job.skillsRequired.length > 4" class="skill-more">
-              +{{ job.skillsRequired.length - 4 }} more
-            </span>
-          </div>
-        </div>
-
-        <!-- Job Footer -->
-        <div class="job-footer">
-          <div class="job-stats">
-            <span class="deadline">
-              <i class="fas fa-clock"></i>
-              Apply before {{ job.applicationDeadline | date:'mediumDate' }}
-            </span>
-            <span class="positions">
-              <i class="fas fa-users"></i>
-              {{ job.positions }} positions
-            </span>
-          </div>
-          <div class="job-actions">
-        <button 
-          class="view-btn"
-          [routerLink]="['/job-details', job.id]">
-          View Details
-        </button>
-        <button 
-          class="apply-btn"
-          [routerLink]="['/apply-job', job.id]">
-          Apply Now
+        <button type="button" class="save-btn" [class.active]="isSaved(job.id)" (click)="toggleSave(job.id)">
+          {{ isSaved(job.id) ? 'Saved' : 'Save' }}
         </button>
       </div>
 
-        <!-- Featured Badge -->
-        <div *ngIf="job.positions > 5" class="featured-badge">
-          <i class="fas fa-star"></i>
-          Featured
-        </div>
-      </div>
-    </div>
+      <p class="tagline">{{ job.companyTagline }}</p>
 
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && filteredJobs.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-search"></i>
+      <div class="info-grid">
+        <div><span>Location</span><strong>{{ job.location }}</strong></div>
+        <div><span>Experience</span><strong>{{ job.experience }}</strong></div>
+        <div><span>Salary</span><strong>INR {{ job.salary.min / 1000 }}k - {{ job.salary.max / 1000 }}k</strong></div>
+        <div><span>Deadline</span><strong>{{ job.applicationDeadline | date:'mediumDate' }}</strong></div>
       </div>
-      <h3>No jobs found</h3>
-      <p>Try adjusting your search criteria or browse all jobs</p>
-      <button 
-        class="browse-all-btn"
-        (click)="onClearFilters()">
-        Browse All Jobs
-      </button>
-    </div>
-  </div>
+
+      <div class="points-list">
+        <div *ngFor="let point of job.summaryPoints">{{ point }}</div>
+      </div>
+
+      <div class="skill-row">
+        <span *ngFor="let skill of job.skillsRequired.slice(0, 4)">{{ skill }}</span>
+        <span *ngIf="job.skillsRequired.length > 4">+{{ job.skillsRequired.length - 4 }} more</span>
+      </div>
+
+      <div class="card-actions">
+        <a class="secondary-btn link-btn" [routerLink]="['/student/job-portals', job.id]">View Details</a>
+        <a class="primary-btn link-btn" [routerLink]="['/student/applications/apply', job.id]" [class.disabled-link]="isApplied(job.id)">
+          {{ isApplied(job.id) ? 'Already Applied' : 'Apply Now' }}
+        </a>
+      </div>
+    </article>
+  </section>
+
+  <ng-template #emptyState>
+    <section class="empty-state">
+      <h3>No matching jobs found</h3>
+      <p>Try adjusting your filters or browse all jobs in the portal.</p>
+      <button type="button" class="primary-btn" (click)="browseAllJobs()">Browse All Jobs</button>
+    </section>
+  </ng-template>
 </div>

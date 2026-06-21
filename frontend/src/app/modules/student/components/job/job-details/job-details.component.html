@@ -1,184 +1,81 @@
-<div class="job-details-container">
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Loading job details...</p>
-  </div>
+<section class="job-detail-shell" *ngIf="job; else missingJob">
+  <header class="detail-hero">
+    <button class="back-btn" (click)="onBack()">Back to Job Portal</button>
 
-  <!-- Job Details -->
-  <div *ngIf="!isLoading && job" class="job-details">
-    <!-- Header Section -->
-    <div class="job-header">
-      <button class="back-btn" (click)="onBack()">
-        <i class="fas fa-arrow-left"></i> Back to Jobs
-      </button>
-      
-      <div class="header-content">
-        <div class="company-section">
-          <div class="company-logo">
-            {{ job.companyName.charAt(0) }}
-          </div>
-          <div class="job-info">
-            <h1>{{ job.title }}</h1>
-            <h2>{{ job.companyName }}</h2>
-            <div class="job-meta">
-              <span class="location">
-                <i class="fas fa-map-marker-alt"></i>
-                {{ job.location }}
-              </span>
-              <span class="type {{ job.type }}">
-                {{ job.type }}
-              </span>
-              <span class="salary">
-                <i class="fas fa-money-bill-wave"></i>
-                ₹{{ job.salary.min/1000 }}k - ₹{{ job.salary.max/1000 }}k
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="action-section">
-          <div class="skills-match">
-            <div class="match-circle">
-              <span class="percentage">{{ skillsMatchPercentage }}%</span>
-              <span class="label">Match</span>
-            </div>
-            <p>Your skills match this job</p>
-          </div>
-
-          <div class="apply-actions">
-            <button 
-              *ngIf="!hasApplied && !isApplicationDeadlinePassed()"
-              class="apply-btn primary"
-              (click)="onApply()">
-              Apply Now
-            </button>
-            <button 
-              *ngIf="hasApplied"
-              class="apply-btn applied"
-              disabled>
-              <i class="fas fa-check"></i> Applied
-            </button>
-            <button 
-              *ngIf="isApplicationDeadlinePassed()"
-              class="apply-btn expired"
-              disabled>
-              Application Closed
-            </button>
-            
-            <button class="save-btn">
-              <i class="fas fa-bookmark"></i> Save
-            </button>
+    <div class="hero-grid">
+      <div class="company-block">
+        <div class="company-logo">{{ job.companyName.charAt(0) }}</div>
+        <div>
+          <p class="company-kicker">{{ job.companyName }}</p>
+          <h1>{{ job.title }}</h1>
+          <p class="hero-copy">{{ job.companyTagline }}</p>
+          <div class="hero-badges">
+            <span>{{ job.location }}</span>
+            <span>{{ job.workMode }}</span>
+            <span>{{ job.type | titlecase }}</span>
+            <span *ngIf="job.hot">Hot Hiring</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="job-content">
-      <div class="main-content">
-        <!-- Job Description -->
-        <section class="description-section">
-          <h3>Job Description</h3>
-          <div class="description-content">
-            <p>{{ job.description }}</p>
-          </div>
-        </section>
-
-        <!-- Requirements -->
-        <section class="requirements-section">
-          <h3>Requirements</h3>
-          <ul class="requirements-list">
-            <li *ngFor="let requirement of job.requirements">{{ requirement }}</li>
-          </ul>
-        </section>
-
-        <!-- Skills Required -->
-        <section class="skills-section">
-        <h3>Skills Required</h3>
-        <div class="skills-list">
-            <span 
-            *ngFor="let skill of job.skillsRequired" 
-            class="skill-tag"
-            [class.matched]="(student?.skills || []).includes(skill)">
-            {{ skill }}
-            <span *ngIf="(student?.skills || []).includes(skill)" class="match-indicator">
-                ✓
-            </span>
-            </span>
+      <div class="action-panel">
+        <div class="match-box">
+          <strong>{{ skillsMatchPercentage }}%</strong>
+          <span>estimated profile match</span>
         </div>
-        </section>
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <!-- Job Summary -->
-        <div class="summary-card">
-          <h4>Job Summary</h4>
-          <div class="summary-list">
-            <div class="summary-item">
-              <i class="fas fa-briefcase"></i>
-              <div>
-                <span class="label">Job Type</span>
-                <span class="value">{{ job.type | titlecase }}</span>
-              </div>
-            </div>
-            <div class="summary-item">
-              <i class="fas fa-map-marker-alt"></i>
-              <div>
-                <span class="label">Location</span>
-                <span class="value">{{ job.location }}</span>
-              </div>
-            </div>
-            <div class="summary-item">
-              <i class="fas fa-money-bill-wave"></i>
-              <div>
-                <span class="label">Salary</span>
-                <span class="value">₹{{ job.salary.min/1000 }}k - ₹{{ job.salary.max/1000 }}k</span>
-              </div>
-            </div>
-            <div class="summary-item">
-              <i class="fas fa-users"></i>
-              <div>
-                <span class="label">Positions</span>
-                <span class="value">{{ job.positions }}</span>
-              </div>
-            </div>
-            <div class="summary-item">
-              <i class="fas fa-calendar-times"></i>
-              <div>
-                <span class="label">Apply Before</span>
-                <span class="value">{{ job.applicationDeadline | date:'mediumDate' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Company Info -->
-        <div class="company-card">
-          <h4>About Company</h4>
-          <div class="company-info">
-            <div class="company-logo-small">
-              {{ job.companyName.charAt(0) }}
-            </div>
-            <h5>{{ job.companyName }}</h5>
-            <p class="company-description">
-              Leading technology company specializing in innovative solutions.
-            </p>
-            <button class="view-company-btn">
-              View Company Profile
-            </button>
-          </div>
+        <div class="action-row">
+          <a *ngIf="!hasApplied && !isApplicationDeadlinePassed()" class="apply-btn" [routerLink]="['/student/applications/apply', job.id]">Apply Now</a>
+          <button *ngIf="hasApplied" class="apply-btn applied" disabled>Applied</button>
+          <button *ngIf="isApplicationDeadlinePassed()" class="apply-btn expired" disabled>Closed</button>
+          <button class="save-btn" (click)="onSaveJob()">{{ isSaved ? 'Saved for Later' : 'Save Job' }}</button>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Error State -->
-  <div *ngIf="!isLoading && !job" class="error-state">
-    <i class="fas fa-exclamation-triangle"></i>
-    <h3>Job Not Found</h3>
-    <p>The job you're looking for doesn't exist or has been removed.</p>
-    <button class="back-to-jobs-btn" (click)="onBack()">
-      Back to Job Search
-    </button>
-  </div>
-</div>
+  <section class="detail-grid">
+    <article class="panel">
+      <h3>Role Overview</h3>
+      <p>{{ job.description }}</p>
+      <div class="summary-points">
+        <div *ngFor="let point of job.summaryPoints">{{ point }}</div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <h3>Job Snapshot</h3>
+      <div class="info-grid">
+        <div><span>Category</span><strong>{{ job.category }}</strong></div>
+        <div><span>Experience</span><strong>{{ job.experience }}</strong></div>
+        <div><span>Openings</span><strong>{{ job.positions }}</strong></div>
+        <div><span>Deadline</span><strong>{{ job.applicationDeadline | date:'mediumDate' }}</strong></div>
+        <div><span>Compensation</span><strong>INR {{ job.salary.min / 1000 }}k - {{ job.salary.max / 1000 }}k</strong></div>
+        <div><span>Work Mode</span><strong>{{ job.workMode }}</strong></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="detail-grid">
+    <article class="panel">
+      <h3>Requirements</h3>
+      <ul class="requirements-list">
+        <li *ngFor="let requirement of job.requirements">{{ requirement }}</li>
+      </ul>
+    </article>
+
+    <article class="panel">
+      <h3>Skills Recruitment Focus</h3>
+      <div class="skills-list">
+        <span *ngFor="let skill of job.skillsRequired">{{ skill }}</span>
+      </div>
+    </article>
+  </section>
+</section>
+
+<ng-template #missingJob>
+  <section class="missing-shell">
+    <h2>Job notification not found</h2>
+    <p>The selected opportunity is unavailable. Return to the job portal for other active recruitment notifications.</p>
+    <button class="apply-btn" (click)="onBack()">Back to Job Portal</button>
+  </section>
+</ng-template>

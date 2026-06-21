@@ -1,64 +1,279 @@
-<div class="placement-drives-container">
-  <div class="header">
-    <h2>Upcoming Placement Drives</h2>
-    <p>Register for companies visiting our campus</p>
-  </div>
+<div class="placement-drives-page">
+  <section class="page-header">
+    <div class="header-copy">
+      <p class="eyebrow">Student Placement Drives</p>
+      <h2>Find the drives that match your profile best</h2>
+      <p class="header-text">
+        Explore student-facing placement opportunities tailored to your branch, CGPA, graduation year, and current skill profile.
+      </p>
 
-  <div class="drives-grid">
-    <div *ngFor="let drive of placementDrives" 
-         class="drive-card" 
-         [class.registered]="isRegistered(drive.id)"
-         [class.expired]="!canRegister(drive)">
-      
-      <div class="drive-header">
-        <h3>{{ drive.companyName }}</h3>
-        <span class="package">{{ drive.package }}</span>
-      </div>
-
-      <div class="drive-content">
-        <p class="job-title">{{ drive.jobTitle }}</p>
-        <p class="description">{{ drive.description }}</p>
-        
-        <div class="drive-details">
-          <div class="detail-item">
-            <span class="label">Location:</span>
-            <span>{{ drive.location }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Drive Date:</span>
-            <span>{{ drive.driveDate | date:'mediumDate' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Registration Deadline:</span>
-            <span>{{ drive.registrationDeadline | date:'mediumDate' }}</span>
-          </div>
-        </div>
-
-        <div class="eligibility">
-          <h4>Eligibility Criteria:</h4>
-          <ul>
-            <li>Min CGPA: {{ drive.eligibility.minCGPA }}</li>
-            <li>Branches: {{ drive.eligibility.allowedBranches.join(', ') }}</li>
-            <li>Backlogs: {{ drive.eligibility.backlogAllowed ? 'Allowed' : 'Not Allowed' }}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="drive-actions">
-        <button *ngIf="!isRegistered(drive.id) && canRegister(drive)"
-                (click)="registerForDrive(drive.id)"
-                class="btn-register">
-          Register
-        </button>
-        <button *ngIf="isRegistered(drive.id)"
-                class="btn-registered" disabled>
-          Registered
-        </button>
-        <button *ngIf="!canRegister(drive)"
-                class="btn-expired" disabled>
-          Registration Closed
-        </button>
+      <div class="header-pills">
+        <span>{{ visibleDrives.length }} visible drives</span>
+        <span>{{ studentProfile.skills.length }} tracked skills</span>
+        <span>Batch {{ studentProfile.graduationYear }}</span>
       </div>
     </div>
-  </div>
+
+    <div class="student-snapshot">
+      <div class="snapshot-avatar">{{ studentProfile.name[0] }}</div>
+      <div class="snapshot-copy">
+        <h3>{{ studentProfile.name }}</h3>
+        <p>{{ studentProfile.branch }}</p>
+        <p>CGPA {{ studentProfile.cgpa }} | {{ studentProfile.activeBacklogs }} backlog(s)</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-grid">
+    <article class="stat-card total">
+      <div class="stat-icon" aria-hidden="true"></div>
+      <div class="stat-info">
+        <h3>{{ totalDriveCount }}</h3>
+        <p>Total Drives</p>
+      </div>
+      <span class="stat-note">All open listings</span>
+    </article>
+
+    <article class="stat-card eligible">
+      <div class="stat-icon" aria-hidden="true"></div>
+      <div class="stat-info">
+        <h3>{{ eligibleDriveCount }}</h3>
+        <p>Eligible Now</p>
+      </div>
+      <span class="stat-note">Ready to apply</span>
+    </article>
+
+    <article class="stat-card registered">
+      <div class="stat-icon" aria-hidden="true"></div>
+      <div class="stat-info">
+        <h3>{{ registeredDriveCount }}</h3>
+        <p>Registered</p>
+      </div>
+      <span class="stat-note">Saved applications</span>
+    </article>
+
+    <article class="stat-card closing">
+      <div class="stat-icon" aria-hidden="true"></div>
+      <div class="stat-info">
+        <h3>{{ closingSoonCount }}</h3>
+        <p>Closing Soon</p>
+      </div>
+      <span class="stat-note">Within 7 days</span>
+    </article>
+  </section>
+
+  <section class="filters-card">
+    <div class="search-shell">
+      <span class="search-icon" aria-hidden="true"></span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="Search by company, role, package, or location..."
+        class="search-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="filter-select">
+        <option value="all">All Status</option>
+        <option value="eligible">Eligible</option>
+        <option value="registered">Registered</option>
+        <option value="closed">Closed</option>
+        <option value="ineligible">Not Eligible</option>
+      </select>
+
+      <select [(ngModel)]="modeFilter" (change)="applyFilters()" class="filter-select">
+        <option value="all">All Modes</option>
+        <option value="On Campus">On Campus</option>
+        <option value="Virtual">Virtual</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+    </div>
+
+    <button type="button" class="toggle-btn" [class.active]="showOnlyEligible" (click)="toggleEligibleFilter()">
+      {{ showOnlyEligible ? 'Eligible Only' : 'Show All Drives' }}
+    </button>
+  </section>
+
+  <section class="drives-grid" *ngIf="visibleDrives.length; else noDrives">
+    <article
+      *ngFor="let drive of visibleDrives"
+      class="drive-card"
+      [class.selected]="selectedDrive?.id === drive.id"
+      [ngClass]="'status-' + getDriveStatus(drive)"
+      (click)="selectDrive(drive.id)">
+      <div class="card-top">
+        <span class="company-badge">{{ drive.companyName }}</span>
+        <span class="status-pill" [ngClass]="getDriveStatus(drive)">{{ getDriveStatusLabel(drive) }}</span>
+      </div>
+
+      <div class="card-body">
+        <h3>{{ drive.jobTitle }}</h3>
+        <p class="drive-description">{{ drive.description }}</p>
+
+        <div class="meta-grid">
+          <div>
+            <span class="meta-label">Drive Date</span>
+            <strong>{{ drive.driveDate | date:'MMM d, y' }}</strong>
+          </div>
+          <div>
+            <span class="meta-label">Location</span>
+            <strong>{{ drive.location }}</strong>
+          </div>
+          <div>
+            <span class="meta-label">Package</span>
+            <strong>{{ drive.package }}</strong>
+          </div>
+          <div>
+            <span class="meta-label">Openings</span>
+            <strong>{{ drive.openings }}</strong>
+          </div>
+        </div>
+
+        <div class="tag-row">
+          <span class="chip">CGPA >= {{ drive.eligibility.minCGPA }}</span>
+          <span class="chip">{{ drive.mode }}</span>
+          <span class="chip">{{ drive.eligibility.allowedBranches.join(', ') }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="deadline-note">{{ getDeadlineLabel(drive) }}</div>
+
+        <div class="card-actions">
+          <button type="button" class="ghost-btn" (click)="selectDrive(drive.id); $event.stopPropagation()">
+            View Match
+          </button>
+
+          <button
+            *ngIf="!isRegistered(drive.id) && selectedDrive?.id === drive.id && selectedDriveEvaluation?.eligible && canRegister(drive)"
+            type="button"
+            class="primary-btn"
+            (click)="registerForDrive(drive.id); $event.stopPropagation()">
+            Register
+          </button>
+
+          <button
+            *ngIf="!isRegistered(drive.id) && selectedDrive?.id !== drive.id && evaluateDrive(drive).eligible && canRegister(drive)"
+            type="button"
+            class="primary-btn"
+            (click)="selectDrive(drive.id); $event.stopPropagation()">
+            Review First
+          </button>
+
+          <button *ngIf="isRegistered(drive.id)" type="button" class="state-btn registered" disabled>
+            Registered
+          </button>
+
+          <button *ngIf="!isRegistered(drive.id) && !canRegister(drive)" type="button" class="state-btn closed" disabled>
+            Closed
+          </button>
+
+          <button
+            *ngIf="!isRegistered(drive.id) && canRegister(drive) && !evaluateDrive(drive).eligible"
+            type="button"
+            class="state-btn blocked"
+            disabled>
+            Not Eligible
+          </button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="selected-drive-panel" *ngIf="selectedDrive as drive">
+    <div class="selected-header">
+      <div>
+        <p class="eyebrow">{{ drive.companyName }}</p>
+        <h3>{{ drive.jobTitle }}</h3>
+        <p class="selected-copy">{{ drive.description }}</p>
+      </div>
+      <span class="package-pill">{{ drive.package }}</span>
+    </div>
+
+    <div class="detail-grid">
+      <article>
+        <span class="meta-label">Drive Date</span>
+        <strong>{{ drive.driveDate | date:'mediumDate' }}</strong>
+      </article>
+      <article>
+        <span class="meta-label">Registration Deadline</span>
+        <strong>{{ drive.registrationDeadline | date:'mediumDate' }}</strong>
+      </article>
+      <article>
+        <span class="meta-label">Mode</span>
+        <strong>{{ drive.mode }}</strong>
+      </article>
+      <article>
+        <span class="meta-label">Location</span>
+        <strong>{{ drive.location }}</strong>
+      </article>
+      <article>
+        <span class="meta-label">Openings</span>
+        <strong>{{ drive.openings }}</strong>
+      </article>
+      <article>
+        <span class="meta-label">Registration</span>
+        <strong>{{ isRegistered(drive.id) ? 'Completed' : canRegister(drive) ? 'Open' : 'Closed' }}</strong>
+      </article>
+    </div>
+
+    <div class="eligibility-card" *ngIf="selectedDriveEvaluation as evaluation">
+      <div class="eligibility-header">
+        <div>
+          <p class="eyebrow small">Eligibility Check</p>
+          <h4>See how your profile fits this drive</h4>
+        </div>
+        <span class="status-pill" [ngClass]="evaluation.eligible ? 'eligible' : 'ineligible'">
+          {{ evaluation.eligible ? 'You are eligible' : 'You are not eligible' }}
+        </span>
+      </div>
+
+      <div class="criteria-grid">
+        <article>
+          <span class="meta-label">Required CGPA</span>
+          <strong>{{ drive.eligibility.minCGPA }}</strong>
+        </article>
+        <article>
+          <span class="meta-label">Allowed Branches</span>
+          <strong>{{ drive.eligibility.allowedBranches.join(', ') }}</strong>
+        </article>
+        <article>
+          <span class="meta-label">Backlog Rule</span>
+          <strong>{{ drive.eligibility.backlogAllowed ? 'Allowed' : 'Not allowed' }}</strong>
+        </article>
+        <article>
+          <span class="meta-label">Graduation Batches</span>
+          <strong>{{ drive.eligibility.graduationYears.join(', ') }}</strong>
+        </article>
+      </div>
+
+      <div class="match-panel" *ngIf="evaluation.eligible; else mismatchBlock">
+        <p class="panel-title">Matched skills from your profile</p>
+        <div class="skill-chips">
+          <span class="chip" *ngFor="let skill of evaluation.matchedSkills">{{ skill }}</span>
+          <span class="chip muted" *ngIf="!evaluation.matchedSkills.length">General eligibility matched</span>
+        </div>
+      </div>
+
+      <ng-template #mismatchBlock>
+        <div class="reason-panel">
+          <p class="panel-title">Why this drive is unavailable</p>
+          <ul>
+            <li *ngFor="let reason of evaluation.reasons">{{ reason }}</li>
+          </ul>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <ng-template #noDrives>
+    <section class="empty-state">
+      <h3>No matching drives right now</h3>
+      <p>
+        There are no drives visible for your current search or filters. Try showing all drives or updating your profile details to unlock more opportunities.
+      </p>
+    </section>
+  </ng-template>
 </div>

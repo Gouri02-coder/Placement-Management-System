@@ -14,6 +14,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByDepartment(String department);
     List<Student> findByCourse(String course);
     List<Student> findByYear(Integer year);
+    List<Student> findByVerifiedByAdminTrue();
+    List<Student> findByRejectedByAdminTrue();
     
     @Query("SELECT s FROM Student s WHERE s.cgpa >= :minCgpa")
     List<Student> findByCgpaGreaterThanEqual(Double minCgpa);

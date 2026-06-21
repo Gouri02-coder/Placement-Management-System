@@ -1,22 +1,107 @@
-<section class="pto-component-shell">
+<section class="pto-component-shell" *ngIf="drive; else driveNotFound">
   <header class="hero-card">
-    <p class="eyebrow">PTO Component</p>
-    <h2>{{ title }}</h2>
-    <p class="subtitle">{{ subtitle }}</p>
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">{{ drive.companyName }}</p>
+        <h2>{{ drive.title }}</h2>
+        <p class="subtitle">{{ drive.description }}</p>
+      </div>
+      <span class="status-pill" [class]="drive.status.toLowerCase()">{{ drive.status }}</span>
+    </div>
+
+    <div class="hero-meta">
+      <span>{{ drive.driveType.replace('_', ' ') }}</span>
+      <span>{{ drive.mode }}</span>
+      <span>{{ drive.location || 'Virtual' }}</span>
+    </div>
   </header>
 
   <div class="metric-grid">
-    <article class="metric-card" *ngFor="let metric of metrics">
-      <span>{{ metric.label }}</span>
-      <strong>{{ metric.value }}</strong>
-      <p>{{ metric.note }}</p>
+    <article class="metric-card">
+      <span>Registered Students</span>
+      <strong>{{ drive.registeredStudents }}</strong>
+      <p>Students currently enrolled for this drive</p>
+    </article>
+    <article class="metric-card">
+      <span>Selected Students</span>
+      <strong>{{ drive.selectedStudents }}</strong>
+      <p>Candidates moved to final selection</p>
+    </article>
+    <article class="metric-card">
+      <span>Total Openings</span>
+      <strong>{{ totalOpenings }}</strong>
+      <p>Total openings across all listed roles</p>
+    </article>
+  </div>
+
+  <div class="details-grid">
+    <article class="content-card">
+      <h3>Schedule</h3>
+      <div class="detail-row">
+        <span>Start Date</span>
+        <strong>{{ drive.startDate | date:'MMM d, yyyy' }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>End Date</span>
+        <strong>{{ drive.endDate | date:'MMM d, yyyy' }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>Registration Deadline</span>
+        <strong>{{ drive.registrationDeadline | date:'MMM d, yyyy' }}</strong>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <h3>Eligibility</h3>
+      <div class="detail-row">
+        <span>Minimum CGPA</span>
+        <strong>{{ drive.eligibilityCriteria.minCgpa }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>Allowed Years</span>
+        <strong>{{ allowedYearsText }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>Allowed Branches</span>
+        <strong>{{ allowedBranchesText }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>Backlogs Allowed</span>
+        <strong>{{ drive.eligibilityCriteria.backlogsAllowed ? 'Yes' : 'No' }}</strong>
+      </div>
     </article>
   </div>
 
   <article class="content-card">
-    <h3>Ready For Extension</h3>
-    <ul>
-      <li *ngFor="let item of highlights">{{ item }}</li>
-    </ul>
+    <h3>Open Positions</h3>
+    <div class="position-list">
+      <div class="position-card" *ngFor="let position of drive.positions">
+        <div>
+          <strong>{{ position.title }}</strong>
+          <p>{{ position.location }}</p>
+        </div>
+        <div class="position-meta">
+          <span>{{ position.openings }} openings</span>
+          <span>{{ position.package | number }} package</span>
+        </div>
+      </div>
+    </div>
   </article>
+
+  <div class="actions">
+    <button class="back-btn" (click)="goBack()">Back to Drive List</button>
+  </div>
 </section>
+
+<ng-template #driveNotFound>
+  <section class="pto-component-shell">
+    <article class="content-card">
+      <p class="eyebrow">Drive Details</p>
+      <h2>Drive not found</h2>
+      <p class="subtitle">The selected drive is not available in the current static drive store.</p>
+      <div class="actions">
+        <button class="back-btn" (click)="goBack()">Back to Drive List</button>
+      </div>
+    </article>
+  </section>
+</ng-template>
